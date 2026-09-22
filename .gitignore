@@ -19,8 +19,8 @@ Thumbs.db
 *.tmp
 
 # Documentos generados (se regeneran con los scripts)
+# NOTA: los PDF de la doc SI viajan por git (para tenerlos en ambas PC).
 documentacion/*.html
-documentacion/*.pdf
 
 # Respaldos de la base de datos (no deben ir por git)
 respaldo/
