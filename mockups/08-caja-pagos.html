@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FINAN-X · Mockup 08 · Caja / Pagos</title>
+  <link rel="stylesheet" href="mockup-style.css">
+</head>
+<body>
+
+  <div class="topbar">
+    <span class="brand">FINAN<span class="dot">·</span>X</span>
+    <span class="tag">Prototipo</span>
+    <span class="nav-pills">
+      <span>Inicio</span><span>Clientes</span><span>Productos</span>
+      <span>Pedidos</span><span>Facturas</span><span class="active">Caja</span><span>Retorno</span><span>Reportes</span>
+    </span>
+  </div>
+
+  <div class="banner">🧩 Pantalla 08 de 14 — <b>Caja: registro de pagos</b>. El cajero elige factura, valor y método; si el método es tarjeta/transferencia/cheque se exigen los datos en línea de este modal.</div>
+
+  <div class="row">
+    <div class="col">
+      <div class="panel">
+        <h2 class="panel-title">Nuevo pago</h2>
+        <p class="panel-sub">Paso 1 · Datos del pago</p>
+        <label>Factura</label>
+        <select><option>FAC-000136 · Pedro Suárez · Saldo $ 2.653.000</option><option>FAC-000134 · María F. López · Saldo $ 5.867.700</option></select>
+        <label>Valor a pagar</label>
+        <input placeholder="Máximo: el saldo de la factura (nunca se acepta sobrepago)" class="phg">
+        <label>Método de pago</label>
+        <select>
+          <option>EFECTIVO — sin datos adicionales</option>
+          <option selected>TARJETA — requiere datos de la tarjeta</option>
+          <option>TRANSFERENCIA — requiere banco, cuenta y referencia</option>
+          <option>CHEQUE — requiere banco y número de cheque</option>
+        </select>
+        <label>Referencia / observaciones (opcional)</label>
+        <input placeholder="Ej.: comprobante 4521" class="phg">
+        <div style="margin-top:14px"><a class="btn primary">Continuar con los datos del medio de pago →</a></div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="modal-bg">
+        <div class="modal-title">Paso 2 · Datos de la tarjeta</div>
+        <p class="panel-sub">Se validan (Luhn, vigencia) pero <b>no se guardan</b>: solo quedan marca, últimos 4 dígitos, vencimiento, banco y titular.</p>
+        <label>Número de tarjeta</label>
+        <input placeholder="4111 1111 1111 1111" class="phg">
+        <div class="row" style="gap:10px">
+          <div class="col"><label>CVV (3-4 dígitos)</label><input placeholder="•••" class="phg"></div>
+          <div class="col"><label>Vencimiento (MM/AA)</label><input placeholder="12/30" class="phg"></div>
+        </div>
+        <label>Banco emisor</label>
+        <input placeholder="Bancolombia" class="phg">
+        <label>Titular</label>
+        <input placeholder="Nombre como aparece en la tarjeta" class="phg">
+        <div class="demo-box" style="color:var(--warn)">🔒 El CVV y el número completo se descartan al terminar. Nunca se almacenan (ninguna base, ningún registro).</div>
+        <div style="margin-top:14px;display:flex;gap:10px">
+          <a class="btn primary">Registrar pago →</a><a class="btn">Cancelar</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2 class="panel-title">Últimos pagos</h2>
+    <table>
+      <tr><th>N.º</th><th>Factura</th><th>Valor</th><th>Método</th><th>Medio (no sensible)</th><th>Estado</th></tr>
+      <tr><td>PAGO-000110</td><td>FAC-000135</td><td>$ 24.990.000</td><td>Tarjeta</td><td><span class="chip blue">VISA ····1111 · vence 12/30 · Bancolombia</span></td><td><span class="chip green">Aplicado</span></td></tr>
+      <tr><td>PAGO-000109</td><td>FAC-000134</td><td>$ 5.000.000</td><td>Transferencia</td><td><span class="chip blue">Bancolombia · cuenta ····7890 · ref. 4521</span></td><td><span class="chip green">Aplicado</span></td></tr>
+      <tr><td>PAGO-000108</td><td>FAC-000136</td><td>$ 800.000</td><td>Efectivo</td><td>—</td><td><span class="chip green">Aplicado</span></td></tr>
+    </table>
+  </div>
+
+  <div class="footer">FINAN-X · Mockup 08 · Caja / Pagos · <strong>Prototipo de demostración — no es la aplicación final</strong></div>
+
+</body>
+</html>

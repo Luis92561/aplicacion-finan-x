@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FINAN-X · Mockup 01 · Inicio de sesión</title>
+  <link rel="stylesheet" href="mockup-style.css">
+</head>
+<body>
+
+  <div class="topbar">
+    <span class="brand">FINAN<span class="dot">·</span>X</span>
+    <span class="tag">Prototipo</span>
+    <span class="nav-pills"><a href="index.html" style="font-size:12px">← Volver a la galería</a></span>
+  </div>
+
+  <div class="banner">🧩 Pantalla 01 de 14 — <b>Inicio de sesión (interno y cliente)</b>. Pantalla de acceso con tres modos en pestañas: iniciar sesión, crear cuenta de cliente (mockup 13) y recuperar contraseña (mockup 02). Los internos entran al portal de usuarios (mockup 14).</div>
+
+  <div class="row">
+    <div class="col">
+      <div class="panel">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+          <span class="chip dashed">Iniciar sesión</span>
+          <span class="chip">Crear cuenta de cliente → mockup 13</span>
+          <span class="chip">¿Olvidaste tu contraseña? → mockup 02</span>
+        </div>
+        <h2 class="panel-title">Iniciar sesión</h2>
+        <p class="panel-sub">Acceso para usuarios internos (correo) y clientes (usuario)</p>
+
+        <label for="user">Usuario o correo</label>
+        <input id="user" placeholder="admin@finanx.test  o  cliente@finanx.test" class="phg">
+
+        <label for="pass">Contraseña</label>
+        <input id="pass" type="password" placeholder="················" class="phg">
+
+        <div style="margin-top:16px;display:flex;gap:10px;align-items:center">
+          <a class="btn primary">Ingresar</a>
+          <span class="field-hint">La contraseña se verifica cifrada (bcrypt) y el acceso entrega un carné digital (JWT) de 8 horas.</span>
+        </div>
+
+        <div class="demo-box">
+          <b>Tras iniciar sesión</b><br>
+          <span class="chip blue">Usuario interno</span> → portal de usuarios internos (mockup 14) ·  <span class="chip green">Cliente</span> → portal del cliente (mockup 11).
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="panel">
+        <h2 class="panel-title">Cuentas de ejemplo</h2>
+        <p class="panel-sub">Datos ficticios para la demostración</p>
+        <table>
+          <tr><th>Rol</th><th>Usuario</th><th>Clave</th></tr>
+          <tr><td>Administrador</td><td>admin@finanx.test</td><td>•••••••</td></tr>
+          <tr><td>Facturador</td><td>facturador@finanx.test</td><td>•••••••</td></tr>
+          <tr><td>Cajero</td><td>cajero@finanx.test</td><td>•••••••</td></tr>
+          <tr><td>Supervisor</td><td>supervisor@finanx.test</td><td>•••••••</td></tr>
+          <tr><td>Cliente (portal)</td><td>cliente@finanx.test</td><td>•••••••</td></tr>
+        </table>
+        <p class="field-hint" style="margin-top:10px">Anti fuerza bruta: tras 5 intentos fallidos desde la misma IP, el acceso se bloquea 15 minutos (un acierto lo libera).</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">FINAN-X · Mockup 01 · Inicio de sesión · <strong>Prototipo de demostración — no es la aplicación final</strong></div>
+
+</body>
+</html>

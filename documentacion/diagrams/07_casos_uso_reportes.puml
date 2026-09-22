@@ -1,0 +1,36 @@
+@startuml FINAN_X_Casos_Reportes
+' 7. Casos de uso de reportes e historial (RF-09, RF-10)
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangles
+skinparam actorStyle awesome
+
+actor "Gerente / Supervisor" as Super
+actor "Administrador" as Admin
+actor "Cliente" as Cliente
+
+rectangle "Reportes e historial" {
+  usecase "Generar reporte de facturación" as R1
+  usecase "Consultar historial financiero" as R2
+  usecase "Filtrar por rango de fechas" as R3
+  usecase "Consultar mi historial" as R4
+  usecase "Consultar auditoría de operaciones" as R5
+}
+
+Super --> R1
+Super --> R2
+Super --> R5
+
+Admin --> R1
+Admin --> R2
+Admin --> R5
+
+Cliente --> R4
+
+R1 ..> R3 : incluye
+
+note right of R4
+Historial construido exclusivamente
+con los registros del cliente autenticado.
+end note
+@enduml

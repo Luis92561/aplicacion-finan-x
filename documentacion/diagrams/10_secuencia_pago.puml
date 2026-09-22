@@ -1,0 +1,25 @@
+@startuml FINAN_X_Secuencia_Pago
+' 10. Secuencia de registro de pago (RF-04)
+actor "Responsable de Pagos" as Cajero
+participant "FINAN-X Web" as Web
+participant "Servicio de Pagos" as Pagos
+database "BD FINAN-X" as DB
+
+Cajero -> Web : Seleccionar factura
+Web -> Pagos : GET /api/facturas/{id}/saldo
+Pagos -> DB : Consultar total y pagos
+DB --> Pagos : Saldo pendiente
+Pagos --> Web : Saldo disponible
+Cajero -> Web : Ingresar valor y método de pago
+Web -> Pagos : POST /api/pagos { facturaId, valor, ... }
+Pagos -> DB : Validar valor ≤ saldo
+alt valor <= saldo
+  Pagos -> DB : INSERT pago + número
+  Pagos -> DB : INSERT auditoría
+  Pagos --> Web : 201 { saldo nuevo, estado_pago }
+  Web --> Cajero : Confirmación del pago
+else valor > saldo
+  Pagos --> Web : 400 El valor supera el saldo
+  Web --> Cajero : Mensaje de error
+end
+@enduml

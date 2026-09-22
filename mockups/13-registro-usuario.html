@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FINAN-X · Mockup 13 · Registro de usuario nuevo</title>
+  <link rel="stylesheet" href="mockup-style.css">
+</head>
+<body>
+
+  <div class="topbar">
+    <span class="brand">FINAN<span class="dot">·</span>X</span>
+    <span class="tag">Prototipo</span>
+    <span class="nav-pills"><a href="index.html" style="font-size:12px">← Volver a la galería</a></span>
+  </div>
+
+  <div class="banner">🧩 Pantalla 13 de 14 — <b>Registro de usuario nuevo (portal del cliente)</b>. Autoservicio: el cliente crea su cuenta y entra directamente a su portal. El administrador también puede crear la cuenta desde el módulo de Clientes (mockup 04).</div>
+
+  <div class="row">
+    <div class="col">
+      <div class="panel" style="max-width:560px">
+        <h2 class="panel-title">Crea tu cuenta de cliente en minutos</h2>
+        <p class="panel-sub">En el entorno real, el acceso se verifica cifrado (bcrypt) y entrega un carné digital (JWT) de 8 horas.</p>
+
+        <label for="tipo-cliente">Tipo de cliente</label>
+        <select id="tipo-cliente"><option>Persona natural</option><option>Empresa</option></select>
+
+        <div class="row" style="gap:10px">
+          <div class="col"><label>Identificación</label><select><option>CC</option><option>CE</option><option>NIT</option><option>PASAPORTE</option></select></div>
+          <div class="col"><label>N.º de identificación *</label><input placeholder="123456789" class="phg"></div>
+        </div>
+
+        <label>Nombre / Razón social *</label>
+        <input placeholder="Nombre completo o empresa" class="phg">
+
+        <div class="row" style="gap:10px">
+          <div class="col"><label>Correo (opcional)</label><input placeholder="correo@ejemplo.com" class="phg"></div>
+          <div class="col"><label>Teléfono (opcional)</label><input placeholder="3001234567" class="phg"></div>
+        </div>
+
+        <div class="row" style="gap:10px">
+          <div class="col"><label>Ciudad (opcional)</label><input placeholder="Bogotá" class="phg"></div>
+          <div class="col"><label>Dirección (opcional)</label><input placeholder="Calle 10 # 5-20" class="phg"></div>
+        </div>
+
+        <div class="demo-box" style="margin:14px 0 4px"><b>Credenciales de acceso al portal</b> — el usuario debe ser único y la contraseña mínimo 6 caracteres.</div>
+
+        <label>Usuario *</label>
+        <input placeholder="mi.usuario" class="phg">
+
+        <div class="row" style="gap:10px">
+          <div class="col"><label>Contraseña *</label><input type="password" placeholder="Mínimo 6 caracteres" class="phg"></div>
+          <div class="col"><label>Confirmar contraseña *</label><input type="password" placeholder="Repítela" class="phg"></div>
+        </div>
+
+        <div style="margin-top:16px;display:flex;gap:10px;align-items:center">
+          <a class="btn primary">Crear cuenta e ingresar →</a>
+          <span class="field-hint">Al registrarte aceptas las condiciones de uso del portal.</span>
+        </div>
+
+        <div class="demo-box">
+          ¿Ya tienes cuenta? <a>Iniciar sesión → mockup 01</a> · <a>¿Olvidaste tu contraseña? → mockup 02</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="panel">
+        <h2 class="panel-title">Qué valida el servidor</h2>
+        <p><span class="chip">⚠️ usuario duplicado → 409</span> <span class="chip">⚠️ identificación duplicada → 409</span></p>
+        <p><span class="chip green">✔ contraseña ≥ 6 caracteres</span> <span class="chip green">✔ cifrado bcrypt (nunca en texto plano)</span></p>
+        <p class="field-hint">El endpoint de registro tiene límite de tasa para evitar abuso. El correo y el teléfono son opcionales y se usan para notificaciones y recuperación de contraseña (mockup 02). La cuenta queda lista para usar en minutos.</p>
+      </div>
+      <div class="panel">
+        <h2 class="panel-title">Camino alterno (interno)</h2>
+        <p class="panel-sub">Un administrador/facturador crea clientes y cuentas de portal desde el módulo <b>Clientes</b> (mockup 04): ver detalle → crear cuenta de portal.</p>
+        <p><a class="btn small">→ Ver mockup 04 · Clientes</a></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">FINAN-X · Mockup 13 · Registro de usuario nuevo · <strong>Prototipo de demostración — no es la aplicación final</strong></div>
+
+</body>
+</html>

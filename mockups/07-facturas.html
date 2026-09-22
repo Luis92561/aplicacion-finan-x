@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FINAN-X · Mockup 07 · Facturas</title>
+  <link rel="stylesheet" href="mockup-style.css">
+</head>
+<body>
+
+  <div class="topbar">
+    <span class="brand">FINAN<span class="dot">·</span>X</span>
+    <span class="tag">Prototipo</span>
+    <span class="nav-pills">
+      <span>Inicio</span><span>Clientes</span><span>Productos</span>
+      <span>Pedidos</span><span class="active">Facturas</span><span>Caja</span><span>Retorno</span><span>Reportes</span>
+    </span>
+  </div>
+
+  <div class="banner">🧩 Pantalla 07 de 14 — <b>Módulo de facturas</b>. Una factura se genera desde un pedido confirmado (¡solo una vez!). Detalle con saldo calculado y botones de pago/anulación.</div>
+
+  <div class="row">
+    <div class="col">
+      <div class="panel">
+        <h2 class="panel-title">Generar factura</h2>
+        <p class="panel-sub">Origen: pedidos confirmados sin facturar</p>
+        <label>Pedido a facturar</label>
+        <select><option>PED-000132 · TecnoAndina S.A.S. · $ 24.990.000</option></select>
+        <div style="margin-top:14px"><a class="btn primary">Generar factura FAC-…</a></div>
+        <div class="demo-box">Regla: 1 pedido → 1 factura. Facturar de nuevo el mismo pedido → el sistema lo rechaza.</div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="panel">
+        <h2 class="panel-title">Detalle de factura (ejemplo)</h2>
+        <table>
+          <tr><td><b>Número</b></td><td><span class="chip blue">FAC-000134</span></td></tr>
+          <tr><td><b>Cliente</b></td><td>María Fernanda López · CC 1002003001</td></tr>
+          <tr><td><b>Total</b></td><td>$ 10.867.700</td></tr>
+          <tr><td><b>Pagado</b></td><td>$ 5.000.000</td></tr>
+          <tr><td><b>Saldo</b></td><td><b>$ 5.867.700</b></td></tr>
+          <tr><td><b>Estado</b></td><td><span class="chip amber">PAGO PARCIAL</span></td></tr>
+        </table>
+        <div style="margin-top:14px;display:flex;gap:10px">
+          <a class="btn primary">Registrar pago</a>
+          <a class="btn">Anular factura</a>
+          <a class="btn">Previsualizar</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2 class="panel-title">Lista de facturas</h2>
+    <table>
+      <tr><th>Número</th><th>Cliente</th><th>Total</th><th>Pagado</th><th>Saldo</th><th>Estado</th><th></th></tr>
+      <tr><td>FAC-000134</td><td>María F. López</td><td>$ 10.867.700</td><td>$ 5.000.000</td><td>$ 5.867.700</td><td><span class="chip amber">PAGO PARCIAL</span></td><td><a class="btn small">Abrir</a></td></tr>
+      <tr><td>FAC-000135</td><td>TecnoAndina S.A.S.</td><td>$ 24.990.000</td><td>$ 24.990.000</td><td>$ 0</td><td><span class="chip green">PAGADA</span></td><td><a class="btn small">Abrir</a></td></tr>
+      <tr><td>FAC-000136</td><td>Pedro Suárez</td><td>$ 2.653.000</td><td>$ 0</td><td>$ 2.653.000</td><td><span class="chip">PENDIENTE</span></td><td><a class="btn small">Abrir</a></td></tr>
+      <tr><td>FAC-000137</td><td>María F. López</td><td>$ 4.500.000</td><td>$ 4.500.000</td><td>$ 1.200.000</td><td><span class="chip red">ANULADA</span></td><td><a class="btn small">Abrir</a></td></tr>
+    </table>
+    <p class="field-hint" style="margin-top:12px">La columna «Saldo» deriva automáticamente de total − pagos + notas de crédito activas (los pagos no se eliminan jamás: se anula la factura y la vista recalcula).</p>
+  </div>
+
+  <div class="footer">FINAN-X · Mockup 07 · Facturas · <strong>Prototipo de demostración — no es la aplicación final</strong></div>
+
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FINAN-X · Mockup 02 · Recuperar contraseña (OTP)</title>
+  <link rel="stylesheet" href="mockup-style.css">
+</head>
+<body>
+
+  <div class="topbar">
+    <span class="brand">FINAN<span class="dot">·</span>X</span>
+    <span class="tag">Prototipo</span>
+    <span class="nav-pills"><a href="index.html" style="font-size:12px">← Volver a la galería</a></span>
+  </div>
+
+  <div class="banner">🧩 Pantalla 02 de 14 — <b>Recuperación de contraseña con código de un solo uso (OTP)</b>. Flujo en dos pasos: solicitar código → cambiarla con el código.</div>
+
+  <div class="row">
+    <div class="col">
+      <div class="panel">
+        <h2 class="panel-title">Paso 1 · Solicitar código</h2>
+        <p class="panel-sub">El código llega por correo o SMS al contacto registrado del cliente</p>
+
+        <label for="uname">Usuario</label>
+        <input id="uname" placeholder="Escriba su usuario del portal" class="phg">
+
+        <label for="canal">Canal de envío</label>
+        <select id="canal">
+          <option>EMAIL — Correo electrónico</option>
+          <option>SMS — Mensaje de texto al teléfono</option>
+        </select>
+        <div class="field-hint">Destino enmascarado: c••••@gmail.com · +57 ••• ••• 7890</div>
+
+        <div style="margin-top:16px"><a class="btn primary">Enviar código de seguridad</a></div>
+
+        <div class="demo-box">
+          <b>Modo demostración:</b> como no existe proveedor real de SMS/correo, el sistema <u>imprime el código en la consola del servidor</u> y lo muestra en la respuesta para poder probar (en producción solo viaja por el canal elegido).
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="panel">
+        <h2 class="panel-title">Paso 2 · Cambiar contraseña</h2>
+        <p class="panel-sub">Se habilita tras recibir el código (ejemplo: <span class="chip blue">4 8 2 9 1 7</span>)</p>
+
+        <label for="code">Código de 6 dígitos</label>
+        <input id="code" placeholder="· · · · · ·" class="phg">
+
+        <label for="newpass">Nueva contraseña (mínimo 6 caracteres)</label>
+        <input id="newpass" type="password" placeholder="················" class="phg">
+
+        <label for="confirm">Confirmar nueva contraseña</label>
+        <input id="confirm" type="password" placeholder="················" class="phg">
+
+        <div style="margin-top:16px"><a class="btn primary">Cambiar contraseña</a></div>
+
+        <div class="demo-box">
+          <b>Reglas del código:</b> dura 10 minutos · admite 5 intentos · se anula al usarlo, al agotar los intentos o al expirar · al pedir uno nuevo, los anteriores quedan sin valor. Nunca se guarda en claro: viaja cifrado (bcrypt).
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">FINAN-X · Mockup 02 · Recuperar contraseña (OTP) · <strong>Prototipo de demostración — no es la aplicación final</strong></div>
+
+</body>
+</html>

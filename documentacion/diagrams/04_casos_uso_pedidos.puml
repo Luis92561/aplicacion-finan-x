@@ -1,0 +1,46 @@
+@startuml FINAN_X_Casos_Pedidos
+' 4. Casos de uso de pedidos (CU-20..CU-24)
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangles
+skinparam actorStyle awesome
+
+actor "Usuario interno autorizado" as Interno
+actor "Cliente" as Cliente
+
+rectangle "Módulo de pedidos / compras" {
+  usecase "Crear pedido" as O1
+  usecase "Asociar cliente al pedido" as O2
+  usecase "Agregar productos al pedido" as O3
+  usecase "Consultar pedido" as O4
+  usecase "Actualizar pedido (solo BORRADOR)" as O5
+  usecase "Cancelar pedido" as O6
+  usecase "Calcular subtotal, impuestos y total" as O7
+  usecase "Cambiar estado del pedido" as O8
+  usecase "Consultar mis compras" as O9
+}
+
+Interno --> O1
+Interno --> O2
+Interno --> O3
+Interno --> O4
+Interno --> O5
+Interno --> O6
+Interno --> O8
+
+O1 ..> O7 : incluye
+O8 ..> O7 : incluye
+
+Cliente --> O4
+Cliente --> O9
+
+note right of O9
+Se filtra por el clienteId de la sesión.
+El cliente no puede seleccionar otro clienteId.
+end note
+
+note bottom of O5
+Un pedido facturado no se modifica
+para evitar inconsistencias con la factura.
+end note
+@enduml

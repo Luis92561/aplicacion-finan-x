@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FINAN-X · Mockup 04 · Clientes</title>
+  <link rel="stylesheet" href="mockup-style.css">
+</head>
+<body>
+
+  <div class="topbar">
+    <span class="brand">FINAN<span class="dot">·</span>X</span>
+    <span class="tag">Prototipo</span>
+    <span class="nav-pills">
+      <span>Inicio</span><span class="active">Clientes</span><span>Productos</span>
+      <span>Pedidos</span><span>Facturas</span><span>Caja</span><span>Retorno</span><span>Reportes</span>
+    </span>
+  </div>
+
+  <div class="banner">🧩 Pantalla 04 de 14 — <b>Módulo de clientes</b>. Listado con filtros; acciones: ver detalle, crear cuenta de portal, enviar resumen financiero, cambiar estado.</div>
+
+  <div class="panel">
+    <div class="row" style="align-items:end">
+      <div class="col">
+        <label for="q">Buscar</label>
+        <input id="q" placeholder="Nombre, identificación, ciudad…" class="phg">
+      </div>
+      <div class="col" style="flex:0 0 220px">
+        <label for="estado">Estado</label>
+        <select id="estado"><option>Todos</option><option>Activos</option><option>Inactivos</option></select>
+      </div>
+      <div style="padding-bottom:4px"><a class="btn primary">+ Nuevo cliente</a></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <table>
+      <tr><th>Identificación</th><th>Nombre / Razón social</th><th>Tipo</th><th>Ciudad</th><th>Saldo pendiente</th><th>Estado</th><th style="width:240px">Acciones</th></tr>
+      <tr><td>CC 1002003001</td><td>María Fernanda López</td><td>Persona</td><td>Bogotá</td><td>$ 2.850.000</td><td><span class="chip green">Activo</span></td>
+          <td><a class="btn small">Cuenta</a> <a class="btn small">Resumen</a> <a class="btn small">Detalle</a></td></tr>
+      <tr><td>NIT 901234567</td><td>TecnoAndina S.A.S.</td><td>Empresa</td><td>Medellín</td><td>$ 6.120.000</td><td><span class="chip green">Activo</span></td>
+          <td><a class="btn small">Cuenta</a> <a class="btn small">Resumen</a> <a class="btn small">Detalle</a></td></tr>
+      <tr><td>CE 324567890</td><td>Pedro Suárez Millán</td><td>Persona</td><td>Cali</td><td>$ 450.000</td><td><span class="chip amber">Inactivo</span></td>
+          <td><a class="btn small">Cuenta</a> <a class="btn small">Resumen</a> <a class="btn small">Detalle</a></td></tr>
+    </table>
+    <p class="field-hint" style="margin-top:12px">Fila de ejemplo: «crear cuenta de portal» habilita al cliente para entrar al autoservicio con usuario y contraseña. Cada cliente puede tener una sola cuenta.</p>
+  </div>
+
+  <div class="footer">FINAN-X · Mockup 04 · Clientes · <strong>Prototipo de demostración — no es la aplicación final</strong></div>
+
+</body>
+</html>

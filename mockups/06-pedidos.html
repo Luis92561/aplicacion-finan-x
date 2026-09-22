@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FINAN-X · Mockup 06 · Pedidos</title>
+  <link rel="stylesheet" href="mockup-style.css">
+</head>
+<body>
+
+  <div class="topbar">
+    <span class="brand">FINAN<span class="dot">·</span>X</span>
+    <span class="tag">Prototipo</span>
+    <span class="nav-pills">
+      <span>Inicio</span><span>Clientes</span><span>Productos</span>
+      <span class="active">Pedidos</span><span>Facturas</span><span>Caja</span><span>Retorno</span><span>Reportes</span>
+    </span>
+  </div>
+
+  <div class="banner">🧩 Pantalla 06 de 14 — <b>Módulo de pedidos</b>. Creación de pedido (izquierda) y lista de pedidos con estados (derecha). <b>Los totales los calcula el servidor</b> con el precio e impuesto vigentes.</div>
+
+  <div class="row">
+    <div class="col">
+      <div class="panel">
+        <h2 class="panel-title">Nuevo pedido</h2>
+        <p class="panel-sub">Cliente + líneas de producto</p>
+
+        <label for="cli">Cliente</label>
+        <select id="cli"><option>María Fernanda López (CC 1002003001)</option><option>TecnoAndina S.A.S. (NIT 901234567)</option></select>
+
+        <table style="margin-top:14px">
+          <tr><th>Producto</th><th>Cant.</th><th>Precio unit.</th><th>Subtotal</th><th></th></tr>
+          <tr><td>Laptop 15"</td><td>2</td><td>$ 4.500.000</td><td>$ 9.000.000</td><td><a class="btn small">×</a></td></tr>
+          <tr><td>Servicio de soporte</td><td>1</td><td>$ 150.000</td><td>$ 150.000</td><td><a class="btn small">×</a></td></tr>
+        </table>
+        <p><a class="btn small">+ Agregar línea</a></p>
+
+        <div class="demo-box">
+          <b>Totales (calculados por el servidor):</b><br>
+          Subtotal: $ 9.150.000 · Impuestos (19 %): $ 1.717.700 · <b>Total: $ 10.867.700</b><br>
+          El seleccionador de producto solo trae productos <i>activos</i>.
+        </div>
+        <div style="margin-top:14px;display:flex;gap:10px">
+          <a class="btn primary">Guardar borrador</a><a class="btn">Confirmar pedido</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="panel">
+        <h2 class="panel-title">Lista de pedidos</h2>
+        <p class="panel-sub">Estados: Borrador → Confirmado → Facturado · Cancelado</p>
+        <table>
+          <tr><th>N.º</th><th>Cliente</th><th>Total</th><th>Estado</th><th></th></tr>
+          <tr><td>PED-000132</td><td>TecnoAndina S.A.S.</td><td>$ 24.990.000</td><td><span class="chip green">Confirmado</span></td><td><a class="btn small">Facturar</a></td></tr>
+          <tr><td>PED-000131</td><td>María F. López</td><td>$ 10.867.700</td><td><span class="chip">Borrador</span></td><td><a class="btn small">Abrir</a></td></tr>
+          <tr><td>PED-000130</td><td>Pedro Suárez</td><td>$ 2.653.000</td><td><span class="chip red">Cancelado</span></td><td><a class="btn small">Abrir</a></td></tr>
+          <tr><td>PED-000129</td><td>María F. López</td><td>$ 4.500.000</td><td><span class="chip blue">Facturado</span></td><td><a class="btn small">Ver factura</a></td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">FINAN-X · Mockup 06 · Pedidos · <strong>Prototipo de demostración — no es la aplicación final</strong></div>
+
+</body>
+</html>

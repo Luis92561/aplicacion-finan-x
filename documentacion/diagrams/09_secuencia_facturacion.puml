@@ -1,0 +1,21 @@
+@startuml FINAN_X_Secuencia_Facturacion
+' 9. Secuencia de generación de factura (CU-25)
+actor Facturador
+participant "FINAN-X Web" as Web
+participant "Servicio de Facturación" as Fact
+database "BD FINAN-X" as DB
+
+Facturador -> Web : Seleccionar pedido confirmado
+Web -> Fact : POST /api/facturas { pedidoId }
+Fact -> DB : Validar pedido (estado = CONFIRMADO)
+DB --> Fact : Pedido válido
+Fact -> DB : Obtener cliente y detalle del pedido
+DB --> Fact : Datos del pedido
+Fact -> Fact : Calcular subtotal / impuestos / total
+Fact -> DB : INSERT factura + generación de número
+Fact -> DB : UPDATE pedido → FACTURADO
+Fact -> DB : INSERT auditoría
+DB --> Fact : Factura creada
+Fact --> Web : 201 { numero_factura }
+Web --> Facturador : Muestra la factura
+@enduml

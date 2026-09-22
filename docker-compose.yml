@@ -1,0 +1,64 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: finanx-db
+    environment:
+      POSTGRES_USER: finanx
+      POSTGRES_PASSWORD: finanx
+      POSTGRES_DB: finanx
+    ports:
+      - "5432:5432"
+    volumes:
+      - finanx_pgdata:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U finanx -d finanx"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  backend:
+    build: ./backend
+    container_name: finanx-backend
+    environment:
+      PORT: 4000
+      PGHOST: db
+      PGPORT: 5432
+      PGUSER: finanx
+      PGPASSWORD: finanx
+      PGDATABASE: finanx
+      # En producción defina un JWT_SECRET propio (≥32 caracteres) — ver documentacion/B_Guia_Tecnica_Desarrolladores
+      JWT_SECRET: ${JWT_SECRET:-finanx-prod-secret-cambiar-por-una-clave-segura-de-32-caracteres}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://localhost:8080,http://127.0.0.1:5173,http://127.0.0.1:8080}
+      LOGIN_MAX_FAILURES: ${LOGIN_MAX_FAILURES:-5}
+      REGISTRO_RATE_LIMIT: ${REGISTRO_RATE_LIMIT:-20}
+      # Recuperación de contraseña (OTP). En producción ponga OTP_RETORNO_DEMO=off: el código
+      # solo se enviaría por SMS/correo real (conectar proveedor en src/middleware/notificar.js).
+      OTP_RETORNO_DEMO: ${OTP_RETORNO_DEMO:-on}
+      OTP_VALIDEZ_MINUTOS: ${OTP_VALIDEZ_MINUTOS:-10}
+      OTP_MAX_INTENTOS: ${OTP_MAX_INTENTOS:-5}
+      RECUPERAR_RATE_LIMIT: ${RECUPERAR_RATE_LIMIT:-40}
+      NODE_ENV: ${NODE_ENV:-production}
+    ports:
+      - "4000:4000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:4000/api/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: finanx-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  finanx_pgdata:

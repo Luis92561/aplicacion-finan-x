@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FINAN-X · Mockup 14 · Portal de usuarios internos</title>
+  <link rel="stylesheet" href="mockup-style.css">
+  <style>
+    /* Shell interno: barra lateral + área principal (espejo de la aplicación real) */
+    .shell { display: flex; gap: 16px; }
+    .sidebar {
+      flex: 0 0 230px; background: #fff; border: 1.5px dashed var(--line);
+      border-radius: 14px; padding: 14px 12px; align-self: flex-start;
+    }
+    .sidebar .brand { font-size: 15px; margin-bottom: 10px; display: block; }
+    .sidebar .brand small { display: block; font-weight: 600; font-size: 10px; color: var(--muted); letter-spacing: .04em; }
+    .side-label { font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin: 10px 4px 6px; }
+    .side-link {
+      display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600;
+      color: var(--ink); border-radius: 8px; padding: 8px 10px; margin: 2px 0; background: var(--ph);
+    }
+    .side-link.active { background: var(--accent-ph); border: 1.5px solid var(--accent); color: var(--accent); }
+    .user-box { margin-top: 12px; border-top: 1.5px dashed var(--line); padding-top: 10px; font-size: 12px; }
+    .user-box strong { display: block; }
+    .user-box span { color: var(--muted); font-size: 11px; }
+    .role-card { border: 1.5px dashed var(--line); border-radius: 12px; padding: 12px 14px; background: #fff; margin-bottom: 12px; }
+    .role-card h3 { margin: 0 0 6px; font-size: 13px; }
+  </style>
+</head>
+<body>
+
+  <div class="banner">🧩 Pantalla 14 de 14 — <b>Portal de usuarios internos (panel de operación)</b>. Estructura del "shell": menú lateral que se adapta al rol y área principal con accesos a cada módulo. El rol ADMIN ve además el módulo Usuarios y Auditoría.</div>
+
+  <div class="shell">
+    <!-- Barra lateral (menú por rol) -->
+    <aside class="sidebar">
+      <span class="brand">FINAN·X <small>Facturación y pagos</small></span>
+      <div class="side-label">Operación</div>
+      <span class="side-link active">📊&nbsp; Inicio</span>
+      <span class="side-link">👥&nbsp; Clientes</span>
+      <span class="side-link">📦&nbsp; Productos</span>
+      <span class="side-link">🧾&nbsp; Pedidos</span>
+      <span class="side-link">📄&nbsp; Facturas</span>
+      <span class="side-link">💳&nbsp; Pagos</span>
+      <span class="side-link">🔖&nbsp; Notas crédito</span>
+      <span class="side-link">⚖️&nbsp; Balances por cliente</span>
+      <span class="side-link">📈&nbsp; Reportes</span>
+      <span class="side-link">🛡️&nbsp; Auditoría</span>
+      <div class="side-label">Solo ADMIN</div>
+      <span class="side-link">🔐&nbsp; Usuarios</span>
+      <div class="user-box">
+        <strong>Administrador</strong>
+        <span>ADMIN · admin@finanx.test</span>
+        <p class="field-hint" style="margin:6px 0 0">🔒 Cerrar sesión</p>
+      </div>
+    </aside>
+
+    <!-- Área principal -->
+    <div class="col">
+      <div class="panel">
+        <h2 class="panel-title">Panel de operación</h2>
+        <p class="panel-sub">Bienvenido, <b>Administrador</b>. Este es el portal de los usuarios internos: cada menú abre un módulo del sistema (los mockups 03–10 muestran sus pantallas).</p>
+        <div class="row">
+          <div class="metric"><div class="k">Facturas del mes</div><span class="v">128</span><div class="bar w35"></div></div>
+          <div class="metric"><div class="k">Valor facturado</div><span class="v">$ 86,4 M</span><div class="bar w65"></div></div>
+          <div class="metric"><div class="k">Recaudado</div><span class="v">$ 71,2 M</span><div class="bar w50"></div></div>
+          <div class="metric"><div class="k">Saldo por cobrar</div><span class="v">$ 15,2 M</span><div class="bar w20"></div></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2 class="panel-title">Accesos rápidos por rol</h2>
+        <div class="row">
+          <div class="col">
+            <div class="role-card"><h3>🔐 ADMIN</h3>Todo + <b>Usuarios</b> (crear/bloquear cuentas de portal) + <b>Auditoría</b>.</div>
+            <div class="role-card"><h3>🧾 FACTURADOR</h3>Clientes, productos, pedidos, facturas, notas de crédito.</div>
+          </div>
+          <div class="col">
+            <div class="role-card"><h3>💵 CAJERO</h3>Facturas, caja/pagos, balances por cliente.</div>
+            <div class="role-card"><h3>🛡️ SUPERVISOR</h3>Reportes, balances y auditoría (solo lectura de operación).</div>
+          </div>
+        </div>
+        <p class="field-hint">El acceso se valida por rol en el servidor (403 si el usuario no tiene permiso): un cajero no puede borrar pedidos ni un cliente ver módulos internos.</p>
+      </div>
+
+      <div class="panel">
+        <h2 class="panel-title">Avisos del día</h2>
+        <p><span class="chip amber">3</span> clientes con saldo vencido · <span class="chip blue">5</span> facturas por vencer esta semana · <span class="chip">0</span> notas de crédito pendientes de revisar</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">FINAN-X · Mockup 14 · Portal de usuarios internos · <strong>Prototipo de demostración — no es la aplicación final</strong></div>
+
+</body>
+</html>

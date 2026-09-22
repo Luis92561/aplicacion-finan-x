@@ -1,0 +1,22 @@
+@startuml FINAN_X_Secuencia_NotaCredito
+!theme plain
+title Nota de crédito (devolución)
+actor "Facturador" as F
+participant "API" as API
+database "PostgreSQL" as DB
+
+F -> API: POST /api/notas-credito\n{facturaId, valor, motivo}
+API -> DB: Validar factura ACTIVA y pagos disponibles\n(pagado − notas activas)
+DB --> API: disponible
+alt valor > disponible o factura sin pagos
+  API --> F: 400/409 con detalle
+else Factura válida
+  API -> DB: INSERT notas_credito (estado=ACTIVA)
+  API -> DB: Número NC-xxxxxx (transacción)
+  API -> DB: saldo_factura = total − pagados + notas
+  API -> F: 201 {numero_nota, saldo}
+end
+F -> API: POST /api/notas-credito/:id/anular {motivo}
+API -> DB: UPDATE estado=ANULADA (lógica, con auditoría)
+API --> F: 200 {estado=ANULADA}
+@enduml

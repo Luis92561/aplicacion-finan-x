@@ -1,0 +1,45 @@
+@startuml FINAN_X_Casos_Pagos
+' 6. Casos de uso de pagos (RF-04..RF-08)
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangles
+skinparam actorStyle awesome
+
+actor "Administrador" as Admin
+actor "Responsable de Pagos" as Cajero
+actor "Cliente" as Cliente
+
+rectangle "Módulo de pagos" {
+  usecase "Registrar pago" as PA1
+  usecase "Consultar pagos realizados" as PA2
+  usecase "Gestionar estado de pago" as PA3
+  usecase "Consultar saldo pendiente" as PA4
+  usecase "Validar valor contra el saldo" as PA5
+  usecase "Consultar mis pagos y saldo" as PA6
+}
+
+Admin --> PA1
+Admin --> PA2
+Admin --> PA4
+
+Cajero --> PA1
+Cajero --> PA2
+Cajero --> PA3
+Cajero --> PA4
+
+Cliente --> PA4
+Cliente --> PA6
+
+PA1 ..> PA5 : incluye
+PA3 ..> PA5 : incluye
+
+note right of PA5
+El valor acumulado de pagos no puede
+superar el total de la factura.
+end note
+
+note bottom of PA6
+El cliente solo consulta pagos
+de sus propias facturas.
+end note
+@enduml

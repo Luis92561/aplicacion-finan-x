@@ -1,0 +1,29 @@
+# --- FINAN-X · archivos que NO se sincronizan con git ---
+
+# Dependencias instaladas (se regeneran con npm install)
+node_modules/
+
+# Compilados del frontend
+dist/
+build/
+
+# Variables de entorno / secretos
+.env
+.env.*
+!.env.example
+
+# Registros y temporales
+*.log
+.DS_Store
+Thumbs.db
+*.tmp
+
+# Documentos generados (se regeneran con los scripts)
+documentacion/*.html
+documentacion/*.pdf
+
+# Respaldos de la base de datos (no deben ir por git)
+respaldo/
+
+# Datos locales sueltos
+nodemon.json

@@ -1,0 +1,14 @@
+# --- FINAN-X · reglas de fin de línea (evita que Windows rompa los scripts) ---
+
+* text=auto
+
+# Los scripts bash deben quedar SIEMPRE con LF, o fallan en Mac/Linux
+*.sh text eol=lf
+
+# Binarios/medios se copian tal cual
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.pdf binary
+*.dmg binary
+*.zip binary

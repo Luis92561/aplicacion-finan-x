@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FINAN-X · Mockup 12 · Pago en línea</title>
+  <link rel="stylesheet" href="mockup-style.css">
+</head>
+<body>
+
+  <div class="topbar">
+    <span class="brand">FINAN<span class="dot">·</span>X</span>
+    <span class="tag">Prototipo</span>
+    <span class="nav-pills">
+      <span>Mi saldo</span><span>Mis facturas</span><span>Mis compras</span>
+      <span>Mis pagos</span><span>Mis notas de crédito</span><span>Mi historial</span>
+      <span class="active">Hola, María 👋</span>
+    </span>
+  </div>
+
+  <div class="banner">🧩 Pantalla 12 de 14 — <b>Pago en línea en el portal del cliente</b>. Si el cliente elige <b>EFECTIVO</b> no se registra el pago aquí: se genera su <b>código de pago Efecty</b> para cancelar en un punto físico. Tarjeta/transferencia/cheque sí usan el botón «Registrar pago».</div>
+
+  <div class="row">
+    <div class="col">
+      <div class="panel">
+        <h2 class="panel-title">Pagar / abonar factura</h2>
+        <label>Factura</label>
+        <select><option>FAC-000134 · Total $ 10.867.700 · Saldo $ 5.867.700</option></select>
+        <label>Valor</label>
+        <input placeholder="0 — el sistema no permite superar el saldo" class="phg">
+        <p><a class="btn small">Pagar saldo completo ($ 5.867.700)</a></p>
+        <label>Método de pago</label>
+        <select>
+          <option selected>EFECTIVO</option>
+          <option>TARJETA</option>
+          <option>TRANSFERENCIA</option>
+          <option>CHEQUE</option>
+        </select>
+        <div class="demo-box" style="color:var(--warn);border-color:#fcd34d">
+          💵 <b>Efectivo:</b> el botón «Registrar pago» <b>no aparece</b>. El cliente genera su código Efecty (vigencia 24 h) y paga en cualquier punto Efecty del país.
+        </div>
+        <div class="demo-box">Con tarjeta, transferencia o cheque sí se muestra «Registrar pago» con los campos propios de cada método (Luhn, banco, n.º de comprobante…), igual que en la caja interna (mockup 08).</div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="modal-bg">
+        <div class="modal-title">💰 Efectivo · Pago en punto Efecty</div>
+        <p class="panel-sub">El efectivo no se registra en el portal: genera tu código y cancela en un punto Efecty. Al confirmarse, el pago se aplica automáticamente a tu factura.</p>
+        <div style="background:#fffbeb;border:1.5px dashed #d97706;border-radius:10px;padding:14px;text-align:center">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#92400e">Tu código de pago Efecty</div>
+          <div style="font-family:ui-monospace,Menlo,monospace;font-size:20px;font-weight:800;color:#b45309;letter-spacing:.04em">EFY-0006058677000012</div>
+          <div style="font-size:11.5px;color:#78716c;margin-top:6px">Factura FAC-000134 · $ 5.867.700 · válido hasta 21/09/26, 11:59 p. m.</div>
+          <div style="margin-top:10px;display:flex;gap:8px;justify-content:center">
+            <a class="btn small">📋 Copiar código</a><a class="btn small">♻ Generar otro código</a>
+          </div>
+        </div>
+        <div class="demo-box" style="margin-top:12px">Código determinístico (14 dígitos + 2 de verificación ISO 7064) que vincula factura y valor. Antes de generarlo, el modal muestra el botón <b>«Generar código de pago Efecty»</b> y nunca «Registrar pago».</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">FINAN-X · Mockup 12 · Pago en línea · <strong>Prototipo de demostración — no es la aplicación final</strong></div>
+
+</body>
+</html>

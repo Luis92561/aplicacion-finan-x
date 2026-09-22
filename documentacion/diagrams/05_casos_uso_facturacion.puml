@@ -1,0 +1,48 @@
+@startuml FINAN_X_Casos_Facturacion
+' 5. Casos de uso de facturación (CU-25..CU-30)
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangles
+skinparam actorStyle awesome
+
+actor "Administrador" as Admin
+actor "Facturador" as Facturador
+actor "Cliente" as Cliente
+
+rectangle "Módulo de facturación" {
+  usecase "Generar factura desde pedido" as F1
+  usecase "Consultar factura" as F2
+  usecase "Anular factura" as F3
+  usecase "Asociar factura a pedido" as F4
+  usecase "Consultar detalle de factura" as F5
+  usecase "Consultar mis facturas" as F6
+  usecase "Validar pedido facturable" as F7
+  usecase "Registrar motivo de anulación" as F8
+}
+
+Admin --> F2
+Admin --> F3
+
+Facturador --> F1
+Facturador --> F2
+Facturador --> F3
+Facturador --> F4
+Facturador --> F5
+
+Cliente --> F5
+Cliente --> F6
+
+F1 ..> F7 : incluye
+F3 ..> F8 : incluye
+
+note right of F6
+Solo facturas cuyo clienteId
+corresponde al usuario autenticado.
+end note
+
+note bottom of F3
+Anulación lógica: se conserva el registro,
+el motivo, quién anuló y cuándo.
+Se impide si la factura tiene pagos.
+end note
+@enduml

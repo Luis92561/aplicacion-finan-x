@@ -1,0 +1,29 @@
+@startuml FINAN_X_Secuencia_Portal_Cliente
+' 11. Secuencia de autorización del portal del cliente (8.1)
+actor Cliente
+participant "Portal FINAN-X" as Portal
+participant "Servicio de autenticación" as Auth
+participant "Servicio de datos" as Data
+database "BD FINAN-X" as DB
+
+Cliente -> Portal : Usuario + contraseña
+Portal -> Auth : Validar credenciales
+Auth -> DB : Buscar usuario_cliente
+DB --> Auth : Usuario + clienteId + estado
+Auth --> Portal : Token (tipo=cliente, clienteId)
+
+Cliente -> Portal : GET /api/mis-facturas
+Portal -> Data : Solicitud autenticada (Bearer token)
+Data -> Data : Obtener clienteId DE LA SESIÓN
+Data -> DB : SELECT facturas WHERE cliente_id = $clienteId
+DB --> Data : Solo facturas del cliente
+Data --> Portal : Facturas autorizadas
+Portal --> Cliente : Muestra sus facturas
+
+note over Data
+La autorización se valida en el servidor.
+El clienteId nunca proviene del navegador:
+cambiar parámetros de la URL no expone
+datos de otros clientes.
+end note
+@enduml

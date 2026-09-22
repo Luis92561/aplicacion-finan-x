@@ -1,0 +1,99 @@
+import { Router } from 'express';
+import pool from '../db.js';
+import { requireAuth, requireRol } from '../middleware/auth.js';
+import { audit } from '../middleware/audit.js';
+import { HttpError, round2, validarDatosPago } from '../utils.js';
+
+const router = Router();
+router.use(requireAuth, requireRol('ADMIN', 'FACTURADOR', 'CAJERO', 'SUPERVISOR'));
+
+const MODULO = 'Pagos';
+
+// GET /api/pagos?q=&facturaId=&clienteId=&desde=&hasta=
+router.get('/', async (req, res, next) => {
+  try {
+    const { q = '', facturaId = '', clienteId = '', desde = '', hasta = '' } = req.query;
+    const conds = [];
+    const params = [];
+    if (q) {
+      params.push(`%${q}%`);
+      conds.push(`(pg.numero_pago ILIKE $${params.length} OR f.numero_factura ILIKE $${params.length} OR pg.referencia ILIKE $${params.length})`);
+    }
+    if (facturaId) { params.push(facturaId); conds.push(`pg.factura_id = $${params.length}`); }
+    if (clienteId) { params.push(clienteId); conds.push(`f.cliente_id = $${params.length}`); }
+    if (desde) { params.push(desde); conds.push(`pg.fecha >= $${params.length}::date`); }
+    if (hasta) { params.push(hasta); conds.push(`pg.fecha <= ($${params.length}::date + interval '1 day')`); }
+    const where = conds.length ? `WHERE ${conds.join(' AND ')}` : '';
+
+    const rows = await pool.query(
+      `SELECT pg.pago_id, pg.numero_pago, pg.fecha, pg.valor::float8, pg.metodo_pago, pg.referencia, pg.observaciones,
+              pg.banco, pg.titular, pg.tipo_tarjeta, pg.ultimos_digitos_tarjeta, pg.vencimiento_tarjeta, pg.numero_cuenta,
+              f.factura_id, f.numero_factura, c.cliente_id, c.nombre_razon_social
+       FROM pagos pg
+       JOIN facturas f ON f.factura_id = pg.factura_id
+       JOIN clientes c ON c.cliente_id = f.cliente_id
+       ${where} ORDER BY pg.pago_id DESC LIMIT 300`,
+      params
+    );
+    res.json(rows.rows);
+  } catch (e) { next(e); }
+});
+
+// POST /api/pagos — { facturaId, valor, metodoPago, referencia, observaciones }
+router.post('/', async (req, res, next) => {
+  const client = await pool.connect();
+  try {
+    const { facturaId, valor, metodoPago = 'EFECTIVO', referencia = '', observaciones = '' } = req.body || {};
+
+    await client.query('BEGIN');
+
+    if (!facturaId || !(Number(valor) > 0)) throw new HttpError(400, 'Factura y valor (mayor que cero) son obligatorios');
+
+    const f = await client.query(
+      `SELECT f.factura_id, f.numero_factura, f.total, f.estado,
+              COALESCE(SUM(p.valor), 0)::float8 AS pagado
+       FROM facturas f LEFT JOIN pagos p ON p.factura_id = f.factura_id
+       WHERE f.factura_id = $1 GROUP BY f.factura_id`,
+      [facturaId]
+    );
+    if (!f.rowCount) throw new HttpError(404, 'Factura no encontrada');
+    if (f.rows[0].estado !== 'ACTIVA') throw new HttpError(409, 'Solo se pueden registrar pagos en facturas activas');
+
+    const saldo = round2(Number(f.rows[0].total) - Number(f.rows[0].pagado));
+    const valorNum = round2(Number(valor));
+    if (valorNum > saldo) throw new HttpError(400, `El valor supera el saldo pendiente ($ ${saldo.toLocaleString('en-US')})`);
+
+    // Datos requeridos según el método de pago (tarjeta/transferencia/cheque); nunca se guardan CVV ni número completo
+    const datosPago = validarDatosPago(metodoPago, req.body);
+
+    const ins = await client.query(
+      `INSERT INTO pagos (factura_id, valor, metodo_pago, referencia, observaciones, usuario_id,
+                          banco, titular, tipo_tarjeta, ultimos_digitos_tarjeta, vencimiento_tarjeta, numero_cuenta)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING pago_id`,
+      [facturaId, valorNum, metodoPago, referencia || null, observaciones || null, req.user.usuarioId ?? null,
+        datosPago.banco || null, datosPago.titular || null, datosPago.tipo_tarjeta || null,
+        datosPago.ultimos_digitos_tarjeta || null, datosPago.vencimiento_tarjeta || null, datosPago.numero_cuenta || null]
+    );
+    const pagoId = ins.rows[0].pago_id;
+    const numero = `PAG-${String(pagoId).padStart(6, '0')}`;
+    await client.query('UPDATE pagos SET numero_pago = $1 WHERE pago_id = $2', [numero, pagoId]);
+
+    const nuevoPagado = round2(Number(f.rows[0].pagado) + valorNum);
+    const nuevoSaldo = round2(Number(f.rows[0].total) - nuevoPagado);
+    const estadoPago = nuevoSaldo <= 0 ? 'PAGADA' : 'PAGO_PARCIAL';
+
+    await client.query('COMMIT');
+    await audit({
+      usuario: req.user.correo, modulo: MODULO, operacion: 'REGISTRAR', registro: numero,
+      descripcion: `Pago de $${valorNum} en ${f.rows[0].numero_factura} (${metodoPago}) · saldo $${nuevoSaldo}`,
+    });
+    res.status(201).json({ pago_id: pagoId, numero_pago: numero, valor: valorNum, saldo: nuevoSaldo, estado_pago: estadoPago });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    next(e);
+  } finally {
+    client.release();
+  }
+});
+
+export default router;

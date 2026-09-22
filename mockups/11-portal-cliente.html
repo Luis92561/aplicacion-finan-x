@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FINAN-X · Mockup 11 · Portal del cliente (vista al ingresar)</title>
+  <link rel="stylesheet" href="mockup-style.css">
+  <style>
+    /* Shell del portal del cliente: barra lateral + área principal (espejo de la aplicación real) */
+    .shell { display: flex; gap: 16px; }
+    .sidebar {
+      flex: 0 0 240px; background: #fff; border: 1.5px dashed var(--line);
+      border-radius: 14px; padding: 14px 12px; align-self: flex-start;
+    }
+    .sidebar .brand { font-size: 15px; margin-bottom: 10px; display: block; }
+    .sidebar .brand small { display: block; font-weight: 600; font-size: 10px; color: var(--muted); letter-spacing: .04em; }
+    .side-label { font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin: 10px 4px 6px; }
+    .side-link {
+      display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600;
+      color: var(--ink); border-radius: 8px; padding: 8px 10px; margin: 2px 0; background: var(--ph);
+    }
+    .side-link.active { background: var(--accent-ph); border: 1.5px solid var(--accent); color: var(--accent); }
+    .user-box { margin-top: 12px; border-top: 1.5px dashed var(--line); padding-top: 10px; font-size: 12px; }
+    .user-box strong { display: block; }
+    .user-box span { color: var(--muted); font-size: 11px; }
+    /* Hero "Mi saldo" (estilo wireframe) */
+    .hero { background: #fff; border: 1.5px dashed var(--line); border-radius: 14px; padding: 18px 20px; }
+    .hero .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+    .hero .big { font-size: 34px; font-weight: 800; margin: 4px 0 12px; }
+  </style>
+</head>
+<body>
+
+  <div class="banner">🧩 Pantalla 11 de 14 — <b>Portal del cliente externo (vista al ingresar)</b>. Al iniciar sesión, el cliente aterriza en <b>«Mi saldo»</b>: resumen financiero y sus facturas pendientes con el botón «Pagar / Abonar». Solo ve <u>sus propios</u> datos (aislamiento por cliente).</div>
+
+  <div class="shell">
+    <!-- Barra lateral del portal del cliente -->
+    <aside class="sidebar">
+      <span class="brand">FINAN·X <small>Portal del cliente</small></span>
+      <div class="side-label">Mi cuenta</div>
+      <span class="side-link active">💰&nbsp; Mi saldo</span>
+      <span class="side-link">👤&nbsp; Mis datos</span>
+      <span class="side-link">🛒&nbsp; Mis compras</span>
+      <span class="side-link">📄&nbsp; Mis facturas</span>
+      <span class="side-link">💳&nbsp; Mis pagos</span>
+      <span class="side-link">🔖&nbsp; Mis notas de crédito</span>
+      <span class="side-link">🗂️&nbsp; Mi historial</span>
+      <div class="user-box">
+        <strong>María Fernanda López</strong>
+        <span>Cliente · cliente@finanx.test</span>
+        <p class="field-hint" style="margin:6px 0 0">🔒 Cerrar sesión</p>
+      </div>
+    </aside>
+
+    <!-- Contenido: Mi saldo (lo primero que ve el cliente) -->
+    <div class="col">
+      <div class="hero">
+        <div class="lbl">Mi saldo pendiente</div>
+        <div class="big">$ 5.867.700</div>
+        <div class="row">
+          <div class="metric"><div class="k">Total en facturas activas</div><span class="v">$ 10.867.700</span><div class="bar w60"></div></div>
+          <div class="metric"><div class="k">Total pagado</div><span class="v" style="color:#15803d">$ 5.000.000</span><div class="bar w45"></div></div>
+          <div class="metric"><div class="k">Facturas con saldo</div><span class="v">1</span><div class="bar w10"></div></div>
+          <div class="metric"><div class="k">Facturas pagadas</div><span class="v">3</span><div class="bar w30"></div></div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:16px">
+        <h2 class="panel-title">Facturas pendientes</h2>
+        <table>
+          <tr><th>Factura</th><th>Fecha</th><th>Total</th><th>Pagado</th><th>Saldo</th><th>Estado</th><th></th></tr>
+          <tr><td>FAC-000134</td><td>12/09/2026</td><td>$ 10.867.700</td><td>$ 5.000.000</td><td>$ 5.867.700</td><td><span class="chip amber">PAGO PARCIAL</span></td><td><a class="btn small">Pagar / Abonar</a></td></tr>
+          <tr><td>FAC-000141</td><td>18/09/2026</td><td>$ 2.150.000</td><td>$ 0</td><td>$ 2.150.000</td><td><span class="chip amber">PENDIENTE</span></td><td><a class="btn small">Pagar / Abonar</a></td></tr>
+        </table>
+        <div class="demo-box" style="margin-top:10px">
+          El botón «Pagar / Abonar» abre el flujo del mockup 12: <b>efectivo genera un código Efecty</b> (sin «Registrar pago»);
+          tarjeta, transferencia o cheque registran el pago en línea.
+        </div>
+        <p class="field-hint" style="margin-top:10px">
+          Resto del portal: Mis datos (actualizar contacto), Mis compras (pedidos), Mis facturas (todas, con detalle),
+          Mis pagos, Mis notas de crédito y Mi historial. El cliente <u>nunca</u> ve clientes, productos ni facturas ajenas.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">FINAN-X · Mockup 11 · Portal del cliente (vista al ingresar) · <strong>Prototipo de demostración — no es la aplicación final</strong></div>
+
+</body>
+</html>

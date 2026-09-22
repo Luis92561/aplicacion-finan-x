@@ -1,0 +1,75 @@
+@startuml FINAN_X_Arquitectura_Hexagonal
+!theme plain
+title FINAN-X · Arquitectura Hexagonal (puertos y adaptadores)
+
+skinparam componentStyle rectangle
+skinparam backgroundColor white
+skinparam shadowing false
+
+' ============ NÚCLEO ============
+package "NÚCLEO · Reglas de negocio puras (sin tecnología)" as nucleo {
+  component [validarDatosPago\n(Luhn · CVV · vigencia · banco)] as vp
+  component [Invariantes\nsin sobrepago · 1 pedido → 1 factura\nsaldo siempre calculado] as inv
+  component [Reglas OTP\n6 dígitos · 10 min · 5 intentos · un solo uso] as otp
+  vp -[hidden]d- inv
+  inv -[hidden]d- otp
+}
+
+' ============ PUERTOS DE ENTRADA ============
+package "PUERTOS DE ENTRADA · API REST (casos de uso)" as in {
+  interface "auth.js · público\nlogin · registro · recuperar OTP" as ia
+  interface "routes/*.js · interno\nclientes · productos · pedidos\nfacturas · pagos · notas\nreportes · usuarios · auditoría" as ib
+  interface "mis.js · portal aislado\nsaldo · facturas · pagos\nhistorial (por clienteId)" as ic
+}
+
+' ============ ADAPTADORES DE ENTRADA ============
+package "ADAPTADORES DE ENTRADA (Express)" as adapt {
+  component [requireAuth\n(JWT)] as aa
+  component [requireRol\n(RBAC)] as ab
+  component [requireCliente\n(aislamiento)] as ac
+  component [Limitadores por IP\nlogin fallos · registro 20/h\nrecuperar 40/15min] as ad
+}
+
+' ============ PUERTOS DE SALIDA ============
+package "PUERTOS DE SALIDA" as out {
+  interface "Persistencia" as op
+  interface "Notificaciones\n(enviarCodigo)" as on
+  interface "Seguridad\n(hash · firma)" as os
+}
+
+' ============ ADAPTADORES DE SALIDA ============
+package "ADAPTADORES DE SALIDA" as oadapt {
+  component [PostgreSQL\npool pg · SQL parametrizado $n\nvista factura_saldo\n(proyección de lectura)] as badb
+  component [notificar.js\ndemo: consola\nprod: Twilio · nodemailer] as ban
+  component [bcryptjs\nhash de claves y OTP] as babc
+  component [jsonwebtoken\nJWT 8 horas] as bajwt
+}
+
+' ============ CONEXIONES ============
+ia -down-> aa
+ia -down-> ab
+ib -down-> aa
+ib -down-> ab
+ic -down-> ac
+aa -down-> aa2
+hide aa2
+
+ia -right-> op
+ib -right-> op
+ic -right-> op
+nucleo -right-> op
+nucleo -right-> on
+nucleo -right-> os
+
+op -down-> badb
+on -down-> ban
+os -down-> babc
+os -down-> bajwt
+
+legend right
+  Dirección del flujo: la API REST (puerto de entrada) invoca el núcleo;
+  el núcleo usa los puertos de salida; los adaptadores implementan cada puerto.
+  Cambiar un adaptador (BD, SMS/correo, JWT) no altera el núcleo.
+endlegend
+
+@enduml

@@ -1,0 +1,36 @@
+@startuml FINAN_X_Casos_Productos
+' 3. Casos de uso de productos (CU-15..CU-19)
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangles
+skinparam actorStyle awesome
+
+actor "Administrador" as Admin
+actor "Usuario interno autorizado" as Interno
+
+rectangle "Módulo de productos" {
+  usecase "Registrar producto" as P1
+  usecase "Consultar producto" as P2
+  usecase "Actualizar producto" as P3
+  usecase "Inactivar producto (baja lógica)" as P4
+  usecase "Buscar productos" as P5
+  usecase "Validar código único" as P6
+}
+
+Admin --> P1
+Admin --> P2
+Admin --> P3
+Admin --> P4
+Admin --> P5
+
+Interno --> P2
+Interno --> P5
+
+P1 ..> P6 : incluye
+P2 ..> P6 : incluye
+
+note right of P4
+La inactivación conserva el historial
+en pedidos y facturas anteriores.
+end note
+@enduml

@@ -1,0 +1,104 @@
+@startuml FINAN_X_Clases
+' 8. Diagrama de clases (modelo de dominio)
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+
+class Usuario {
+  - usuarioId : int
+  - nombre : string
+  - correo : string
+  - passwordHash : string
+  - estado : string
+  + iniciarSesion() : Token
+}
+class Rol {
+  - rolId : int
+  - nombre : string
+  - descripcion : string
+}
+class UsuarioCliente {
+  - usuarioClienteId : int
+  - username : string
+  - passwordHash : string
+  - estado : string
+}
+class Cliente {
+  - clienteId : int
+  - tipoCliente : string
+  - tipoIdentificacion : string
+  - numeroIdentificacion : string
+  - nombreRazonSocial : string
+  - telefono : string
+  - correo : string
+  - direccion : string
+  - ciudad : string
+  - estado : string
+  + saldoPendiente() : decimal
+}
+class Producto {
+  - productoId : int
+  - codigo : string
+  - nombre : string
+  - descripcion : string
+  - categoria : string
+  - precio : decimal
+  - impuesto : decimal
+  - unidadMedida : string
+  - estado : string
+}
+class Pedido {
+  - pedidoId : int
+  - numeroPedido : string
+  - fecha : date
+  - subtotal : decimal
+  - impuestos : decimal
+  - total : decimal
+  - estado : string
+  + calcularTotales() : void
+}
+class DetallePedido {
+  - detalleId : int
+  - cantidad : decimal
+  - precioUnitario : decimal
+  - subtotal : decimal
+}
+class Factura {
+  - facturaId : int
+  - numeroFactura : string
+  - fechaEmision : date
+  - fechaVencimiento : date
+  - subtotal : decimal
+  - impuestos : decimal
+  - total : decimal
+  - estado : string
+  - motivoAnulacion : string
+  + saldo() : decimal
+  + estadoPago() : string
+}
+class Pago {
+  - pagoId : int
+  - numeroPago : string
+  - fecha : date
+  - valor : decimal
+  - metodoPago : string
+  - referencia : string
+}
+class Auditoria {
+  - auditoriaId : int
+  - fechaHora : datetime
+  - modulo : string
+  - operacion : string
+  - registroAfectado : string
+  - descripcion : string
+}
+
+Usuario "N" --> "1" Rol : pertenece a
+Usuario "1" --> "N" Auditoria : genera
+UsuarioCliente "0..1" --> "1" Cliente : accede a
+Cliente "1" --> "N" Pedido : realiza
+Cliente "1" --> "N" Factura : recibe
+Pedido "1" --> "N" DetallePedido : contiene
+Producto "1" --> "N" DetallePedido : incluido en
+Pedido "1" --> "0..1" Factura : genera
+Factura "1" --> "N" Pago : recibe
+@enduml

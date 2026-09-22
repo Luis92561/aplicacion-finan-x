@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FINAN-X · Mockup 09 · Notas de crédito</title>
+  <link rel="stylesheet" href="mockup-style.css">
+</head>
+<body>
+
+  <div class="topbar">
+    <span class="brand">FINAN<span class="dot">·</span>X</span>
+    <span class="tag">Prototipo</span>
+    <span class="nav-pills">
+      <span>Inicio</span><span>Clientes</span><span>Productos</span>
+      <span>Pedidos</span><span>Facturas</span><span>Caja</span><span class="active">Retorno</span><span>Reportes</span>
+    </span>
+  </div>
+
+  <div class="banner">🧩 Pantalla 09 de 14 — <b>Notas de crédito (devoluciones)</b>. Devuelve dinero de una factura ya cobrada; la nota activa aumenta el saldo pendiente de la factura.</div>
+
+  <div class="row">
+    <div class="col">
+      <div class="panel">
+        <h2 class="panel-title">Crear nota de crédito</h2>
+        <p class="panel-sub">Solo sobre facturas con pagos recibidos</p>
+        <label>Factura</label>
+        <select><option>FAC-000134 · María F. López · Recaudado $ 5.000.000</option></select>
+        <label>Valor a devolver</label>
+        <input placeholder="Máximo: el recaudado neto ($ 5.000.000)" class="phg">
+        <label>Motivo (obligatorio)</label>
+        <textarea rows="3" placeholder="Ej.: devolución parcial por ítem dañado en entrega…" class="phg"></textarea>
+        <div style="margin-top:14px"><a class="btn primary">Crear nota de crédito</a></div>
+        <div class="demo-box"><b>Regla:</b> las notas activas de una factura no pueden superar el recaudado neto (pagos − notas activas previas). El sistema rechaza valores mayores (sobredevolución).</div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="panel">
+        <h2 class="panel-title">Notas registradas</h2>
+        <table>
+          <tr><th>N.º</th><th>Factura</th><th>Valor</th><th>Motivo</th><th>Estado</th><th></th></tr>
+          <tr><td>NC-000021</td><td>FAC-000134</td><td>$ 800.000</td><td>Devolución parcial por ítem dañado</td><td><span class="chip green">Activa</span></td><td><a class="btn small">Anular</a></td></tr>
+          <tr><td>NC-000020</td><td>FAC-000133</td><td>$ 250.000</td><td>Ajuste de precio acordado</td><td><span class="chip">Anulada</span></td><td>—</td></tr>
+        </table>
+        <p class="field-hint" style="margin-top:12px">Anular una nota requiere motivo; solo se anula una vez y no puede reanularse. El saldo de la factura se recalcula al instante.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">FINAN-X · Mockup 09 · Notas de crédito · <strong>Prototipo de demostración — no es la aplicación final</strong></div>
+
+</body>
+</html>

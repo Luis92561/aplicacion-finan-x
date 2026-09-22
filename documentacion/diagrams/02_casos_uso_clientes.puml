@@ -1,0 +1,45 @@
+@startuml FINAN_X_Casos_Clientes
+' 2. Casos de uso de clientes (RF-C01..C06, CU-09, CU-10)
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangles
+skinparam actorStyle awesome
+
+actor "Administrador" as Admin
+actor "Facturador" as Facturador
+actor "Cliente" as Cliente
+
+rectangle "Gestión de clientes" {
+  usecase "Registrar cliente" as C1
+  usecase "Consultar cliente" as C2
+  usecase "Actualizar cliente" as C3
+  usecase "Inactivar cliente" as C4
+  usecase "Buscar cliente" as C5
+  usecase "Validar duplicados por identificación" as C6
+  usecase "Crear cuenta de acceso del cliente" as C7
+  usecase "Consultar mis datos" as C8
+}
+
+Admin --> C1
+Admin --> C2
+Admin --> C3
+Admin --> C4
+Admin --> C5
+Admin --> C7
+
+Facturador --> C1
+Facturador --> C2
+Facturador --> C3
+Facturador --> C5
+
+C1 ..> C6 : incluye
+C2 ..> C6 : incluye
+
+Cliente --> C8
+
+note right of C8
+La pantalla carga automáticamente los datos
+del cliente autenticado; no se permite
+seleccionar otro cliente.
+end note
+@enduml

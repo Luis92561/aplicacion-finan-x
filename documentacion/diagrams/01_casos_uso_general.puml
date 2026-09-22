@@ -1,0 +1,65 @@
+@startuml FINAN_X_Casos_General
+' 1. Diagrama general de casos de uso
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangles
+skinparam actorStyle awesome
+
+actor Administrador as Admin
+actor Facturador as Facturador
+actor "Responsable de Pagos" as Pagos
+actor Supervisor as Super
+actor "Cliente" as Cliente
+
+rectangle "FINAN-X" {
+  usecase "Gestionar usuarios y roles" as U
+  usecase "Gestionar clientes" as C
+  usecase "Gestionar productos" as P
+  usecase "Gestionar pedidos" as PD
+  usecase "Gestionar facturas" as F
+  usecase "Gestionar pagos" as PA
+  usecase "Consultar saldos" as S
+  usecase "Generar reportes" as R
+  usecase "Consultar historial financiero" as H
+  usecase "Consultar auditoría" as A
+  usecase "Iniciar sesión" as L
+  usecase "Consultar mis datos / compras / facturas / pagos / saldo" as M
+}
+
+Admin --> U
+Admin --> C
+Admin --> P
+Admin --> PD
+Admin --> F
+Admin --> PA
+Admin --> S
+Admin --> R
+Admin --> H
+Admin --> A
+
+Facturador --> C
+Facturador --> P
+Facturador --> PD
+Facturador --> F
+Facturador --> S
+
+Pagos --> F
+Pagos --> PA
+Pagos --> S
+
+Super --> F
+Super --> PA
+Super --> S
+Super --> R
+Super --> H
+Super --> A
+
+Cliente --> L
+Cliente --> M
+
+note right of M
+El cliente solo consulta información
+asociada a su cuenta autenticada.
+No puede acceder a datos de terceros.
+end note
+@enduml

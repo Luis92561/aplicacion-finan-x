@@ -1,0 +1,171 @@
+/* ============================================================
+   FINAN-X · Mockups / Prototipo de demostración (wireframes)
+   Estilo deliberadamente "de maqueta": cajas punteadas, barras
+   grises y textos de ejemplo. NO es la aplicación final.
+   ============================================================ */
+:root {
+  --line: #cbd5e1;
+  --ink: #334155;
+  --muted: #94a3b8;
+  --ph: #e8edf3;
+  --accent: #2563eb;
+  --accent-ph: #dbeafe;
+  --warn: #b45309;
+  --warn-ph: #fef3c7;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--ink);
+  background: #f6f8fb;
+  margin: 0;
+  padding: 26px 30px 60px;
+}
+a { color: var(--accent); }
+
+/* —— Barra superior —— */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #fff;
+  border: 1.5px dashed var(--line);
+  border-radius: 14px;
+  padding: 12px 18px;
+  margin-bottom: 20px;
+}
+.brand { font-weight: 800; font-size: 17px; letter-spacing: .02em; }
+.brand .dot { color: var(--accent); }
+.tag {
+  font-size: 11px; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--accent);
+  background: var(--accent-ph);
+  border: 1.5px solid var(--accent);
+  border-radius: 999px; padding: 4px 12px;
+}
+.tag.demo { color:#fff; background: var(--accent); border-color: var(--accent); }
+.nav-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+.nav-pills span {
+  font-size: 11px; color: var(--muted);
+  background: var(--ph); border-radius: 999px; padding: 5px 12px;
+}
+.nav-pills .active { color: var(--ink); font-weight: 700; background: #fff; border: 1.5px dashed var(--ink); }
+
+/* —— Aviso demo —— */
+.banner {
+  display: flex; gap: 10px; align-items: center;
+  background: var(--warn-ph);
+  border: 1.5px solid #fcd34d;
+  color: var(--warn);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px; font-weight: 600;
+  margin-bottom: 18px;
+}
+
+/* —— Paneles / cajas —— */
+.panel {
+  background: #fff;
+  border: 1.5px dashed var(--line);
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-bottom: 18px;
+}
+.panel-title {
+  font-size: 14px; font-weight: 800; letter-spacing: .02em;
+  margin: 0 0 4px; text-transform: uppercase; color: var(--ink);
+}
+.panel-sub { font-size: 12px; color: var(--muted); margin: 0 0 14px; }
+.row { display: flex; gap: 16px; flex-wrap: wrap; }
+.col { flex: 1; min-width: 240px; }
+
+/* —— Placeholders (barras grises) —— */
+.ph { background: var(--ph); border-radius: 6px; }
+.bar { height: 13px; background: var(--ph); border-radius: 6px; margin: 7px 0; }
+.bar.w20 { width: 20%; } .bar.w35 { width: 35%; } .bar.w50 { width: 50%; }
+.bar.w65 { width: 65%; } .bar.w80 { width: 80%; }
+.chip {
+  display: inline-block; font-size: 11px; font-weight: 700;
+  background: var(--ph); color: #64748b; border-radius: 6px; padding: 3px 8px;
+}
+.chip.green { background: #dcfce7; color: #15803d; }
+.chip.blue  { background: var(--accent-ph); color: var(--accent); }
+.chip.red   { background: #fee2e2; color: #b91c1c; }
+.chip.amber { background: #fef3c7; color: #b45309; }
+.chip.dashed{border: 1.5px dashed var(--ink); background: #fff; color: var(--ink);}
+
+/* —— Fila de datos ficticios (tablas wireframe) —— */
+.datarow { display: grid; gap: 8px; margin: 8px 0; }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+.grid-5 { grid-template-columns: repeat(5, 1fr); }
+.grid-6 { grid-template-columns: repeat(6, 1fr); }
+
+/* —— Tablas de ejemplo —— */
+table { width: 100%; border-collapse: collapse; }
+th {
+  text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em;
+  color: var(--muted); border-bottom: 1.5px solid var(--line); padding: 8px 6px;
+}
+td { padding: 11px 6px; border-bottom: 1px dashed var(--line); font-size: 13px; }
+tr:hover td { background: #f8fafc; }
+
+/* —— Formularios de ejemplo —— */
+label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 12px 0 5px; }
+input, textarea, select {
+  width: 100%; border: 1.5px dashed var(--line); border-radius: 8px;
+  padding: 10px 12px; font-size: 13px; color: var(--muted); background: #fff;
+}
+input.phg::placeholder, textarea.phg::placeholder { color: #aab4c3; font-style: italic; }
+.field-hint { font-size: 11.5px; color: var(--muted); margin-top: 4px; }
+
+/* —— Botones —— */
+.btn {
+  display: inline-block; padding: 9px 16px; border-radius: 9px;
+  font-size: 13px; font-weight: 700; text-decoration: none; cursor: pointer;
+  border: 1.5px dashed var(--ink); color: var(--ink); background: #fff;
+}
+.btn.primary { background: var(--accent-ph); border-color: var(--accent); border-style: solid; color: var(--accent); }
+.btn.small { padding: 5px 11px; font-size: 12px; }
+
+/* —— Tarjetas de métricas (dashboard) —— */
+.metric {
+  border: 1.5px dashed var(--line); border-radius: 12px; padding: 14px 16px;
+  background: #fff; text-align: left;
+}
+.metric .k { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.metric .v { display:block; font-size: 24px; font-weight: 800; margin-top: 4px; }
+.metric .bar { margin: 12px 0 0; height: 8px; }
+
+/* —— Modal de ejemplo —— */
+.modal-bg {
+  border: 1.5px solid #64748b; border-radius: 14px;
+  background: rgba(255,255,255,.96); padding: 26px;
+  max-width: 520px; margin: 14px 0; box-shadow: 0 10px 30px rgba(100,116,139,.18);
+}
+.modal-title { font-size: 16px; font-weight: 800; margin: 0 0 2px; }
+
+/* —— Credenciales / caja de demo —— */
+.demo-box {
+  background: #f8fafc; border: 1.5px dashed var(--line); border-radius: 10px;
+  padding: 12px 14px; font-size: 12.5px; color: #475569; margin-top: 12px;
+}
+
+/* —— Pie —— */
+.footer {
+  margin-top: 30px; text-align: center; font-size: 11px; color: var(--muted);
+}
+.footer strong { color: #64748b; }
+
+/* ============================================================
+   Impresión / PDF: fondo blanco, colores exactos, sin cortes
+   ============================================================ */
+@media print {
+  body { background: #ffffff; padding: 0; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .topbar, .banner, .panel, .metric, .modal-bg, .demo-box {
+    break-inside: avoid; page-break-inside: avoid;
+  }
+  .banner { background: #fff7ed; }
+  .footer { position: static; }
+}
+@page { margin: 12mm; }

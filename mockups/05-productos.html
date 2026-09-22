@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FINAN-X · Mockup 05 · Productos</title>
+  <link rel="stylesheet" href="mockup-style.css">
+</head>
+<body>
+
+  <div class="topbar">
+    <span class="brand">FINAN<span class="dot">·</span>X</span>
+    <span class="tag">Prototipo</span>
+    <span class="nav-pills">
+      <span>Inicio</span><span>Clientes</span><span class="active">Productos</span>
+      <span>Pedidos</span><span>Facturas</span><span>Caja</span><span>Retorno</span><span>Reportes</span>
+    </span>
+  </div>
+
+  <div class="banner">🧩 Pantalla 05 de 14 — <b>Módulo de productos</b>. Catálogo con precio e impuesto; el precio e IVA al momento del pedido los calcula el servidor.</div>
+
+  <div class="panel">
+    <div class="row" style="align-items:end">
+      <div class="col">
+        <label for="q">Buscar</label>
+        <input id="q" placeholder="Código, nombre o categoría…" class="phg">
+      </div>
+      <div style="padding-bottom:4px"><a class="btn primary">+ Nuevo producto</a></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <table>
+      <tr><th>Código</th><th>Nombre</th><th>Categoría</th><th>Precio</th><th>IVA</th><th>Estado</th><th>Acciones</th></tr>
+      <tr><td>PROD-001</td><td>Laptop 15"</td><td>Cómputo</td><td>$ 4.500.000</td><td>19 %</td><td><span class="chip green">Activo</span></td><td><a class="btn small">Editar</a></td></tr>
+      <tr><td>PROD-002</td><td>Monitor 27"</td><td>Cómputo</td><td>$ 2.100.000</td><td>19 %</td><td><span class="chip green">Activo</span></td><td><a class="btn small">Editar</a></td></tr>
+      <tr><td>PROD-003</td><td>Teclado mecánico</td><td>Cómputo</td><td>$ 280.000</td><td>19 %</td><td><span class="chip green">Activo</span></td><td><a class="btn small">Editar</a></td></tr>
+      <tr><td>PROD-004</td><td>Servicio de soporte</td><td>Servicios</td><td>$ 150.000</td><td>0 %</td><td><span class="chip amber">Inactivo</span></td><td><a class="btn small">Editar</a></td></tr>
+    </table>
+    <p class="field-hint" style="margin-top:12px">Validaciones: código único · precio ≥ 0 · impuesto entre 0 y 100 %. Los productos inactivos no pueden usarse en pedidos nuevos.</p>
+  </div>
+
+  <div class="footer">FINAN-X · Mockup 05 · Productos · <strong>Prototipo de demostración — no es la aplicación final</strong></div>
+
+</body>
+</html>

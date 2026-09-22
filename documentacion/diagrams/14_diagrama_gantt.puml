@@ -1,0 +1,50 @@
+@startgantt FINAN_X_Diagrama_Gantt
+!theme plain
+title FINAN-X · Diagrama de Gantt simulado (21 ago - 28 sep 2026)
+project starts 2026-08-21
+saturday are closed
+sunday are closed
+printscale weekly
+
+' ====== Semana 1 (21-27 ago) ======
+-- Semana 1 · 21-27 ago --
+[Requisitos y alcance (F0)] starts 2026-08-21 and requires 2 days
+[Arquitectura hexagonal y stack (F0)] starts 2026-08-24 and requires 2 days
+[Infraestructura Docker (F1)] starts 2026-08-25 and requires 3 days
+[Entrega 1 · vie 28 ago] happens 2026-08-28
+
+' ====== Semana 2 (28 ago - 3 sep) ======
+-- Semana 2 · 28 ago - 3 sep --
+[Modelo de datos y seed (F2)] starts 2026-08-28 and requires 2 days
+[API REST del núcleo: auth, clientes, productos, pedidos (F3)] starts 2026-08-31 and requires 4 days
+[Entrega 2 · vie 4 sep] happens 2026-09-04
+
+' ====== Semana 3 (4-10 sep) ======
+-- Semana 3 · 4-10 sep --
+[API: facturas, pagos, notas, reportes, auditoria, portal (F3)] starts 2026-09-04 and requires 3 days
+[Frontend: panel interno React (F4)] starts 2026-09-07 and requires 4 days
+[Entrega 3 · vie 11 sep] happens 2026-09-11
+
+' ====== Semana 4 (11-17 sep) ======
+-- Semana 4 · 11-17 sep --
+[Portal del cliente aislado (F5)] starts 2026-09-11 and requires 3 days
+[Seguridad y endurecimiento (F6)] starts 2026-09-14 and requires 3 days
+[Suite e2e base 74 casos (F7)] starts 2026-09-16 and requires 2 days
+[Entrega 4 · vie 18 sep] happens 2026-09-18
+
+' ====== Semana 5 (18-24 sep) ======
+-- Semana 5 · 18-24 sep --
+[Notas de crédito y saldo derivado (F8)] starts 2026-09-18 and requires 2 days
+[Recuperación de contraseña OTP (F9)] starts 2026-09-21 and requires 4 days
+[Entrega 5 · vie 25 sep] happens 2026-09-25
+
+' ====== Semana 6 (25-28 sep, cierre) ======
+-- Semana 6 · 25-28 sep (cierre) --
+[Datos de pago en línea, PCI (F10)] starts 2026-09-25 and requires 2 days
+[Documentación, specs y mockups (F12)] starts 2026-09-25 and requires 3 days
+[Verificación final e2e 99/99 (F11)] starts 2026-09-27 and requires 2 days
+[Entrega final · lun 28 sep] happens 2026-09-28
+
+hide footbox
+
+@enduml

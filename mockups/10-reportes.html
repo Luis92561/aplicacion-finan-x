@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FINAN-X · Mockup 10 · Reportes</title>
+  <link rel="stylesheet" href="mockup-style.css">
+</head>
+<body>
+
+  <div class="topbar">
+    <span class="brand">FINAN<span class="dot">·</span>X</span>
+    <span class="tag">Prototipo</span>
+    <span class="nav-pills">
+      <span>Inicio</span><span>Clientes</span><span>Productos</span>
+      <span>Pedidos</span><span>Facturas</span><span>Caja</span><span>Retorno</span><span class="active">Reportes</span>
+    </span>
+  </div>
+
+  <div class="banner">🧩 Pantalla 10 de 14 — <b>Reportes y balances</b>. Visión financiera: resumen, facturación por período y balance por cliente con historial detallado.</div>
+
+  <div class="panel">
+    <div class="row" style="align-items:end">
+      <div class="col"><label>Desde</label><input placeholder="01/09/2026" class="phg"></div>
+      <div class="col"><label>Hasta</label><input placeholder="30/09/2026" class="phg"></div>
+      <div class="col"><label>Cliente</label><select><option>Todos</option><option>María F. López</option><option>TecnoAndina S.A.S.</option></select></div>
+      <div style="padding-bottom:4px"><a class="btn primary">Generar reporte</a></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <div class="panel">
+        <h2 class="panel-title">Resumen del período</h2>
+        <div class="metric" style="margin-bottom:10px"><div class="k">Facturas emitidas</div><span class="v">128</span></div>
+        <div class="metric" style="margin-bottom:10px"><div class="k">Valor facturado</div><span class="v">$ 86,4 M</span></div>
+        <div class="metric" style="margin-bottom:10px"><div class="k">Recaudado</div><span class="v">$ 71,2 M</span></div>
+        <div class="metric"><div class="k">Saldo por cobrar</div><span class="v">$ 15,2 M</span></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="panel">
+        <h2 class="panel-title">Balance por cliente (ejemplo)</h2>
+        <table>
+          <tr><th>Cliente</th><th>Facturado</th><th>Pagado</th><th>Saldo</th></tr>
+          <tr><td>María F. López</td><td>$ 18.550.000</td><td>$ 15.700.000</td><td>$ 2.850.000</td></tr>
+          <tr><td>TecnoAndina S.A.S.</td><td>$ 61.400.000</td><td>$ 55.280.000</td><td>$ 6.120.000</td></tr>
+          <tr><td>Pedro Suárez</td><td>$ 6.450.000</td><td>$ 6.000.000</td><td>$ 450.000</td></tr>
+        </table>
+        <p class="field-hint" style="margin-top:12px">El historial de cada cliente muestra facturas, pagos y notas de crédito con <b>saldo móvil</b>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">FINAN-X · Mockup 10 · Reportes · <strong>Prototipo de demostración — no es la aplicación final</strong></div>
+
+</body>
+</html>

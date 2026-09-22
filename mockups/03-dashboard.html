@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FINAN-X · Mockup 03 · Dashboard</title>
+  <link rel="stylesheet" href="mockup-style.css">
+</head>
+<body>
+
+  <div class="topbar">
+    <span class="brand">FINAN<span class="dot">·</span>X</span>
+    <span class="tag">Prototipo</span>
+    <span class="nav-pills">
+      <span class="active">Inicio</span><span>Clientes</span><span>Productos</span>
+      <span>Pedidos</span><span>Facturas</span><span>Caja</span><span>Retorno</span><span>Reportes</span>
+    </span>
+  </div>
+
+  <div class="banner">🧩 Pantalla 03 de 14 — <b>Dashboard del panel interno</b>. Resumen del día y accesos rápidos a cada módulo (solo usuario autenticado; el menú se adapta al rol).</div>
+
+  <div class="panel">
+    <div class="row">
+      <div class="metric"><div class="k">Facturas del mes</div><span class="v">128</span><div class="bar w35"></div></div>
+      <div class="metric"><div class="k">Valor facturado</div><span class="v">$ 86,4 M</span><div class="bar w65"></div></div>
+      <div class="metric"><div class="k">Recaudado</div><span class="v">$ 71,2 M</span><div class="bar w50"></div></div>
+      <div class="metric"><div class="k">Saldo por cobrar</div><span class="v">$ 15,2 M</span><div class="bar w20"></div></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <div class="panel">
+        <h2 class="panel-title">Accesos rápidos</h2>
+        <p class="panel-sub">Ejemplo de navegación del menú lateral</p>
+        <p><a class="btn" style="margin-right:8px">Nuevo pedido</a><a class="btn">Registrar pago</a></p>
+        <p><span class="chip">Clientes</span> <span class="chip">Productos</span> <span class="chip">Facturas</span> <span class="chip">Notas de crédito</span> <span class="chip">Balances</span> <span class="chip">Auditoría (solo ADMIN/Supervisor)</span></p>
+      </div>
+      <div class="panel">
+        <h2 class="panel-title">Últimas facturas</h2>
+        <div class="datarow grid-4">
+          <div><span class="chip blue">FAC-000143</span></div><div><span class="chip green">PAGADA</span></div>
+          <div class="bar w50" style="align-self:center"></div><div class="bar w35" style="align-self:center"></div>
+        </div>
+        <div class="datarow grid-4">
+          <div><span class="chip blue">FAC-000144</span></div><div><span class="chip amber">PAGO PARCIAL</span></div>
+          <div class="bar w65" style="align-self:center"></div><div class="bar w20" style="align-self:center"></div>
+        </div>
+        <div class="datarow grid-4">
+          <div><span class="chip blue">FAC-000145</span></div><div><span class="chip">PENDIENTE</span></div>
+          <div class="bar w35" style="align-self:center"></div><div class="bar w50" style="align-self:center"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="panel">
+        <h2 class="panel-title">Gráfica ficticia</h2>
+        <p class="panel-sub">Facturación de la semana (datos de ejemplo)</p>
+        <div class="datarow grid-5">
+          <div class="bar" style="height:70px"></div>
+          <div class="bar" style="height:40px"></div>
+          <div class="bar" style="height:110px"></div>
+          <div class="bar" style="height:85px"></div>
+          <div class="bar" style="height:60px"></div>
+        </div>
+        <p class="field-hint">Barras de ejemplo · Monetización real en el dashboard final con datos de la base.</p>
+      </div>
+      <div class="panel">
+        <h2 class="panel-title">Avisos del día</h2>
+        <p><span class="chip amber">3</span> clientes con saldo vencido</p>
+        <p><span class="chip blue">5</span> facturas por vencer esta semana</p>
+        <p><span class="chip">0</span> notas de crédito pendientes de revisar</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">FINAN-X · Mockup 03 · Dashboard · <strong>Prototipo de demostración — no es la aplicación final</strong></div>
+
+</body>
+</html>
