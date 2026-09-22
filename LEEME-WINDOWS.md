@@ -1,6 +1,6 @@
-# 📦 FINAN-X en Windows · Guía rápida
+# FINAN-X en Windows · Guía completa
 
-Este proyecto está construido con **Docker**, así que se abre en Windows casi igual que en Mac: solo necesitas **Docker Desktop for Windows**. Aquí está todo lo que necesitas, paso a paso.
+Este proyecto usa **Docker**, así que en Windows se abre casi igual que en Mac: solo necesitas **Docker Desktop for Windows** + **Git for Windows**. El código viaja por **GitHub** (repositorio privado), así que no hace falta USB para el código — solo para mover datos entre PC (opcional, al final).
 
 ---
 
@@ -10,82 +10,85 @@ Este proyecto está construido con **Docker**, así que se abre en Windows casi 
 |---|---|
 | **Windows 10 u 11** (64 bits) | Hogar/Pro, actualizado |
 | **Docker Desktop for Windows** | Gratis: https://www.docker.com/products/docker-desktop/ |
-| Internet | Para la primera descarga de imágenes (PostgreSQL 16, Node 22, nginx) |
+| **Git for Windows** | Gratis: https://git-scm.com/download/win |
+| Internet | Para descargar imágenes (PostgreSQL 16, Node 22, nginx) y clonar el repo |
 | RAM recomendada | 8 GB o más (4 GB mínimo) |
 
-> ⚠️ Durante la instalación de Docker Desktop **acepta usar el motor WSL 2** (es la opción recomendada por defecto). Esto requiere que la **virtualización esté activada en la BIOS** (normalmente ya lo está; si no, entra a la BIOS y activa "Intel VT-x").
+> Durante la instalación de Docker Desktop **acepta el motor WSL 2** (opción recomendada por defecto). Esto requiere que la **virtualización esté activada en la BIOS** (normalmente ya lo está; si no, activa "Intel VT-x" o "AMD-V").
 
 ---
 
-## 1. Instalar Docker Desktop
+## 1. Instalar Docker Desktop y Git
 
-1. Descarga e instala **Docker Desktop for Windows**.
-2. Al terminar, **reinicia el equipo** si te lo pide.
-3. Abre **Docker Desktop** y espera a que el "whale" deje de girar (abajo a la izquierda debe decir *Engine running*).
-4. Para comprobar que quedó bien, abre **PowerShell** y escribe:
+1. **Docker Desktop for Windows**: descarga, instala, reinicia si lo pide.
+2. **Git for Windows**: descarga e instala con las opciones por defecto (al final te pregunta el editor — puedes dejar el que venga, o elegir VS Code).
+3. Abre **Docker Desktop** y espera a que abajo a la izquierda diga *Engine running*.
+4. Abre **PowerShell** y verifica:
 
 ```powershell
 docker version
+git --version
 ```
 
-Debe mostrar una versión (p. ej. `27.x`). Si dice *"command not found"*, reinicia PowerShell o el equipo.
+Ambos deben responder con versión (p. ej. `docker 27.x`, `git 2.4x`).
+
+> Si PowerShell te bloquea los scripts (mensaje azul "Execution Policy"), ejecuta **una vez**:
+>
+> ```powershell
+> Set-ExecutionPolicy -Scope LocalMachine RemoteSigned
+> ```
+> (respóndele **Y**). Esto es lo que hace que `.\levantar.ps1` pueda ejecutarse.
 
 ---
 
-## 2. Pasar el proyecto a la PC
+## 2. Traer el proyecto a la PC (git clone)
 
-1. Copia el archivo **`FINANX-PROYECTO.zip`** (te lo dejo listo en este mismo proyecto) a la PC Windows, por USB, Google Drive, iCloud, WhatsApp… como prefieras.
-2. Descomprímelo en una ruta **sin espacios ni símbolos raros**. Idea:
+Abre PowerShell y escribe:
 
+```powershell
+git clone https://github.com/Luis92561/aplicacion-finan-x.git C:\FINANX
+cd C:\FINANX
 ```
-C:\FINANX
-```
 
-> 💡 Si lo descomprimes dentro de *Documentos* o el *Escritorio* con nombre "Project Facturacion Finan-x", también funciona, pero las rutas con espacios dan problemas en algunas herramientas. `C:\FINANX` es lo más limpio.
+Te pedirá usuario y contraseña **(contraseña = token de GitHub**, no tu contraseña normal). Si no tienes token, créalo: GitHub → Settings → Developer settings → **Personal access tokens → Tokens (classic) → Generate** → marca **`repo`** → copia el token → úsalo como contraseña.
 
 Dentro de `C:\FINANX` debe quedar:
 
 ```
 C:\FINANX\
 ├── docker-compose.yml
-├── levantar.ps1        ← script para Windows (nuevo)
-├── iniciar-app.ps1     ← script para Windows (nuevo)
-├── database\           (init.sql y migraciones)
-├── backend\            (API Node.js)
-└── frontend\           (aplicación React)
+├── levantar.ps1            ← arranca todo (Windows)
+├── iniciar-app.ps1         ← arranca + abre el navegador (Windows)
+├── sincronizar-datos.ps1   ← mover datos entre PC (Windows)
+├── database\               (init.sql y migraciones)
+├── backend\                (API Node.js)
+└── frontend\               (aplicación React)
 ```
+
+> Ruta `C:\FINANX` = sin espacios ni acentos → sin problemas con Docker.
 
 ---
 
 ## 3. Arrancar la aplicación
-
-1. Abre **PowerShell**:
-   - Pulsa `Inicio`, escribe `PowerShell`, dale Enter.
-   - (O clic derecho sobre la carpeta `C:\FINANX` → *Abrir en terminal*.)
-2. Ve a la carpeta y arranca:
 
 ```powershell
 cd C:\FINANX
 .\levantar.ps1
 ```
 
-3. La primera vez **tardará varios minutos** (descarga PostgreSQL, Node, nginx y compila el frontend). Las siguientes veces es casi instantáneo.
-4. Cuando termine **se abrirá tu navegador** en:
+1. **La primera vez tarda varios minutos** (descarga PostgreSQL, Node, nginx y compila el frontend). Las siguientes veces es casi instantáneo.
+2. Si Docker Desktop no está abierto, **el script lo abre solo y espera** a que esté listo.
+3. Al terminar se abre tu navegador en:
 
 ```
-http://localhost:8080
+http://localhost:8080/login
 ```
 
-> Si PowerShell te bloquea el script con un mensaje azul de "Execution Policy", ejecuta antes esto (solo para la ventana actual):
->
-> ```powershell
-> Set-ExecutionPolicy -Scope Process Bypass
-> ```
-> y vuelve a intentar `.\levantar.ps1`.
+> ¿Prefieres el navegador y que de paso verifique que esté arriba? Usa `.\iniciar-app.ps1`.
 
 ---
 
-## 4. Iniciar sesión
+## 4. Iniciar sesión (credenciales demo)
 
 | Rol | Correo | Contraseña |
 |---|---|---|
@@ -97,35 +100,50 @@ http://localhost:8080
 
 ---
 
-## 5. Detener / reiniciar
+## 5. Mantener el código actualizado (Mac ↔ PC)
+
+Cuando en **una** PC cambias código, súbelo. En la **otra**, bájalo.
+
+**Al terminar de trabajar (en la PC que modificó):**
+```powershell
+git add -A
+git commit -m "describe lo que hiciste"
+git push
+```
+
+**Al empezar a trabajar (en la otra PC):**
+```powershell
+git pull
+```
+
+> Haz `git pull` **antes** de tocar código. Si tus archivos están en conflicto, PowerShell te lo dirá y se resuelve a mano (o me lo pegas aquí).
+
+---
+
+## 6. Detener / reiniciar
 
 ```powershell
 .\levantar.ps1 --stop         # detiene la app (los datos se conservan)
 .\levantar.ps1                # la vuelve a levantar
-.\iniciar-app.ps1             # levanta y abre el navegador
-.\iniciar-app.ps1 stop        # detiene
-.\iniciar-app.ps1 url         # solo abre el navegador (si ya corre)
+.\levantar.ps1 --purge        # detiene y BORRA los datos (instalación nueva)
 ```
 
-> ⚠️ `--purge` borra TODOS los datos (como si fuera una instalación nueva). No lo uses si quieres conservar los registros.
+> ⚠️ `--purge` borra TODOS los datos. No lo uses si quieres conservar registros.
 
 ---
 
-## 6. Abrir la base de datos en PostgreSQL (Windows)
+## 7. Abrir la base de datos (Windows)
 
-La base corre dentro de Docker en el puerto **5432**, igual que en Mac:
+La base corre dentro de Docker en el puerto **5432** (igual que en Mac):
 
-**Opción A — Consola (psql):**
-
+**Consola:**
 ```powershell
 docker exec -it finanx-db psql -U finanx -d finanx
 ```
 
-**Opción B — Con pgAdmin (como ya sabes):**
-
-1. Instala **pgAdmin 4** para Windows (el instalador `.exe` de 64 bits, no el ARM — la mayoría de PCs son x64): https://www.pgadmin.org/download/
-2. Abre pgAdmin → clic derecho en *Servers* → **Register → Server…**
-3. Conexión:
+**pgAdmin 4** (opcional):
+1. Instala **pgAdmin 4 for Windows** (el `.exe` de 64 bits / x64).
+2. Register → Server:
 
 | Campo | Valor |
 |---|---|
@@ -139,50 +157,40 @@ docker exec -it finanx-db psql -U finanx -d finanx
 
 ---
 
-## 7. Problemas comunes en Windows (y su solución)
+## 8. Problemas comunes (y su solución)
 
 | Problema | Solución |
 |---|---|
-| `docker: command not found` | Docker Desktop no instalado o PowerShell no reiniciado. Repite el paso 1. |
-| *"WSL 2 installation is incomplete"* | Abre PowerShell como administrador y ejecuta `wsl --update`, luego reinicia y abre Docker Desktop. |
-| *"Virtualization is not enabled"* | Activa "Intel VT-x" (o AMD-V) en la BIOS y reinicia. |
-| El puerto 5432/4000/8080 está ocupado | Otra app usa esos puertos. Cierra esa app, o cambia el puerto en `docker-compose.yml` (ej. `"8081:80"` y abre `http://localhost:8081`). |
-| Los scripts `.sh` (Mac) fallan aquí | Son de Mac/Linux. **Usa los `.ps1`** que vienen en esta carpeta: `levantar.ps1` e `iniciar-app.ps1`. |
+| `docker: command not found` | Docker no instalado o PowerShell no reiniciado. Repite el paso 1. |
+| *"WSL 2 installation is incomplete"* | PowerShell como administrador → `wsl --update` → reinicia y abre Docker Desktop. |
+| *"Virtualization is not enabled"* | Activa "Intel VT-x" / "AMD-V" en la BIOS y reinicia. |
+| El puerto 5432/4000/8080 está ocupado | Otra app usa esos puertos. Ciérrala, o cambia el puerto en `docker-compose.yml`. |
+| *"Test-DockerRunning : el término ... no se reconoce"* | Ese error **ya está corregido** en las últimas versiones de los scripts. Ejecuta `git pull` para traerlas. |
+| *"failed to connect to the docker API ... daemon is not running"* | Docker Desktop no estaba encendido. El script ahora **lo abre solo** y espera ~2 min. O ábrelo manualmente y deja que diga *Engine running*. |
+| Los scripts `.sh` fallan aquí | Son de Mac/Linux. **Usa los `.ps1`**: `levantar.ps1`, `iniciar-app.ps1`. |
+| El antivirus bloquea Docker | Agrega Docker Desktop a las exclusiones del antivirus. |
 | La primera carga es muy lenta | Es normal (descarga imágenes). Las siguientes son rápidas. |
-| El antivirus bloquea Docker | Agrega Docker Desktop a las exclusiones del antivirus (Windows Defender → permitir en la carpeta de datos de Docker). |
-| No veo las 2 imágenes… ¿dónde está la app? | Revisa contenedores: `docker compose ps`. Los tres (db, backend, frontend) deben estar "Up". |
 
 ---
 
-## 8. (Opcional) Llevarse los datos actuales a la PC nueva
+## 9. (Opcional) Llevar los datos de una PC a la otra
 
-Quien arranca la app en la PC nueva empieza con la **base de datos demo de siempre** (clientes, facturas, pagos del seed). Si quisieras llevar **tus datos actuales** (los que tienes en la Mac), se exportan/importan así:
+Cada computadora tiene **su propia base** en Docker (los datos NO se sincronizan con git). Para pasar datos entre PC:
 
-**En la Mac:**
-
-```bash
-docker exec finanx-db pg_dump -U finanx -d finanx > respaldo_finanx.sql
-```
-
-**En la PC Windows (después de levantar la app una vez):**
-
+**En la PC que tiene los datos (exporta):**
 ```powershell
-Get-Content respaldo_finanx.sql | docker exec -i finanx-db psql -U finanx -d finanx
+.\sincronizar-datos.ps1 export
 ```
+Crea un archivo `respaldo\finanx_FECHA.sql`. Llévalo a la otra PC (USB, Drive…).
 
-> ⚠️ Hazlo con la app **detenida** (`docker compose down`) para que no haya conflictos, y levanta solo la base primero si fuera necesario. Es un paso avanzado: salta este punto si no lo necesitas.
-
----
-
-## 9. Comandos útiles cortos
-
+**En la PC de destino (importa):**
 ```powershell
-docker compose ps            # estado de los 3 contenedores
-docker compose logs backend  # ver los registros del backend
-docker compose logs db       # ver los registros de la base
-docker exec -it finanx-db psql -U finanx -d finanx   # entrar a la base
+.\sincronizar-datos.ps1 import
 ```
+Te pedirá confirmación y **reemplazará** los datos actuales por los del respaldo.
+
+> ⚠️ `import` borra los datos actuales de esa PC. Asegúrate de que es lo que quieres.
 
 ---
 
-Ahora solo queda copiar el ZIP y seguir el paso 2. ¡Buena mudanza! 🚚
+**¿Dudas en cualquier paso? Mándame el mensaje tal cual te salga y te lo resuelvo.** 🚀

@@ -1,5 +1,5 @@
 # =====================================================================
-# FINAN-X · levantar.ps1  (version Windows / PowerShell)
+# FINAN-X - levantar.ps1  (version Windows / PowerShell)
 # =====================================================================
 #  Levanta la aplicacion completa (PostgreSQL + API REST + Frontend)
 #  con Docker Compose. Equivalente de levantar.sh para Windows.
