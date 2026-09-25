@@ -1,0 +1,463 @@
+@startuml FINAN_X_Clases_Detallado
+' Motor interno de PlantUML: NO requiere Graphviz instalado.
+!pragma layout smetana
+
+' ============================================================================
+'  FINAN-X · Diagrama de Clases (detallado, derivado del codigo real)
+'  Fuentes: database/init.sql, migracion_notas_credito.sql,
+'           migracion_recuperacion_contrasena.sql,
+'           backend/src/utils.js, backend/src/routes/*.js
+' ============================================================================
+!theme plain
+title FINAN-X · Diagrama de Clases (modelo de dominio + reglas de negocio)
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam class {
+  BackgroundColor #F7F9FC
+  BorderColor #2C3E50
+  ArrowColor #34495E
+  FontSize 12
+}
+skinparam package {
+  BackgroundColor #EAF0F6
+  BorderColor #5D7A99
+  FontStyle bold
+}
+skinparam enum {
+  BackgroundColor #FFF4E5
+  BorderColor #D68910
+  FontColor #7E5109
+  FontSize 11
+}
+skinparam note {
+  BackgroundColor #EAFAF1
+  BorderColor #1E8449
+  FontColor #145A32
+}
+hide empty members
+
+' ======================= SEGURIDAD E IDENTIDAD =========================
+package "Seguridad e Identidad" {
+
+  enum RolNombre {
+    ADMINISTRADOR
+    FACTURADOR
+    CAJERO
+    SUPERVISOR
+  }
+
+  class Rol {
+    - rolId : int
+    - nombre : RolNombre
+    - descripcion : string
+  }
+
+  class Usuario {
+    - usuarioId : int
+    - nombre : string
+    - correo : string
+    - passwordHash : string
+    - rolId : int
+    - estado : EstadoRegistro
+    - fechaCreacion : dateTime
+    --
+    + iniciarSesion() : Token
+    + crear(correo, clave, rol) : Usuario
+    + cambiarEstado() : void
+    + esAdministrador() : boolean
+  }
+
+  class UsuarioCliente {
+    - usuarioClienteId : int
+    - clienteId : int
+    - username : string
+    - passwordHash : string
+    - estado : EstadoRegistro
+    - fechaCreacion : dateTime
+    - ultimoAcceso : dateTime
+    --
+    + crear() : UsuarioCliente
+    + iniciarSesion() : Token
+    + solicitarRecuperacion(canal) : void
+  }
+
+  enum CanalOTP {
+    EMAIL
+    SMS
+  }
+
+  class RecuperacionClave {
+    - recuperacionId : int
+    - usuarioClienteId : int
+    - canal : CanalOTP
+    - codigoHash : string
+    - intentos : int
+    - usado : boolean
+    - expiraEn : dateTime
+    - creadoEn : dateTime
+    --
+    + estaVencida() : boolean
+    + validar(codigo) : boolean
+    + marcarUsado() : void
+  }
+}
+
+' ============================== CATALOGO ================================
+package "Catalogo" {
+
+  enum TipoCliente {
+    PERSONA
+    EMPRESA
+  }
+
+  enum TipoIdentificacion {
+    CC
+    NIT
+    CE
+    PASAPORTE
+  }
+
+  enum EstadoRegistro {
+    ACTIVO
+    INACTIVO
+  }
+
+  class Cliente {
+    - clienteId : int
+    - tipoCliente : TipoCliente
+    - tipoIdentificacion : TipoIdentificacion
+    - numeroIdentificacion : string
+    - nombreRazonSocial : string
+    - telefono : string
+    - correo : string
+    - direccion : string
+    - ciudad : string
+    - estado : EstadoRegistro
+    - fechaCreacion : dateTime
+    --
+    + crear() : Cliente
+    + actualizar() : void
+    + activar() : void
+    + desactivar() : void
+    + crearCuenta() : UsuarioCliente
+    + saldoPendiente() : decimal
+    + resumen() : ResumenCliente
+  }
+
+  class ResumenCliente <<DTO>> {
+    + totalFacturado : decimal
+    + totalPagado : decimal
+    + totalNotasCredito : decimal
+    + saldo : decimal
+    + facturasPendientes : int
+  }
+
+  class Producto {
+    - productoId : int
+    - codigo : string
+    - nombre : string
+    - descripcion : string
+    - categoria : string
+    - precio : decimal
+    - impuesto : decimal
+    - unidadMedida : string
+    - estado : EstadoRegistro
+    - fechaCreacion : dateTime
+    - fechaActualizacion : dateTime
+    --
+    + crear() : Producto
+    + actualizar() : void
+    + activar() : void
+    + desactivar() : void
+    + valorConImpuesto() : decimal
+  }
+}
+
+' ============================= OPERACION ===============================
+package "Operacion · Pedidos" {
+
+  enum EstadoPedido {
+    BORRADOR
+    CONFIRMADO
+    CANCELADO
+    FACTURADO
+  }
+
+  class Pedido {
+    - pedidoId : int
+    - numeroPedido : string
+    - clienteId : int
+    - fecha : dateTime
+    - subtotal : decimal
+    - impuestos : decimal
+    - total : decimal
+    - estado : EstadoPedido
+    - observaciones : string
+    - fechaCreacion : dateTime
+    --
+    + crear() : Pedido
+    + actualizar() : void
+    + agregarDetalle(producto, cantidad) : DetallePedido
+    + quitarDetalle(detalleId) : void
+    + confirmar() : void
+    + cancelar() : void
+    + calcularTotales() : void
+    + facturar() : Factura
+  }
+
+  class DetallePedido {
+    - detalleId : int
+    - pedidoId : int
+    - productoId : int
+    - cantidad : decimal
+    - precioUnitario : decimal
+    - subtotal : decimal
+    --
+    + calcularSubtotal() : decimal
+    + totalImpuesto() : decimal
+  }
+}
+
+' =========================== FACTURACION ===============================
+package "Facturacion" {
+
+  enum EstadoDocumento {
+    ACTIVA
+    ANULADA
+  }
+
+  class Factura {
+    - facturaId : int
+    - numeroFactura : string
+    - pedidoId : int
+    - clienteId : int
+    - fechaEmision : dateTime
+    - fechaVencimiento : date
+    - subtotal : decimal
+    - impuestos : decimal
+    - total : decimal
+    - estado : EstadoDocumento
+    - motivoAnulacion : string
+    - fechaAnulacion : dateTime
+    - usuarioAnulacionId : int
+    - fechaCreacion : dateTime
+    --
+    + emitir(pedido) : Factura
+    + anular(motivo, usuario) : void
+    + saldo() : decimal
+    + valorPagado() : decimal
+    + notasCreditoActivas() : decimal
+    + estadoPago() : EstadoPago
+    + estaPagada() : boolean
+  }
+
+  class NotaCredito {
+    - notaCreditoId : int
+    - numeroNota : string
+    - facturaId : int
+    - clienteId : int
+    - fecha : dateTime
+    - valor : decimal
+    - motivo : string
+    - estado : EstadoDocumento
+    - fechaCreacion : dateTime
+    - usuarioId : int
+    - fechaAnulacion : dateTime
+    - usuarioAnulacion : int
+    - motivoAnulacion : string
+    --
+    + emitir(factura, valor, motivo) : NotaCredito
+    + anular(motivo, usuario) : void
+    + estaActiva() : boolean
+  }
+}
+
+' ============================= COBRANZA ================================
+package "Cobranza" {
+
+  enum MetodoPago {
+    EFECTIVO
+    TARJETA
+    TRANSFERENCIA
+    CHEQUE
+  }
+
+  enum TipoTarjeta {
+    VISA
+    MASTERCARD
+    AMEX
+    OTRA
+  }
+
+  enum EstadoPago {
+    PENDIENTE
+    PAGO_PARCIAL
+    PAGADA
+    ANULADA
+  }
+
+  class Pago {
+    - pagoId : int
+    - numeroPago : string
+    - facturaId : int
+    - fecha : dateTime
+    - valor : decimal
+    - metodoPago : MetodoPago
+    - referencia : string
+    - observaciones : string
+    - usuarioId : int
+    - fechaRegistro : dateTime
+    --
+    - banco : string
+    - titular : string
+    - tipoTarjeta : TipoTarjeta
+    - ultimosDigitosTarjeta : string
+    - vencimientoTarjeta : string
+    - numeroCuenta : string
+    --
+    + registrar(factura, valor, metodo) : Pago
+    + esPagoEnLinea() : boolean
+    + verificarNoSobrepago() : void
+  }
+
+  class FacturaSaldo <<vista>> {
+    - facturaId : int
+    - numeroFactura : string
+    - pedidoId : int
+    - clienteId : int
+    - total : decimal
+    - valorPagado : decimal
+    - notasCredito : decimal
+    - saldo : decimal
+    - estado : EstadoDocumento
+    - estadoPago : EstadoPago
+  }
+}
+
+' ============================ AUDITORIA ================================
+package "Auditoria" {
+
+  enum UsuarioTipo {
+    INTERNO
+    CLIENTE
+  }
+
+  class Auditoria {
+    - auditoriaId : int
+    - usuario : string
+    - usuarioTipo : UsuarioTipo
+    - fechaHora : dateTime
+    - modulo : string
+    - operacion : string
+    - registroAfectado : string
+    - descripcion : string
+    --
+    + registrar(modulo, operacion, registro) : void
+  }
+}
+
+' ====================== NUCLEO DE REGLAS (utils.js) ====================
+package "Nucleo de reglas (sin tecnologia) · backend/src/utils.js" {
+
+  class ReglasFinancieras <<static>> {
+    {static} + round2(n) : decimal
+    {static} + calcularTotal(subtotal, impuestos) : decimal
+    {static} + calcularSaldo(total, pagado, notas) : decimal
+  }
+
+  class ValidacionTarjeta <<static>> {
+    {static} + validarLuhn(numero) : boolean
+    {static} + derivarTipoTarjeta(numero) : TipoTarjeta
+    {static} + validarDatosPago(metodo, datos) : DatosPago
+  }
+
+  class DatosPago <<DTO>> {
+    + banco : string
+    + titular : string
+    + tipoTarjeta : TipoTarjeta
+    + ultimosDigitosTarjeta : string
+    + vencimientoTarjeta : string
+    + numeroCuenta : string
+  }
+}
+
+' ============================== RELACIONES =============================
+Rol "1" --> "0..*" Usuario : define >
+Usuario "1" --> "0..*" Pago : registra
+Usuario "1" --> "0..*" NotaCredito : emite
+Usuario "1" --> "0..*" Factura : anula
+Usuario "1" --> "0..*" Auditoria : genera
+
+Cliente "1" --> "0..1" UsuarioCliente : accede con
+UsuarioCliente "1" --> "0..*" RecuperacionClave : solicita
+Cliente "1" --> "0..*" Pedido : realiza
+Cliente "1" --> "0..*" Factura : recibe
+Cliente "1" --> "0..*" NotaCredito : obtiene
+Cliente ..> ResumenCliente : proyecta
+
+Pedido "1" *-- "1..*" DetallePedido : contiene
+Producto "1" --> "0..*" DetallePedido : se incluye en
+Pedido "1" --> "0..1" Factura : genera
+
+Factura "1" --> "0..*" Pago : recibe
+Factura "1" --> "0..*" NotaCredito : amortiza
+Factura ..> FacturaSaldo : "se proyecta en"
+Pago ..> FacturaSaldo : "se suma en"
+
+Pago ..> ValidacionTarjeta : "valida con <<uses>>"
+Pago ..> DatosPago : "produce <<uses>>"
+DetallePedido ..> ReglasFinancieras : "redondea con <<uses>>"
+Pedido ..> ReglasFinancieras : "calcula con <<uses>>"
+Factura ..> ReglasFinancieras : "saldo con <<uses>>"
+
+' ================================ NOTAS ================================
+note right of Factura
+  <b>Invariante de saldo</b>
+  saldo = total - valorPagado
+          + notasCreditoActivas
+  --
+  <b>Estados de pago</b>
+  ANULADA · PENDIENTE · PAGO_PARCIAL · PAGADA
+end note
+
+note bottom of Factura
+  <b>Regla 1 pedido -> 0..1 factura</b>
+  (UNIQUE en facturas.pedido_id)
+end note
+
+note bottom of Pago
+  <b>Nunca hay sobrepago:</b>
+  el total de pagos no puede
+  superar el total de la factura
+end note
+
+note left of ValidacionTarjeta
+  <b>PCI-DSS</b>
+  Nunca se almacena el numero
+  completo de la tarjeta ni el CVV.
+  Solo ultimos 4 digitos, banco,
+  titular y vencimiento MM/AA.
+end note
+
+note top of RecuperacionClave
+  <b>OTP de un solo uso</b>
+  6 digitos · 10 minutos
+  5 intentos maximo
+  El codigo se guarda cifrado
+  (bcrypt), nunca en texto plano.
+end note
+
+legend right
+  |= Color |= Significado |
+  | <#F7F9FC> | Clase / entidad persistente |
+  | <#FFF4E5> | Enumeracion (catalogo cerrado) |
+  | <#EAFAF1> | Nota de regla de negocio |
+  --
+  Multiplicidad: "1" a "0..*" = uno a muchos.
+  "0..1" = opcional. "*" = composicion.
+  <b>PK</b> clave primaria · <b>FK</b> clave foranea
+endlegend
+
+@enduml
