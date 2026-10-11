@@ -20,6 +20,11 @@ CREATE INDEX IF NOT EXISTS idx_notas_credito_cliente  ON notas_credito(cliente_i
 -- Vista de saldo: las notas de crédito activas aumentan el saldo (reversan pagos).
 -- La nueva columna notas_credito se agrega al FINAL para mantener compatibilidad
 -- con CREATE OR REPLACE VIEW sobre la vista existente.
+--
+-- IMPORTANTE: pagos y notas_credito se agregan en subconsultas INDEPENDIENTES.
+-- Dos LEFT JOIN a tablas hijas en la misma consulta producen el producto
+-- cartesiano de ambos conjuntos (P pagos x N notas = P*N filas), lo que
+-- multiplicaba SUM(pagos) por N y SUM(notas) por P y dejaba el saldo mal.
 CREATE OR REPLACE VIEW factura_saldo AS
 SELECT
   f.factura_id,
@@ -31,19 +36,27 @@ SELECT
   f.subtotal::float8   AS subtotal,
   f.impuestos::float8  AS impuestos,
   f.total::float8      AS total,
-  COALESCE(SUM(p.valor), 0)::float8 AS valor_pagado,
-  (f.total - COALESCE(SUM(p.valor), 0) + COALESCE(SUM(nc.valor), 0))::float8 AS saldo,
+  COALESCE(pg.valor_pagado, 0)::float8 AS valor_pagado,
+  (f.total - COALESCE(pg.valor_pagado, 0) + COALESCE(nc.notas_credito, 0))::float8 AS saldo,
   f.estado,
   CASE
-    WHEN f.estado = 'ANULADA'                                          THEN 'ANULADA'
-    WHEN COALESCE(SUM(p.valor), 0) - COALESCE(SUM(nc.valor), 0) <= 0   THEN 'PENDIENTE'
-    WHEN f.total - COALESCE(SUM(p.valor), 0) + COALESCE(SUM(nc.valor), 0) <= 0 THEN 'PAGADA'
+    WHEN f.estado = 'ANULADA'                                                     THEN 'ANULADA'
+    WHEN COALESCE(pg.valor_pagado, 0) - COALESCE(nc.notas_credito, 0) <= 0        THEN 'PENDIENTE'
+    WHEN f.total - COALESCE(pg.valor_pagado, 0) + COALESCE(nc.notas_credito, 0) <= 0 THEN 'PAGADA'
     ELSE 'PAGO_PARCIAL'
   END AS estado_pago,
   f.motivo_anulacion,
   f.fecha_anulacion,
-  COALESCE(SUM(nc.valor), 0)::float8 AS notas_credito
+  COALESCE(nc.notas_credito, 0)::float8 AS notas_credito
 FROM facturas f
-LEFT JOIN pagos p ON p.factura_id = f.factura_id
-LEFT JOIN notas_credito nc ON nc.factura_id = f.factura_id AND nc.estado = 'ACTIVA'
-GROUP BY f.factura_id;
+LEFT JOIN (
+  SELECT factura_id, SUM(valor) AS valor_pagado
+  FROM pagos
+  GROUP BY factura_id
+) pg ON pg.factura_id = f.factura_id
+LEFT JOIN (
+  SELECT factura_id, SUM(valor) AS notas_credito
+  FROM notas_credito
+  WHERE estado = 'ACTIVA'
+  GROUP BY factura_id
+) nc ON nc.factura_id = f.factura_id;

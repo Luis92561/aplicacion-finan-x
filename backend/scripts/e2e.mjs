@@ -266,6 +266,75 @@ async function main() {
   const anuCNsin = await call('POST', `/notas-credito/${cnId}/anular`, { token: AT, body: {} });
   check('Anular CN sin motivo → 400', anuCNsin.status === 400);
 
+  // ---------- Regresión: producto cartesiano en la vista factura_saldo ----------
+  // Dos LEFT JOIN a tablas hijas (pagos y notas_credito) en la misma consulta
+  // generaban P*N filas: SUM(pagos) se multiplicaba por el nº de notas y
+  // SUM(notas) por el nº de pagos. Estos casos fallan si el bug reaparece.
+  console.log('9c-bis) Regresión: saldo con múltiples pagos y notas de crédito');
+  const cliFan = await call('POST', '/clientes', {
+    token: AT,
+    body: { tipoCliente: 'EMPRESA', tipoIdentificacion: 'NIT', numeroIdentificacion: `FAN${suffix}`, nombreRazonSocial: `Fan Out ${suffix}`, correo: `fan${suffix}@finanx.test` },
+  });
+  const cliFanId = cliFan.data?.cliente_id;
+
+  // Factura con un producto activo; los importes se derivan del total real
+  // para que la prueba no dependa de los IDs ni de los precios del seed.
+  const prodFan = await call('GET', '/productos?estado=ACTIVO', { token: AT });
+  const prodFanId = prodFan.data?.[0]?.producto_id;
+
+  const pedFan = await call('POST', '/pedidos', { token: AT, body: { clienteId: cliFanId, items: [{ productoId: prodFanId, cantidad: 1 }] } });
+  await call('PATCH', `/pedidos/${pedFan.data?.pedido_id}/estado`, { token: AT, body: { estado: 'CONFIRMADO' } });
+  const facFan = await call('POST', '/facturas', { token: AT, body: { pedidoId: pedFan.data?.pedido_id } });
+  const facFanId = facFan.data?.factura_id;
+
+  const saldoFan0 = await call('GET', `/facturas/${facFanId}/saldo`, { token: AT });
+  const totalFan = Number(saldoFan0.data?.total);
+  check('Factura de prueba con total > 0', totalFan > 0, JSON.stringify(saldoFan0.data));
+
+  // El total se reparte en DOS pagos; luego se emiten DOS notas (0.10 y 0.20),
+  // de modo que una factura acumula 2 pagos Y 2 notas a la vez.
+  const r2 = (n) => Math.round(n * 100) / 100;
+  // Comparación monetaria con tolerancia (evita falsos fallos por coma flotante)
+  const casi = (a, b) => Math.abs(Number(a) - Number(b)) < 0.005;
+  const pagoA = r2(totalFan / 2);
+  const pagoB = r2(totalFan - pagoA);
+  const nota1 = 0.1;
+  const nota2 = 0.2;
+  const disponible = r2(totalFan - nota1 - nota2); // lo que queda por poder devolver
+
+  // Escenario A: 2 pagos + 1 nota  → el saldo debe subir exactamente el valor de la nota
+  await call('POST', '/pagos', { token: AT, body: { facturaId: facFanId, valor: pagoA, metodoPago: 'EFECTIVO' } });
+  await call('POST', '/pagos', { token: AT, body: { facturaId: facFanId, valor: pagoB, metodoPago: 'EFECTIVO' } });
+  const saldoPagado = await call('GET', `/facturas/${facFanId}/saldo`, { token: AT });
+  check('Valor pagado con 2 pagos es correcto (no multiplicado)', casi(saldoPagado.data?.valor_pagado, totalFan), JSON.stringify(saldoPagado.data));
+  check('Saldo 0 tras pagar el total con 2 pagos', casi(saldoPagado.data?.saldo, 0), JSON.stringify(saldoPagado.data));
+
+  const cnFan1 = await call('POST', '/notas-credito', { token: AT, body: { facturaId: facFanId, valor: nota1, motivo: 'Devolución regresión' } });
+  check('Nota de crédito 1 creada sobre factura con 2 pagos', cnFan1.status === 201, JSON.stringify(cnFan1.data));
+  const saldoTrasCN1 = await call('GET', `/facturas/${facFanId}/saldo`, { token: AT });
+  check('Tras la 1ª nota el saldo sube exactamente el valor devuelto', casi(saldoTrasCN1.data?.saldo, nota1), JSON.stringify(saldoTrasCN1.data));
+  check('Notas de crédito devueltas = valor de la nota (no duplicado)', casi(saldoTrasCN1.data?.notas_credito, nota1), JSON.stringify(saldoTrasCN1.data));
+
+  // Escenario B: 2 pagos + 2 notas → el disponible baja con cada nota
+  const cnFan2 = await call('POST', '/notas-credito', { token: AT, body: { facturaId: facFanId, valor: nota2, motivo: 'Devolución regresión 2' } });
+  check('Nota de crédito 2 creada sobre factura con 2 pagos', cnFan2.status === 201, JSON.stringify(cnFan2.data));
+
+  const cnFanExcede = await call('POST', '/notas-credito', { token: AT, body: { facturaId: facFanId, valor: r2(disponible + 0.01), motivo: 'supera el disponible' } });
+  check('CN que supera lo pagado disponible → 400 (disponible no inflado)', cnFanExcede.status === 400, JSON.stringify(cnFanExcede.data));
+  const cnFanOk = await call('POST', '/notas-credito', { token: AT, body: { facturaId: facFanId, valor: disponible, motivo: 'agota el disponible' } });
+  check('CN que agota exactamente el disponible → 201', cnFanOk.status === 201, JSON.stringify(cnFanOk.data));
+
+  const saldoFin = await call('GET', `/facturas/${facFanId}/saldo`, { token: AT });
+  check('Valor pagado sigue siendo el total (no multiplicado por 3 notas)', casi(saldoFin.data?.valor_pagado, totalFan), JSON.stringify(saldoFin.data));
+  check('Notas de crédito acumuladas = total pagado', casi(saldoFin.data?.notas_credito, totalFan), JSON.stringify(saldoFin.data));
+  check('Saldo vuelve al total tras devolver todo lo pagado', casi(saldoFin.data?.saldo, totalFan), JSON.stringify(saldoFin.data));
+
+  // El saldo de la vista (que incluye las notas) y la validación de pago deben
+  // coincidir: al haberse devuelto todo lo pagado, la factura vuelve a deber el
+  // total y un pago por ese importe debe aceptarse.
+  const pagoExtra = await call('POST', '/pagos', { token: AT, body: { facturaId: facFanId, valor: totalFan, metodoPago: 'EFECTIVO' } });
+  check('El pago usa el saldo de la vista (coherente con las notas)', pagoExtra.status === 201, JSON.stringify(pagoExtra.data));
+
   // ---------- Balance por cliente y envío por correo ----------
   console.log('9d) Balance por cliente y envío del estado financiero');
   const balance = await call('GET', '/reportes/balance-clientes', { token: AT });

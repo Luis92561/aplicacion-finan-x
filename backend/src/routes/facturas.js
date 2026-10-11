@@ -142,7 +142,8 @@ router.get('/:id/pagos', async (req, res, next) => {
 router.get('/:id/saldo', async (req, res, next) => {
   try {
     const rows = await pool.query(
-      `SELECT v.numero_factura, v.total::float8, v.valor_pagado::float8, v.saldo::float8, v.estado_pago, v.estado
+      `SELECT v.numero_factura, v.total::float8, v.valor_pagado::float8, v.saldo::float8,
+              v.notas_credito::float8, v.estado_pago, v.estado
        FROM factura_saldo v WHERE v.factura_id = $1`,
       [Number(req.params.id)]
     );

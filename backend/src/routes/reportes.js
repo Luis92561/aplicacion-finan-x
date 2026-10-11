@@ -18,8 +18,8 @@ router.get('/resumen', async (req, res, next) => {
         (SELECT COUNT(*)::int FROM facturas WHERE estado = 'ACTIVA')::int AS facturas_activas,
         (SELECT COUNT(*)::int FROM facturas WHERE estado = 'ANULADA')::int AS facturas_anuladas,
         (SELECT COALESCE(SUM(valor),0)::float8 FROM pagos)            AS pagos_recibidos,
-        (SELECT COALESCE(SUM(f.total - COALESCE((SELECT SUM(p.valor) FROM pagos p WHERE p.factura_id = f.factura_id), 0)), 0)::float8
-         FROM facturas f WHERE f.estado = 'ACTIVA')                   AS saldo_pendiente_total`
+        (SELECT COALESCE(SUM(v.saldo), 0)::float8
+         FROM factura_saldo v WHERE v.estado = 'ACTIVA')              AS saldo_pendiente_total`
     );
     res.json(rows.rows[0]);
   } catch (e) { next(e); }

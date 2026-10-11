@@ -66,15 +66,22 @@ router.post('/', async (req, res, next) => {
     if (!(Number(valor) > 0)) throw new HttpError(400, 'El valor de la nota crédito debe ser mayor que cero');
     if (!motivo || !String(motivo).trim()) throw new HttpError(400, 'Debe indicar el motivo de la devolución');
 
+    // pagos y notas_credito se agregan en subconsultas independientes: dos LEFT JOIN
+    // a tablas hijas a la vez producirían el producto cartesiano (P pagos x N notas),
+    // inflando `pagado` e impidiendo calcular bien cuánto queda por devolver.
     const f = await client.query(
       `SELECT f.factura_id, f.numero_factura, f.cliente_id, f.estado,
-              COALESCE(SUM(p.valor), 0)::float8 AS pagado,
-              COALESCE(SUM(CASE WHEN nc.estado = 'ACTIVA' THEN nc.valor END), 0)::float8 AS notas_previas
+              COALESCE(pg.pagado, 0)::float8        AS pagado,
+              COALESCE(nc.notas_previas, 0)::float8 AS notas_previas
        FROM facturas f
-       LEFT JOIN pagos p ON p.factura_id = f.factura_id
-       LEFT JOIN notas_credito nc ON nc.factura_id = f.factura_id
-       WHERE f.factura_id = $1
-       GROUP BY f.factura_id`,
+       LEFT JOIN (
+         SELECT factura_id, SUM(valor) AS pagado FROM pagos GROUP BY factura_id
+       ) pg ON pg.factura_id = f.factura_id
+       LEFT JOIN (
+         SELECT factura_id, SUM(valor) AS notas_previas
+         FROM notas_credito WHERE estado = 'ACTIVA' GROUP BY factura_id
+       ) nc ON nc.factura_id = f.factura_id
+       WHERE f.factura_id = $1`,
       [facturaId]
     );
     if (!f.rowCount) throw new HttpError(404, 'Factura no encontrada');

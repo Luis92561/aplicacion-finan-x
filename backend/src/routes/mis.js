@@ -129,17 +129,18 @@ router.get('/mis-pagos/efecty-codigo', async (req, res, next) => {
     if (!facturaId) throw new HttpError(400, 'Indique el número de factura (facturaId)');
 
     const f = await pool.query(
-      `SELECT f.factura_id, f.numero_factura, f.total, f.estado,
-              COALESCE(SUM(p.valor), 0)::float8 AS pagado
-       FROM facturas f LEFT JOIN pagos p ON p.factura_id = f.factura_id
-       WHERE f.factura_id = $1 AND f.cliente_id = $2
-       GROUP BY f.factura_id`,
+      `SELECT f.factura_id, f.numero_factura, f.estado,
+              v.saldo::float8 AS saldo
+       FROM facturas f
+       JOIN factura_saldo v ON v.factura_id = f.factura_id
+       WHERE f.factura_id = $1 AND f.cliente_id = $2`,
       [facturaId, req.user.clienteId]
     );
     if (!f.rowCount) throw new HttpError(404, 'Factura no encontrada');
     if (f.rows[0].estado !== 'ACTIVA') throw new HttpError(409, 'Solo se generan códigos para facturas activas');
 
-    const saldo = round2(Number(f.rows[0].total) - Number(f.rows[0].pagado));
+    // Saldo de la vista factura_saldo: incluye las notas de crédito activas.
+    const saldo = round2(Number(f.rows[0].saldo));
     if (saldo <= 0) throw new HttpError(409, 'La factura ya está pagada');
     const valor = round2(req.query.valor ? Number(req.query.valor) : saldo);
     if (!(valor > 0) || valor > saldo) {
@@ -238,17 +239,19 @@ router.post('/mis-pagos', async (req, res, next) => {
     if (!facturaId || !(Number(valor) > 0)) throw new HttpError(400, 'Factura y valor (mayor que cero) son obligatorios');
 
     const f = await client.query(
-      `SELECT f.factura_id, f.numero_factura, f.total, f.estado,
-              COALESCE(SUM(p.valor), 0)::float8 AS pagado
-       FROM facturas f LEFT JOIN pagos p ON p.factura_id = f.factura_id
-       WHERE f.factura_id = $1 AND f.cliente_id = $2
-       GROUP BY f.factura_id`,
+      `SELECT f.factura_id, f.numero_factura, f.estado,
+              v.saldo::float8 AS saldo
+       FROM facturas f
+       JOIN factura_saldo v ON v.factura_id = f.factura_id
+       WHERE f.factura_id = $1 AND f.cliente_id = $2`,
       [facturaId, req.user.clienteId]
     );
     if (!f.rowCount) throw new HttpError(404, 'Factura no encontrada');
     if (f.rows[0].estado !== 'ACTIVA') throw new HttpError(409, 'Solo se pueden registrar pagos en facturas activas');
 
-    const saldo = round2(Number(f.rows[0].total) - Number(f.rows[0].pagado));
+    // Saldo de la vista factura_saldo: incluye las notas de crédito activas.
+    // Calcularlo como total - pagos permitiría abonar más que el saldo real.
+    const saldo = round2(Number(f.rows[0].saldo));
     const valorNum = round2(Number(valor));
     if (valorNum > saldo) throw new HttpError(400, `El valor supera el saldo pendiente ($ ${saldo.toLocaleString('en-US')})`);
 
@@ -272,8 +275,9 @@ router.post('/mis-pagos', async (req, res, next) => {
     const numero = `PAG-${String(pagoId).padStart(6, '0')}`;
     await client.query('UPDATE pagos SET numero_pago = $1 WHERE pago_id = $2', [numero, pagoId]);
 
-    const nuevoPagado = round2(Number(f.rows[0].pagado) + valorNum);
-    const nuevoSaldo = round2(Number(f.rows[0].total) - nuevoPagado);
+    // El saldo ya incluye las notas de crédito, así que el nuevo saldo es
+    // simplemente el saldo anterior menos el valor del pago.
+    const nuevoSaldo = round2(saldo - valorNum);
     const estadoPago = nuevoSaldo <= 0 ? 'PAGADA' : 'PAGO_PARCIAL';
 
     await client.query('COMMIT');

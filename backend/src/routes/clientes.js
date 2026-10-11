@@ -27,8 +27,8 @@ router.get('/', async (req, res, next) => {
       `SELECT c.cliente_id, c.tipo_cliente, c.tipo_identificacion, c.numero_identificacion,
               c.nombre_razon_social, c.telefono, c.correo, c.direccion, c.ciudad, c.estado, c.fecha_creacion,
               (SELECT COUNT(*) FROM pedidos p WHERE p.cliente_id = c.cliente_id)::int AS total_pedidos,
-              (SELECT COALESCE(SUM(f.total - COALESCE((SELECT SUM(pg.valor) FROM pagos pg WHERE pg.factura_id = f.factura_id), 0)), 0)::float8
-               FROM facturas f WHERE f.cliente_id = c.cliente_id AND f.estado = 'ACTIVA') AS saldo_pendiente,
+              (SELECT COALESCE(SUM(v.saldo), 0)::float8
+               FROM factura_saldo v WHERE v.cliente_id = c.cliente_id AND v.estado = 'ACTIVA') AS saldo_pendiente,
               (SELECT COUNT(*) FROM usuario_cliente uc WHERE uc.cliente_id = c.cliente_id)::int AS tiene_cuenta
        FROM clientes c ${where}
        ORDER BY c.cliente_id DESC LIMIT 300`,
@@ -44,8 +44,8 @@ router.get('/:id', async (req, res, next) => {
     const id = Number(req.params.id);
     const rows = await pool.query(
       `SELECT c.*,
-              (SELECT COALESCE(SUM(f.total - COALESCE((SELECT SUM(pg.valor) FROM pagos pg WHERE pg.factura_id = f.factura_id), 0)), 0)::float8
-               FROM facturas f WHERE f.cliente_id = c.cliente_id AND f.estado = 'ACTIVA') AS saldo_pendiente
+              (SELECT COALESCE(SUM(v.saldo), 0)::float8
+               FROM factura_saldo v WHERE v.cliente_id = c.cliente_id AND v.estado = 'ACTIVA') AS saldo_pendiente
        FROM clientes c WHERE c.cliente_id = $1`,
       [id]
     );
