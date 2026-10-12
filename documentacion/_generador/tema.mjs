@@ -113,7 +113,9 @@ export const CSS = `
   .indice li{margin:3px 0}
   .firma{margin-top:38px; display:grid; grid-template-columns:1fr 1fr; gap:28px}
   .firma .l{border-top:1px solid #334155; padding-top:5px; font-size:9pt; color:#334155}
-  .placeholder{background:#fef3c7; border-bottom:1px dashed var(--warning); padding:0 3px; font-weight:600}
+  /* Linea en blanco para completar a mano (por ejemplo, los datos de las partes en
+     el contrato). Sustituye a los antiguos marcadores resaltados en amarillo. */
+  .linea-vacia{display:block; height:1.15em; border-bottom:1px solid #334155}
   footer.pie-doc{margin-top:26px; border-top:1px solid var(--border); padding-top:7px; font-size:8pt; color:var(--muted)}
 `;
 

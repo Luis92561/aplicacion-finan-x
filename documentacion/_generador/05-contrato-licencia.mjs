@@ -9,29 +9,42 @@
  *   - La EMPRESA recibe una licencia de uso NO EXCLUSIVA, para su operacion interna.
  *   - Duracion indefinida, territorio Colombia.
  *
- * Los datos de las partes quedan como marcadores para que los complete el equipo.
+ * Los datos de las partes (nombres, documentos, NIT, domicilio) se entregan como
+ * lineas EN BLANCO con su etiqueta, para completarlos a mano.
  *
  * Uso (desde la raiz):  node documentacion/_generador/05-contrato-licencia.mjs
  */
 import { html, portada, escribir, tabla } from './tema.mjs';
 
-/** Marcador visible para los datos que debe rellenar el equipo. */
-const M = (texto) => `<span class="placeholder">${texto}</span>`;
+/**
+ * Linea en blanco para completar a mano.
+ *
+ * Antes estas lineas llevaban un marcador resaltado en amarillo ("[Nombre completo 1]",
+ * "[NIT]"...). Ahora se entregan vacias, pero conservando la etiqueta de cada campo
+ * para que se sepa que corresponde en cada renglon al rellenarlo.
+ */
+const vacio = (alto = 1.15) => `<span class="linea-vacia"${alto !== 1.15 ? ` style="height:${alto}em"` : ''}></span>`;
+
+/** Fila de etiqueta y valor(es). `valor` puede ser un texto o una lista de renglones. */
+const fila = (etiqueta, valor) => {
+  const v = Array.isArray(valor) ? valor.join('<br>') : valor;
+  return `<tr><td style="width:32%"><strong>${etiqueta}</strong></td><td>${v}</td></tr>`;
+};
 
 const PARTES = [
   ['EL LICENCIANTE (el equipo desarrollador)', [
-    ['Integrantes', M('[Nombre completo 1]'), M('[Nombre completo 2]'), M('[Nombre completo 3]')],
-    ['Documento de identidad', M('[CC / pasaporte]'), M('[CC / pasaporte]'), M('[CC / pasaporte]')],
-    ['Domicilio', M('[Ciudad, dirección]')],
-    ['Correo de contacto', M('[correo@dominio]')],
+    ['Integrantes', [vacio(), vacio(), vacio()]],
+    ['Documento de identidad', [vacio(), vacio(), vacio()]],
+    ['Domicilio', vacio()],
+    ['Correo de contacto', vacio()],
     ['En adelante', '<strong>«EL EQUIPO»</strong> o <strong>«EL LICENCIANTE»</strong>'],
   ]],
   ['EL LICENCIATARIO (la empresa contratante)', [
-    ['Razón social', M('[Nombre o razón social de la empresa]')],
-    ['NIT', M('[NIT]')],
-    ['Representante legal', M('[Nombre del representante]')],
-    ['Documento del representante', M('[CC]')],
-    ['Domicilio', M('[Ciudad, dirección]')],
+    ['Razón social', vacio()],
+    ['NIT', vacio()],
+    ['Representante legal', vacio()],
+    ['Documento del representante', vacio()],
+    ['Domicilio', vacio()],
     ['En adelante', '<strong>«LA EMPRESA»</strong> o <strong>«EL LICENCIATARIO»</strong>'],
   ]],
 ];
@@ -54,7 +67,7 @@ ${portada({
 <div class="caja err">
   <span class="titulo">Advertencia importante sobre el alcance de este documento</span>
   <p>Este contrato se elabora como <strong>ejercicio académico</strong> para la asignatura Integración de Aplicaciones, a partir de un escenario supuesto: una empresa contrata al equipo para desarrollar el software.</p>
-  <p style="margin-bottom:0">El software está protegido por las <strong>normas de derecho de autor colombianas</strong> (Ley 23 de 1982 y Ley 44 de 1993, entre otras). Un contrato destinado a una relación comercial real debe ser <strong>revisado y ajustado por un profesional del derecho</strong>, y este documento no sustituye esa asesoría. Los datos de las partes aparecen como <span class="placeholder">marcadores</span> para que el equipo los complete.</p>
+  <p style="margin-bottom:0">El software está protegido por las <strong>normas de derecho de autor colombianas</strong> (Ley 23 de 1982 y Ley 44 de 1993, entre otras). Un contrato destinado a una relación comercial real debe ser <strong>revisado y ajustado por un profesional del derecho</strong>, y este documento no sustituye esa asesoría.</p>
 </div>
 
 <h1>Contrato de licencia de uso de software</h1>
@@ -63,7 +76,7 @@ ${portada({
 ${PARTES.map(([titulo, campos]) => `
 <h3>${titulo}</h3>
 <table class="compacta"><tbody>
-${campos.map((f) => `<tr><td style="width:32%"><strong>${f[0]}</strong></td><td>${f.slice(1).join(' &nbsp;·&nbsp; ')}</td></tr>`).join('\n')}
+${campos.map(([etiqueta, valor]) => fila(etiqueta, valor)).join('\n')}
 </tbody></table>`).join('\n')}
 
 <p>Se ha convenido celebrar el presente <strong>contrato de licencia de uso de software</strong>, que se regirá por las siguientes cláusulas:</p>
@@ -80,7 +93,7 @@ ${tabla(
     ['<strong>Tecnologías</strong>', 'React y Vite (interfaz); Node.js y Express (servicios); PostgreSQL 16 (datos); Docker para el despliegue.'],
     ['<strong>Entrega</strong>', 'Código fuente, esquema de base de datos, scripts de instalación, documentación y pruebas automatizadas.'],
     ['<strong>Versión</strong>', 'Versión 1.0 — la identificada en el repositorio al momento de la entrega.'],
-    ['<strong>Ubicación del código</strong>', M('[URL del repositorio entregado]')],
+    ['<strong>Ubicación del código</strong>', `${vacio()}<br><span style="font-size:8pt;color:#64748b">URL del repositorio o del medio de entrega</span>`],
   ],
 )}
 
@@ -198,7 +211,7 @@ ${tabla(
 <p>Cualquier modificación de este contrato deberá constar por <strong>escrito</strong> y ser suscrita por ambas partes.</p>
 
 <h2>DÉCIMO CUARTA. Ley aplicable y solución de controversias</h2>
-<p>Este contrato se rige por las leyes de la <strong>República de Colombia</strong>. Las partes intentarán resolver de buena fe cualquier controversia derivada de su interpretación o cumplimiento, y de no lograrlo acudirán a los jueces competentes de <span class="placeholder">[ciudad]</span>.</p>
+<p>Este contrato se rige por las leyes de la <strong>República de Colombia</strong>. Las partes intentarán resolver de buena fe cualquier controversia derivada de su interpretación o cumplimiento, y de no lograrlo acudirán a los jueces competentes de ${vacio()}.</p>
 
 <h2>DÉCIMO QUINTA. Aceptación</h2>
 <p>Las partes manifiestan que han leído y comprendido el contenido de este contrato y lo aceptan en su integridad, y en constancia firman:</p>
@@ -206,24 +219,26 @@ ${tabla(
 <div class="firma">
   <div>
     <div class="l">
-      <strong>EL LICENCIANTE</strong><br><br><br>
-      ${M('[Nombre del integrante 1]')}<br>
-      CC ${M('[número]')}<br>
+      <strong>EL LICENCIANTE</strong>
+      ${vacio(2.6)}
+      ${vacio()}<br>
+      CC ${vacio()}<br>
       En representación del equipo desarrollador
     </div>
   </div>
   <div>
     <div class="l">
-      <strong>EL LICENCIATARIO</strong><br><br><br>
-      ${M('[Nombre del representante legal]')}<br>
-      CC ${M('[número]')}<br>
-      Representante legal de ${M('[razón social]')}<br>
-      NIT ${M('[NIT]')}
+      <strong>EL LICENCIATARIO</strong>
+      ${vacio(2.6)}
+      ${vacio()}<br>
+      CC ${vacio()}<br>
+      Representante legal de ${vacio()}<br>
+      NIT ${vacio()}
     </div>
   </div>
 </div>
 
-<p style="margin-top:26px">Firmado en <span class="placeholder">[ciudad]</span>, a los <span class="placeholder">[día]</span> días del mes de <span class="placeholder">[mes]</span> de <span class="placeholder">[año]</span>.</p>
+<p style="margin-top:26px">Firmado en ${vacio()}, a los ${vacio()} días del mes de ${vacio()} de ${vacio()}.</p>
 
 <h1>Anexo · Resumen de la licencia en una página</h1>
 ${tabla(
@@ -242,7 +257,7 @@ ${tabla(
   ],
 )}
 
-<footer class="pie-doc">FINAN-X · Evidencia 5 de 7 · Contrato de licencia de software · Documento con finalidad académica. Los datos de las partes son marcadores a completar por el equipo.</footer>
+<footer class="pie-doc">FINAN-X · Evidencia 5 de 7 · Contrato de licencia de software · Documento con finalidad académica.</footer>
 `;
 
 escribir('E5_Contrato_Licencia_Software.html', html({ titulo: 'FINAN-X · Contrato de licencia de software', cuerpo }));
