@@ -5,10 +5,47 @@ export class HttpError extends Error {
   }
 }
 
+/**
+ * Convierte un parámetro de ruta a número entero positivo.
+ *
+ * Antes cada ruta hacía `Number(req.params.id)`: con una URL como `/api/facturas/abc`,
+ * `Number('abc')` es NaN, el NaN viajaba a PostgreSQL y la consulta reventaba con un
+ * error de tipo, que el manejador global convertía en un 500 (error del servidor).
+ * Lo correcto es responder 400: es una petición mal formada, no un fallo nuestro.
+ */
+export function idNumerico(valor, nombre = 'identificador') {
+  const n = Number(valor);
+  if (!Number.isInteger(n) || n <= 0) {
+    throw new HttpError(400, `El ${nombre} debe ser un número entero positivo`);
+  }
+  return n;
+}
+
 /** Redondea a 2 decimales para evitar errores de punto flotante en cálculos monetarios. */
 export const round2 = (n) => Math.round((Number(n || 0)) * 100) / 100;
 
-export const num = (v) => Number(v || 0);
+/**
+ * Métodos de pago admitidos. Es la lista que entienden los informes (reportes/facturacion
+ * cuenta pagos por cada uno de estos), así que cualquier otro valor crearía pagos invisibles
+ * para las estadísticas.
+ */
+export const METODOS_PAGO = ['EFECTIVO', 'TARJETA', 'TRANSFERENCIA', 'CHEQUE'];
+
+
+/** Longitud mínima de contraseña, en un solo sitio para que no haya reglas distintas. */
+export const MIN_CLAVE = 6;
+
+/**
+ * Valida una contraseña nueva. Antes la longitud mínima solo se comprobaba al autoregistrarse
+ * y al recuperar la contraseña por OTP: crear un usuario interno o dar acceso al portal a un
+ * cliente aceptaba cualquier cosa, incluso una contraseña de un carácter.
+ */
+export function validarPassword(password) {
+  const clave = String(password ?? '');
+  if (!clave) throw new HttpError(400, 'La contraseña es obligatoria');
+  if (clave.length < MIN_CLAVE) throw new HttpError(400, `La contraseña debe tener al menos ${MIN_CLAVE} caracteres`);
+  return clave;
+}
 
 /** Algoritmo de Luhn: valida el dígito verificador de un número de tarjeta. */
 export function validarLuhn(numero) {

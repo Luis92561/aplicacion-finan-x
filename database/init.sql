@@ -265,3 +265,13 @@ ALTER TABLE pagos ADD COLUMN IF NOT EXISTS tipo_tarjeta TEXT;             -- VIS
 ALTER TABLE pagos ADD COLUMN IF NOT EXISTS ultimos_digitos_tarjeta TEXT;  -- solo 4 dígitos
 ALTER TABLE pagos ADD COLUMN IF NOT EXISTS vencimiento_tarjeta TEXT;      -- MM/AA
 ALTER TABLE pagos ADD COLUMN IF NOT EXISTS numero_cuenta TEXT;            -- transferencia
+
+-- ------------------------------------------------------------
+-- Invalidación de sesiones (token_version)
+-- Cada cuenta lleva un contador que viaja dentro del JWT; al cambiar la
+-- contraseña se incrementa y los tokens emitidos antes dejan de ser válidos.
+-- Sin esto, un token robado seguía sirviendo hasta 8 h después de que la
+-- víctima cambiara su contraseña para protegerse.
+-- ------------------------------------------------------------
+ALTER TABLE usuarios        ADD COLUMN IF NOT EXISTS token_version INT NOT NULL DEFAULT 1;
+ALTER TABLE usuario_cliente ADD COLUMN IF NOT EXISTS token_version INT NOT NULL DEFAULT 1;

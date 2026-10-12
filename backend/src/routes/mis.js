@@ -2,7 +2,7 @@ import { Router } from 'express';
 import pool from '../db.js';
 import { requireAuth, requireCliente } from '../middleware/auth.js';
 import { audit } from '../middleware/audit.js';
-import { HttpError, round2, validarDatosPago } from '../utils.js';
+import { HttpError, round2, validarDatosPago, idNumerico, METODOS_PAGO } from '../utils.js';
 
 const router = Router();
 
@@ -40,7 +40,7 @@ router.get('/mis-pedidos', async (req, res, next) => {
 // GET /api/mis-pedidos/:id — detalle (verifica pertenencia)
 router.get('/mis-pedidos/:id', async (req, res, next) => {
   try {
-    const id = Number(req.params.id);
+    const id = idNumerico(req.params.id, 'id');
     const ped = await pool.query(
       `SELECT p.pedido_id, p.numero_pedido, p.fecha, p.subtotal::float8, p.impuestos::float8, p.total::float8, p.estado, p.observaciones
        FROM pedidos p WHERE p.pedido_id = $1 AND p.cliente_id = $2`,
@@ -73,7 +73,7 @@ router.get('/mis-facturas', async (req, res, next) => {
 // GET /api/mis-facturas/:id
 router.get('/mis-facturas/:id', async (req, res, next) => {
   try {
-    const id = Number(req.params.id);
+    const id = idNumerico(req.params.id, 'id');
     const f = await pool.query(
       `SELECT v.*, v.total::float8, v.valor_pagado::float8, v.saldo::float8, p.numero_pedido
        FROM factura_saldo v JOIN pedidos p ON p.pedido_id = v.pedido_id
@@ -237,17 +237,37 @@ router.post('/mis-pagos', async (req, res, next) => {
 
     const { facturaId, valor, metodoPago = 'EFECTIVO', referencia = '', observaciones = '' } = req.body || {};
     if (!facturaId || !(Number(valor) > 0)) throw new HttpError(400, 'Factura y valor (mayor que cero) son obligatorios');
+    const facturaIdNum = idNumerico(facturaId, 'id de factura');
 
+    // FOR UPDATE: bloquea la fila de la factura durante la transacción.
+    // Sin esto, el cliente podía abonar desde el portal al mismo tiempo que el cajero
+    // registraba otro pago: ambos leían el mismo saldo, ambos pasaban la validación y se
+    // cobraba de más. Con el bloqueo, el segundo espera y vuelve a leer el saldo real.
+    //
+    // La consulta filtra por `cliente_id` de la SESIÓN: por eso pertenencia y existencia se
+    // comprueban aquí, ANTES de validar el método de pago. Así una factura ajena responde
+    // 404 (no se revela que existe) en lugar de un error sobre el método.
     const f = await client.query(
       `SELECT f.factura_id, f.numero_factura, f.estado,
               v.saldo::float8 AS saldo
        FROM facturas f
        JOIN factura_saldo v ON v.factura_id = f.factura_id
-       WHERE f.factura_id = $1 AND f.cliente_id = $2`,
-      [facturaId, req.user.clienteId]
+       WHERE f.factura_id = $1 AND f.cliente_id = $2
+       FOR UPDATE OF f`,
+      [facturaIdNum, req.user.clienteId]
     );
     if (!f.rowCount) throw new HttpError(404, 'Factura no encontrada');
     if (f.rows[0].estado !== 'ACTIVA') throw new HttpError(409, 'Solo se pueden registrar pagos en facturas activas');
+
+    // El efectivo no se registra desde el portal: se paga en un punto Efecty con un código generado.
+    const metodo = String(metodoPago).toUpperCase();
+    if (metodo === 'EFECTIVO') {
+      throw new HttpError(400, 'El efectivo no se registra desde el portal: genera tu código de pago Efecty y paga en cualquier punto Efecty');
+    }
+    // Lista blanca: `metodo_pago` no tenía validación ni en la aplicación ni en la base.
+    if (!METODOS_PAGO.includes(metodo)) {
+      throw new HttpError(400, `Método de pago inválido. Use uno de: ${METODOS_PAGO.join(', ')}`);
+    }
 
     // Saldo de la vista factura_saldo: incluye las notas de crédito activas.
     // Calcularlo como total - pagos permitiría abonar más que el saldo real.
@@ -255,19 +275,14 @@ router.post('/mis-pagos', async (req, res, next) => {
     const valorNum = round2(Number(valor));
     if (valorNum > saldo) throw new HttpError(400, `El valor supera el saldo pendiente ($ ${saldo.toLocaleString('en-US')})`);
 
-    // El efectivo no se registra desde el portal: se paga en un punto Efecty con un código generado.
-    if (metodoPago === 'EFECTIVO') {
-      throw new HttpError(400, 'El efectivo no se registra desde el portal: genera tu código de pago Efecty y paga en cualquier punto Efecty');
-    }
-
     // Datos requeridos según el método (tarjeta/transferencia/cheque); nunca se guardan CVV ni número completo
-    const datosPago = validarDatosPago(metodoPago, req.body);
+    const datosPago = validarDatosPago(metodo, req.body);
 
     const ins = await client.query(
       `INSERT INTO pagos (factura_id, valor, metodo_pago, referencia, observaciones,
                           banco, titular, tipo_tarjeta, ultimos_digitos_tarjeta, vencimiento_tarjeta, numero_cuenta)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING pago_id`,
-      [facturaId, valorNum, metodoPago, referencia || null, observaciones || null,
+      [facturaIdNum, valorNum, metodo, referencia || null, observaciones || null,
         datosPago.banco || null, datosPago.titular || null, datosPago.tipo_tarjeta || null,
         datosPago.ultimos_digitos_tarjeta || null, datosPago.vencimiento_tarjeta || null, datosPago.numero_cuenta || null]
     );
@@ -280,14 +295,18 @@ router.post('/mis-pagos', async (req, res, next) => {
     const nuevoSaldo = round2(saldo - valorNum);
     const estadoPago = nuevoSaldo <= 0 ? 'PAGADA' : 'PAGO_PARCIAL';
 
-    await client.query('COMMIT');
+    // La auditoría entra en la MISMA transacción: antes iba después del COMMIT y al pool,
+    // así que un fallo al auditar dejaba el pago registrado sin traza.
     await audit({
+      client,
       usuario: req.user.username, usuarioTipo: 'CLIENTE', modulo: 'Pagos', operacion: 'PAGO_PORTAL',
-      registro: numero, descripcion: `Pago desde el portal de $${valorNum} en ${f.rows[0].numero_factura} (${metodoPago}) · saldo $${nuevoSaldo}`,
+      registro: numero, descripcion: `Pago desde el portal de $${valorNum} en ${f.rows[0].numero_factura} (${metodo}) · saldo $${nuevoSaldo}`,
     });
+
+    await client.query('COMMIT');
     res.status(201).json({ pago_id: pagoId, numero_pago: numero, valor: valorNum, saldo: nuevoSaldo, estado_pago: estadoPago });
   } catch (e) {
-    await client.query('ROLLBACK');
+    await client.query('ROLLBACK').catch(() => {});
     next(e);
   } finally {
     client.release();

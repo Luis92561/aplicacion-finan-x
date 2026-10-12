@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import pool from '../db.js';
 import { requireAuth, requireRol } from '../middleware/auth.js';
-import { HttpError } from '../utils.js';
+import { HttpError, idNumerico } from '../utils.js';
 
 const router = Router();
 router.use(requireAuth, requireRol('ADMIN', 'SUPERVISOR', 'FACTURADOR'));
@@ -31,9 +31,25 @@ router.get('/facturacion', async (req, res, next) => {
     const { desde = '', hasta = '' } = req.query;
     const params = [];
     const conds = [];
-    if (desde) { params.push(desde); conds.push(`f.fecha_emision >= $${params.length}::date`); }
-    if (hasta) { params.push(hasta); conds.push(`f.fecha_emision <= ($${params.length}::date + interval '1 day')`); }
+    const idxDesde = desde ? params.push(desde) : null;
+    const idxHasta = hasta ? params.push(hasta) : null;
+    if (idxDesde) conds.push(`f.fecha_emision >= $${idxDesde}::date`);
+    if (idxHasta) conds.push(`f.fecha_emision <= ($${idxHasta}::date + interval '1 day')`);
     const where = conds.length ? `WHERE ${conds.join(' AND ')}` : '';
+
+    // Filtro de fechas para la subconsulta del saldo (alias `f2`).
+    // REUTILIZA los mismos índices $n que la consulta principal en lugar de añadir parámetros
+    // nuevos: al añadirlos se enviaban más parámetros de los que la consulta usaba y
+    // PostgreSQL fallaba con "bind message supplies N parameters, but prepared statement
+    // requires M".
+    const condsSaldo = ["f2.estado = 'ACTIVA'"];
+    if (idxDesde) condsSaldo.push(`f2.fecha_emision >= $${idxDesde}::date`);
+    if (idxHasta) condsSaldo.push(`f2.fecha_emision <= ($${idxHasta}::date + interval '1 day')`);
+
+    // La subconsulta del saldo llevaba SOLO `f2.estado = 'ACTIVA'`, sin el filtro de fechas:
+    // restaba a lo facturado en el rango los pagos de TODAS las facturas del sistema, así
+    // que `saldo_pendiente` era incorrecto en cuanto se usaba un rango.
+    const whereSaldo = condsSaldo.join(' AND ');
 
     const facturas = await pool.query(
       `SELECT
@@ -42,8 +58,10 @@ router.get('/facturacion', async (req, res, next) => {
         COUNT(*) FILTER (WHERE f.estado = 'ANULADA')::int AS anuladas,
         COALESCE(SUM(f.total) FILTER (WHERE f.estado = 'ACTIVA'), 0)::float8 AS total_facturado,
         COALESCE(SUM(f.total) FILTER (WHERE f.estado = 'ANULADA'), 0)::float8 AS total_anulado,
-        COALESCE(SUM(f.total) FILTER (WHERE f.estado = 'ACTIVA') -
-          COALESCE((SELECT SUM(p.valor) FROM pagos p JOIN facturas f2 ON f2.factura_id = p.factura_id WHERE f2.estado = 'ACTIVA'), 0), 0)::float8 AS saldo_pendiente
+        COALESCE(SUM(f.total) FILTER (WHERE f.estado = 'ACTIVA'), 0)::float8
+          - COALESCE((SELECT SUM(p.valor)
+                      FROM pagos p JOIN facturas f2 ON f2.factura_id = p.factura_id
+                      WHERE ${whereSaldo}), 0)::float8 AS saldo_pendiente
        FROM facturas f ${where}`,
       params
     );
@@ -97,7 +115,7 @@ router.get('/balance-clientes', async (req, res, next) => {
 // GET /api/reportes/historial/:clienteId  — historial financiero de un cliente
 router.get('/historial/:clienteId', async (req, res, next) => {
   try {
-    const clienteId = Number(req.params.clienteId);
+    const clienteId = idNumerico(req.params.clienteId, 'id de cliente');
     const cli = await pool.query(
       `SELECT cliente_id, nombre_razon_social, numero_identificacion, ciudad, estado FROM clientes WHERE cliente_id = $1`,
       [clienteId]

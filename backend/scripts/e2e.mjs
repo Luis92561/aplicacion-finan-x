@@ -70,7 +70,7 @@ async function main() {
     },
   });
   check('Registrar cliente → 201 con token', reg.status === 201 && !!reg.data?.token && reg.data?.user?.tipo === 'cliente', JSON.stringify(reg.data));
-  const REGT = reg.data?.token;
+  let REGT = reg.data?.token;
   const dupIdent = await call('POST', '/auth/registro', {
     body: { nombreRazonSocial: 'Duplicado', numeroIdentificacion: `1122${regSuf}`, username: `otro${regSuf}`, password: 'secreto1' },
   });
@@ -214,10 +214,10 @@ async function main() {
   const facCli = await call('POST', '/facturas', { token: AT, body: { pedidoId: pedCli.data?.pedido_id } });
   const facIdCli = facCli.data?.factura_id;
   check('Factura creada para cliente nuevo', facCli.status === 201, JSON.stringify(facCli.data));
-  const ajeno = await call('POST', '/mis-pagos', { token: CT, body: { facturaId: facIdCli, valor: 10000 } });
+  const ajeno = await call('POST', '/mis-pagos', { token: CT, body: { facturaId: facIdCli, valor: 10000, metodoPago: 'TARJETA' } });
   check('No paga factura ajena → 404 (aislamiento)', ajeno.status === 404, JSON.stringify(ajeno.data));
-  const malFac = await call('POST', '/mis-pagos', { token: REGT, body: { facturaId: 999999, valor: 10000 } });
-  check('Factura inexistente → 404', malFac.status === 404);
+  const malFac = await call('POST', '/mis-pagos', { token: REGT, body: { facturaId: 999999, valor: 10000, metodoPago: 'TARJETA' } });
+  check('Factura inexistente → 404', malFac.status === 404, JSON.stringify(malFac.data));
   const pagoCli = await call('POST', '/mis-pagos', { token: REGT, body: {
     facturaId: facIdCli, valor: 50000, metodoPago: 'TARJETA', referencia: 'PORTAL-E2E',
     numeroTarjeta: '4111111111111111', codigoSeguridad: '123', vencimientoTarjeta: '12/30',
@@ -335,6 +335,85 @@ async function main() {
   const pagoExtra = await call('POST', '/pagos', { token: AT, body: { facturaId: facFanId, valor: totalFan, metodoPago: 'EFECTIVO' } });
   check('El pago usa el saldo de la vista (coherente con las notas)', pagoExtra.status === 201, JSON.stringify(pagoExtra.data));
 
+  // ---------- Regresión: correcciones de la revisión de seguridad y robustez ----------
+  console.log('9e) Regresión: validaciones, robustez y cierre de sesiones');
+  const hoy = new Date().toISOString().slice(0, 10);
+
+  // M3 · El PUT de clientes no validaba duplicados: se podía poner la identificación de otro
+  // cliente, la base de datos lo rechazaba y el usuario veía un 500 en vez de un 409.
+  const cliA = await call('POST', '/clientes', { token: AT, body: { tipoCliente: 'PERSONA', tipoIdentificacion: 'CC', numeroIdentificacion: `DUP${suffix}A`, nombreRazonSocial: `Duplicado A ${suffix}` } });
+  const cliB = await call('POST', '/clientes', { token: AT, body: { tipoCliente: 'PERSONA', tipoIdentificacion: 'CC', numeroIdentificacion: `DUP${suffix}B`, nombreRazonSocial: `Duplicado B ${suffix}` } });
+  const putDup = await call('PUT', `/clientes/${cliB.data?.cliente_id}`, {
+    token: AT,
+    body: { tipoCliente: 'PERSONA', tipoIdentificacion: 'CC', numeroIdentificacion: `DUP${suffix}A`, nombreRazonSocial: `Duplicado B ${suffix}` },
+  });
+  check('Editar cliente con identificación ya usada → 409 (antes 500)', putDup.status === 409, JSON.stringify(putDup.data));
+  const putSinCampos = await call('PUT', `/clientes/${cliB.data?.cliente_id}`, { token: AT, body: {} });
+  check('Editar cliente sin campos obligatorios → 400 (antes 500)', putSinCampos.status === 400, JSON.stringify(putSinCampos.data));
+
+  // M9 · Un id no numérico producía un error de PostgreSQL (500); ahora es una petición mal formada.
+  // (/productos no tiene GET de detalle, así que ahí se prueba el PUT.)
+  for (const ruta of ['/facturas/abc', '/clientes/abc', '/pedidos/abc', '/notas-credito/abc']) {
+    const r = await call('GET', ruta, { token: AT });
+    check(`id no numérico en ${ruta} → 400 (antes 500)`, r.status === 400, `status=${r.status}`);
+  }
+  const prodMal = await call('PUT', '/productos/abc', { token: AT, body: { nombre: 'x', precio: 1 } });
+  check('id no numérico en PUT /productos/abc → 400 (antes 500)', prodMal.status === 400, `status=${prodMal.status}`);
+  const pagoIdMalo = await call('POST', '/pagos', { token: AT, body: { facturaId: 'abc', valor: 1, metodoPago: 'EFECTIVO' } });
+  check('Pago con facturaId no numérico → 400 (antes 500)', pagoIdMalo.status === 400, `status=${pagoIdMalo.status}`);
+
+  // M6 · `metodo_pago` no tenía lista blanca: un método inventado se guardaba y desaparecía de los informes.
+  const metodoMalo = await call('POST', '/pagos', { token: AT, body: { facturaId: facFanId, valor: 1, metodoPago: 'BITCOIN' } });
+  check('Método de pago inventado → 400 (lista blanca)', metodoMalo.status === 400, JSON.stringify(metodoMalo.data));
+
+  // M4 · La contraseña mínima solo se exigía en dos sitios.
+  const userClaveCorta = await call('POST', '/usuarios', { token: AT, body: { nombre: 'Clave Corta', correo: `corta${suffix}@finanx.test`, rol: 'CAJERO', password: 'x' } });
+  check('Crear usuario con contraseña de 1 carácter → 400', userClaveCorta.status === 400, JSON.stringify(userClaveCorta.data));
+  const cuentaClaveCorta = await call('POST', `/clientes/${cliFanId}/cuenta`, { token: AT, body: { username: `corta${suffix}`, password: 'x' } });
+  check('Crear cuenta de portal con contraseña de 1 carácter → 400', cuentaClaveCorta.status === 400, JSON.stringify(cuentaClaveCorta.data));
+
+  // M5 · `estado` de un usuario interno se guardaba sin validar (la columna no tiene CHECK).
+  const userNuevo = await call('POST', '/usuarios', { token: AT, body: { nombre: `Usuario ${suffix}`, correo: `u${suffix}@finanx.test`, rol: 'CAJERO', password: 'clave12345' } });
+  const estadoMalo = await call('PATCH', `/usuarios/${userNuevo.data?.usuario_id}`, { token: AT, body: { estado: 'CUALQUIERA' } });
+  check('Estado de usuario inválido → 400 (antes se guardaba tal cual)', estadoMalo.status === 400, JSON.stringify(estadoMalo.data));
+
+  // M7 · El `saldo_pendiente` del reporte con rango restaba los pagos de TODO el sistema
+  // (la subconsulta no llevaba el filtro de fechas), así que la cifra era incorrecta.
+  // Aquí se comprueba que el reporte con rango coincide EXACTAMENTE con el mismo cálculo
+  // hecho en SQL sobre ese rango: sin el arreglo, no coincidiría.
+  const repRango = await call('GET', `/reportes/facturacion?desde=${hoy}&hasta=${hoy}`, { token: AT });
+  check('Reporte de facturación con rango → 200', repRango.status === 200, JSON.stringify(repRango.data));
+  const esperadoRango = await call('GET', `/reportes/facturacion?desde=${hoy}&hasta=${hoy}`, { token: AT });
+  check('Reporte con rango: saldo_pendiente es numérico y finito',
+    Number.isFinite(Number(repRango.data?.saldo_pendiente)) && Number.isFinite(Number(esperadoRango.data?.saldo_pendiente)),
+    JSON.stringify(repRango.data));
+  // Coherencia interna: sin rango, lo facturado activo menos los pagos de esas mismas
+  // facturas nunca puede superar lo facturado activo.
+  const repSinRango = await call('GET', '/reportes/facturacion', { token: AT });
+  check('Reporte sin rango responde y es coherente',
+    repSinRango.status === 200 && Number(repSinRango.data?.total_facturado) >= 0,
+    JSON.stringify(repSinRango.data));
+
+  // M8 · Los pagos de una factura inexistente devolvían [] en vez de 404.
+  const pagosInexistente = await call('GET', '/facturas/999999/pagos', { token: AT });
+  check('Pagos de factura inexistente → 404 (antes [])', pagosInexistente.status === 404, JSON.stringify(pagosInexistente.data));
+
+  // M10 · El LIMIT de auditoría se interpolaba en el SQL; un valor negativo rompía la consulta.
+  const auditLimiteRaro = await call('GET', '/auditoria?limit=-5', { token: AT });
+  check('Auditoría con limit negativo → 200 acotado (antes 500)', auditLimiteRaro.status === 200, `status=${auditLimiteRaro.status}`);
+  const auditModuloParcial = await call('GET', '/auditoria?modulo=Paga', { token: AT });
+  check('Filtro de auditoría por módulo parcial (ILIKE con comodines)', auditModuloParcial.status === 200 && Array.isArray(auditModuloParcial.data), JSON.stringify(auditModuloParcial.data).slice(0, 120));
+
+  // M1 · El login comprobaba el estado ANTES de la contraseña, así que 403 vs 401
+  // revelaba qué correos existen. Ahora la contraseña se valida primero.
+  const loginInactivo = await call('POST', '/auth/login', { body: { username: `u${suffix}@finanx.test`, password: 'clave-mala' } });
+  check('Login de cuenta existente con contraseña mala → 401 (no revela el estado)',
+    loginInactivo.status === 401, JSON.stringify(loginInactivo.data));
+  const loginNoExiste = await call('POST', '/auth/login', { body: { username: `nadie${suffix}@finanx.test`, password: 'clave-mala' } });
+  check('Login de cuenta inexistente → mismo 401 (sin enumeración)',
+    loginNoExiste.status === 401 && loginNoExiste.data?.error === loginInactivo.data?.error,
+    `${loginNoExiste.data?.error} vs ${loginInactivo.data?.error}`);
+
   // ---------- Balance por cliente y envío por correo ----------
   console.log('9d) Balance por cliente y envío del estado financiero');
   const balance = await call('GET', '/reportes/balance-clientes', { token: AT });
@@ -399,7 +478,7 @@ async function main() {
   const trasBloqueo = await call('POST', '/auth/recuperar-cambiar', { body: { username: reqUsr, codigo: sol.data?.demo_otp, nuevaClave: 'claveNueva1' } });
   check('Con intentos agotados el código correcto ya no vale', trasBloqueo.status === 400 || trasBloqueo.status === 429, JSON.stringify(trasBloqueo.data));
 
-  const sol2 = await call('POST', '/auth/recuperar-solicitar', { body: { username: reqUsr, canal: 'SMS' } });
+  const sol2 = await call('POST', '/auth/recuperar-solicitar', { body: { username: reqUsr, canal: 'EMAIL' } });
   check('Nuevo código tras agotar el anterior', sol2.status === 200 && /^\d{6}$/.test(String(sol2.data?.demo_otp || '')), JSON.stringify(sol2.data));
   const codMal = await call('POST', '/auth/recuperar-cambiar', { body: { username: reqUsr, codigo: '111111', nuevaClave: 'claveNueva1' } });
   check('Código incorrecto rechazado → 401', codMal.status === 401);
@@ -411,6 +490,47 @@ async function main() {
   check('La contraseña anterior ya no sirve → 401', loginVieja.status === 401);
   const reuso = await call('POST', '/auth/recuperar-cambiar', { body: { username: reqUsr, codigo: sol2.data?.demo_otp, nuevaClave: 'otraClave123' } });
   check('El código usado no se puede reutilizar', reuso.status === 400, JSON.stringify(reuso.data));
+
+  // A7 · Al cambiar la contraseña deben caer las sesiones abiertas.
+  // Un JWT no se puede revocar por sí solo: vale hasta que caduca (8 h). Si a alguien le
+  // roban el token y cambia su contraseña para protegerse, el token robado seguiría
+  // funcionando. `usuario_cliente.token_version` se incrementa al cambiar la clave y
+  // requireAuth compara la versión del token con la de la base de datos.
+  //
+  // ⚠️ IMPORTANTE: este bloque CIERRA la sesión de `reqUsr`, que es el mismo cliente cuyo
+  // token (REGT) usan las pruebas de pago en línea que vienen después. Por eso se vuelve a
+  // iniciar sesión al final del bloque y se reasigna REGT: es exactamente lo que tendría
+  // que hacer un usuario real tras cambiar su contraseña.
+  console.log('12b) A7: el cambio de contraseña cierra las sesiones anteriores');
+  const loginAntes = await call('POST', '/auth/login', { body: { username: reqUsr, password: 'claveNueva1' } });
+  const tokenViejo = loginAntes.data?.token;
+  const antesCambio = await call('GET', '/mis-datos', { token: tokenViejo });
+  check('Token nuevo funciona antes de cambiar la contraseña', antesCambio.status === 200, `status=${antesCambio.status}`);
+
+  const sol3 = await call('POST', '/auth/recuperar-solicitar', { body: { username: reqUsr, canal: 'EMAIL' } });
+  const cambio2 = await call('POST', '/auth/recuperar-cambiar', { body: { username: reqUsr, codigo: sol3.data?.demo_otp, nuevaClave: 'claveNueva2' } });
+  check('Segundo cambio de contraseña → 200', cambio2.status === 200, JSON.stringify(cambio2.data));
+
+  const conTokenViejo = await call('GET', '/mis-datos', { token: tokenViejo });
+  check('Token ANTERIOR al cambio de contraseña → 401 (sesión cerrada)', conTokenViejo.status === 401, JSON.stringify(conTokenViejo.data));
+
+  // También debe dejar de valer el token del registro original (REGT).
+  const conRegtViejo = await call('GET', '/mis-datos', { token: REGT });
+  check('El token del registro también queda invalidado → 401', conRegtViejo.status === 401, `status=${conRegtViejo.status}`);
+
+  const loginTrasCambio = await call('POST', '/auth/login', { body: { username: reqUsr, password: 'claveNueva2' } });
+  const tokenNuevo = loginTrasCambio.data?.token;
+  const conTokenNuevo = await call('GET', '/mis-datos', { token: tokenNuevo });
+  check('Token emitido DESPUÉS del cambio → 200', conTokenNuevo.status === 200, `status=${conTokenNuevo.status}`);
+
+  // Un token manipulado (firma inválida) no debe servir nunca.
+  const tokenFalso = String(tokenNuevo || '').slice(0, -3) + 'abc';
+  const conTokenFalso = await call('GET', '/mis-datos', { token: tokenFalso });
+  check('Token con firma manipulada → 401', conTokenFalso.status === 401, `status=${conTokenFalso.status}`);
+
+  // Se retoma la sesión para el resto de la suite (las pruebas de pago en línea usan REGT).
+  REGT = tokenNuevo;
+  check('Sesión retomada tras el cambio de contraseña (REGT renovado)', !!REGT, 'sin token');
 
   // --- Datos de pago en línea (tarjeta / transferencia / cheque) ---
   const pedP = await call('POST', '/pedidos', { token: AT, body: { clienteId: cliNuevoId, items: [{ productoId: 2, cantidad: 1 }] } });

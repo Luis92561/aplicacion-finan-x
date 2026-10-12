@@ -2,7 +2,7 @@ import { Router } from 'express';
 import pool from '../db.js';
 import { requireAuth, requireRol } from '../middleware/auth.js';
 import { audit } from '../middleware/audit.js';
-import { HttpError } from '../utils.js';
+import { HttpError, idNumerico } from '../utils.js';
 
 const router = Router();
 router.use(requireAuth, requireRol('ADMIN', 'FACTURADOR', 'CAJERO', 'SUPERVISOR'));
@@ -76,11 +76,17 @@ router.post('/', async (req, res, next) => {
     await client.query('UPDATE facturas SET numero_factura = $1 WHERE factura_id = $2', [numero, facturaId]);
     await client.query(`UPDATE pedidos SET estado = 'FACTURADO' WHERE pedido_id = $1`, [pedidoId]);
 
+    // Dentro de la transacción: la factura no debe existir sin su registro de auditoría.
+    await audit({
+      client,
+      usuario: req.user.correo, modulo: MODULO, operacion: 'GENERAR', registro: numero,
+      descripcion: `Factura ${numero} generada del pedido ${p.numero_pedido} para ${cli.rows[0].nombre_razon_social}`,
+    });
+
     await client.query('COMMIT');
-    await audit({ usuario: req.user.correo, modulo: MODULO, operacion: 'GENERAR', registro: numero, descripcion: `Factura ${numero} generada del pedido ${p.numero_pedido} para ${cli.rows[0].nombre_razon_social}` });
     res.status(201).json({ factura_id: facturaId, numero_factura: numero });
   } catch (e) {
-    await client.query('ROLLBACK');
+    await client.query('ROLLBACK').catch(() => {});
     next(e);
   } finally {
     client.release();
@@ -90,7 +96,7 @@ router.post('/', async (req, res, next) => {
 // GET /api/facturas/:id — detalle con líneas del pedido y pagos
 router.get('/:id', async (req, res, next) => {
   try {
-    const id = Number(req.params.id);
+    const id = idNumerico(req.params.id, 'id');
     const f = await pool.query(
       `SELECT f.*, f.subtotal::float8, f.impuestos::float8, f.total::float8,
               v.saldo::float8, v.valor_pagado::float8, v.estado_pago,
@@ -129,10 +135,17 @@ router.get('/:id', async (req, res, next) => {
 // GET /api/facturas/:id/pagos
 router.get('/:id/pagos', async (req, res, next) => {
   try {
+    const id = idNumerico(req.params.id, 'id');
+    // Antes devolvía [] cuando la factura no existía, así que no se podía distinguir
+    // "esta factura no tiene pagos" de "esta factura no existe". Los demás endpoints de
+    // detalle (/facturas/:id y /facturas/:id/saldo) sí responden 404.
+    const existe = await pool.query('SELECT 1 FROM facturas WHERE factura_id = $1', [id]);
+    if (!existe.rowCount) throw new HttpError(404, 'Factura no encontrada');
+
     const rows = await pool.query(
       `SELECT pago_id, numero_pago, fecha, valor::float8, metodo_pago, referencia, observaciones
        FROM pagos WHERE factura_id = $1 ORDER BY fecha DESC`,
-      [Number(req.params.id)]
+      [id]
     );
     res.json(rows.rows);
   } catch (e) { next(e); }
@@ -145,7 +158,7 @@ router.get('/:id/saldo', async (req, res, next) => {
       `SELECT v.numero_factura, v.total::float8, v.valor_pagado::float8, v.saldo::float8,
               v.notas_credito::float8, v.estado_pago, v.estado
        FROM factura_saldo v WHERE v.factura_id = $1`,
-      [Number(req.params.id)]
+      [idNumerico(req.params.id, 'id')]
     );
     if (!rows.rowCount) throw new HttpError(404, 'Factura no encontrada');
     res.json(rows.rows[0]);
@@ -154,31 +167,55 @@ router.get('/:id/saldo', async (req, res, next) => {
 
 // POST /api/facturas/:id/anular  — { motivo } · anulación lógica, solo sin pagos
 router.post('/:id/anular', async (req, res, next) => {
+  const client = await pool.connect();
   try {
-    const id = Number(req.params.id);
+    const id = idNumerico(req.params.id, 'id');
     const { motivo } = req.body || {};
     if (!motivo || !motivo.trim()) throw new HttpError(400, 'Debe indicar el motivo de anulación');
 
-    const f = await pool.query(
-      `SELECT f.estado, f.numero_factura, f.total,
+    await client.query('BEGIN');
+
+    // FOR UPDATE: impide que se registre un pago entre la comprobación y la anulación.
+    const f = await client.query(
+      `SELECT f.estado, f.numero_factura, f.pedido_id,
               (SELECT COUNT(*) FROM pagos WHERE factura_id = f.factura_id)::int AS pagos
-       FROM facturas f WHERE f.factura_id = $1`,
+       FROM facturas f WHERE f.factura_id = $1
+       FOR UPDATE`,
       [id]
     );
     if (!f.rowCount) throw new HttpError(404, 'Factura no encontrada');
     if (f.rows[0].estado !== 'ACTIVA') throw new HttpError(409, 'La factura no está activa');
     if (f.rows[0].pagos > 0) throw new HttpError(409, 'No se puede anular una factura con pagos registrados (regla de negocio)');
 
-    await pool.query(
+    await client.query(
       `UPDATE facturas SET estado = 'ANULADA', motivo_anulacion = $1, fecha_anulacion = NOW(), usuario_anulacion = $2
        WHERE factura_id = $3`,
       [motivo, req.user.usuarioId, id]
     );
-    await audit({ usuario: req.user.correo, modulo: MODULO, operacion: 'ANULAR', registro: f.rows[0].numero_factura, descripcion: `Anulación de ${f.rows[0].numero_factura}: ${motivo}` });
-    // El pedido vuelve a quedar disponible para refacturación
-    await pool.query(`UPDATE pedidos SET estado = 'CONFIRMADO' WHERE pedido_id = (SELECT pedido_id FROM facturas WHERE factura_id = $1)`, [id]);
+
+    // El pedido vuelve a CONFIRMADO.
+    // ⚠️ OJO: `facturas.pedido_id` es UNIQUE, así que la factura anulada sigue ocupando el
+    // pedido y volver a facturarlo da conflicto. Antes el comentario decía que el pedido
+    // "queda disponible para refacturación" y eso no era cierto: ver C4 en
+    // deep-docs/09-OBSERVACIONES-Y-RIESGOS.md (requiere decidir la regla de negocio).
+    await client.query('UPDATE pedidos SET estado = $1 WHERE pedido_id = $2', ['CONFIRMADO', f.rows[0].pedido_id]);
+
+    // La anulación y la reversión del pedido se confirman juntas: antes eran dos UPDATE
+    // sueltos y, si fallaba el segundo, la factura quedaba anulada con el pedido en FACTURADO.
+    await audit({
+      client,
+      usuario: req.user.correo, modulo: MODULO, operacion: 'ANULAR', registro: f.rows[0].numero_factura,
+      descripcion: `Anulación de ${f.rows[0].numero_factura}: ${motivo}`,
+    });
+
+    await client.query('COMMIT');
     res.json({ ok: true, estado: 'ANULADA' });
-  } catch (e) { next(e); }
+  } catch (e) {
+    await client.query('ROLLBACK').catch(() => {});
+    next(e);
+  } finally {
+    client.release();
+  }
 });
 
 export default router;

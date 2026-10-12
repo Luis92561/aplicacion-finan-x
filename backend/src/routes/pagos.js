@@ -2,7 +2,7 @@ import { Router } from 'express';
 import pool from '../db.js';
 import { requireAuth, requireRol } from '../middleware/auth.js';
 import { audit } from '../middleware/audit.js';
-import { HttpError, round2, validarDatosPago } from '../utils.js';
+import { HttpError, round2, validarDatosPago, idNumerico, METODOS_PAGO } from '../utils.js';
 
 const router = Router();
 router.use(requireAuth, requireRol('ADMIN', 'FACTURADOR', 'CAJERO', 'SUPERVISOR'));
@@ -48,14 +48,24 @@ router.post('/', async (req, res, next) => {
     await client.query('BEGIN');
 
     if (!facturaId || !(Number(valor) > 0)) throw new HttpError(400, 'Factura y valor (mayor que cero) son obligatorios');
+    // Un facturaId no numérico llegaba a PostgreSQL y provocaba un error de tipo (500).
+    const facturaIdNum = idNumerico(facturaId, 'id de factura');
 
+    // FOR UPDATE: bloquea la fila de la factura durante la transacción.
+    //
+    // Sin este bloqueo, dos pagos simultáneos sobre la misma factura podían leer el MISMO
+    // saldo, pasar los dos la validación `valor <= saldo` e insertarse ambos: el cliente
+    // acababa pagando más de lo que debía. Pasa con dos cajeros en paralelo, o con el
+    // cliente pagando desde el portal justo cuando el cajero registra el pago.
+    // Con el bloqueo, el segundo espera a que el primero confirme y vuelve a leer el saldo.
     const f = await client.query(
-      `SELECT f.factura_id, f.numero_factura, f.total, f.estado,
-              v.saldo::float8 AS saldo, v.valor_pagado::float8 AS pagado
+      `SELECT f.factura_id, f.numero_factura, f.estado,
+              v.saldo::float8 AS saldo
        FROM facturas f
        JOIN factura_saldo v ON v.factura_id = f.factura_id
-       WHERE f.factura_id = $1`,
-      [facturaId]
+       WHERE f.factura_id = $1
+       FOR UPDATE OF f`,
+      [facturaIdNum]
     );
     if (!f.rowCount) throw new HttpError(404, 'Factura no encontrada');
     if (f.rows[0].estado !== 'ACTIVA') throw new HttpError(409, 'Solo se pueden registrar pagos en facturas activas');
@@ -67,14 +77,21 @@ router.post('/', async (req, res, next) => {
     const valorNum = round2(Number(valor));
     if (valorNum > saldo) throw new HttpError(400, `El valor supera el saldo pendiente ($ ${saldo.toLocaleString('en-US')})`);
 
-    // Datos requeridos según el método de pago (tarjeta/transferencia/cheque); nunca se guardan CVV ni número completo
-    const datosPago = validarDatosPago(metodoPago, req.body);
+    // Datos requeridos según el método de pago (tarjeta/transferencia/cheque); nunca se guardan CVV ni número completo.
+    // `metodo_pago` no tenía lista blanca ni en la aplicación ni en la base (la columna es TEXT
+    // sin CHECK), así que se aceptaba cualquier cadena; esos pagos luego no aparecían en los
+    // informes, que solo cuentan EFECTIVO / TRANSFERENCIA / TARJETA / CHEQUE.
+    const metodo = String(metodoPago).toUpperCase();
+    if (!METODOS_PAGO.includes(metodo)) {
+      throw new HttpError(400, `Método de pago inválido. Use uno de: ${METODOS_PAGO.join(', ')}`);
+    }
+    const datosPago = validarDatosPago(metodo, req.body);
 
     const ins = await client.query(
       `INSERT INTO pagos (factura_id, valor, metodo_pago, referencia, observaciones, usuario_id,
                           banco, titular, tipo_tarjeta, ultimos_digitos_tarjeta, vencimiento_tarjeta, numero_cuenta)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING pago_id`,
-      [facturaId, valorNum, metodoPago, referencia || null, observaciones || null, req.user.usuarioId ?? null,
+      [facturaIdNum, valorNum, metodoPago, referencia || null, observaciones || null, req.user.usuarioId ?? null,
         datosPago.banco || null, datosPago.titular || null, datosPago.tipo_tarjeta || null,
         datosPago.ultimos_digitos_tarjeta || null, datosPago.vencimiento_tarjeta || null, datosPago.numero_cuenta || null]
     );
@@ -87,14 +104,18 @@ router.post('/', async (req, res, next) => {
     const nuevoSaldo = round2(saldo - valorNum);
     const estadoPago = nuevoSaldo <= 0 ? 'PAGADA' : 'PAGO_PARCIAL';
 
-    await client.query('COMMIT');
+    // La auditoría entra en la MISMA transacción (antes iba después del COMMIT y al pool,
+    // así que un fallo al auditar dejaba el pago registrado sin traza).
     await audit({
+      client,
       usuario: req.user.correo, modulo: MODULO, operacion: 'REGISTRAR', registro: numero,
       descripcion: `Pago de $${valorNum} en ${f.rows[0].numero_factura} (${metodoPago}) · saldo $${nuevoSaldo}`,
     });
+
+    await client.query('COMMIT');
     res.status(201).json({ pago_id: pagoId, numero_pago: numero, valor: valorNum, saldo: nuevoSaldo, estado_pago: estadoPago });
   } catch (e) {
-    await client.query('ROLLBACK');
+    await client.query('ROLLBACK').catch(() => {});
     next(e);
   } finally {
     client.release();

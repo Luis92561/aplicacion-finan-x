@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import pool from '../db.js';
 import { requireAuth, requireRol } from '../middleware/auth.js';
 import { audit } from '../middleware/audit.js';
-import { HttpError } from '../utils.js';
+import { HttpError, idNumerico, validarPassword } from '../utils.js';
 
 const router = Router();
 router.use(requireAuth, requireRol('ADMIN', 'FACTURADOR', 'CAJERO', 'SUPERVISOR'));
@@ -41,7 +41,7 @@ router.get('/', async (req, res, next) => {
 // GET /api/clientes/:id
 router.get('/:id', async (req, res, next) => {
   try {
-    const id = Number(req.params.id);
+    const id = idNumerico(req.params.id, 'id');
     const rows = await pool.query(
       `SELECT c.*,
               (SELECT COALESCE(SUM(v.saldo), 0)::float8
@@ -80,10 +80,25 @@ router.post('/', async (req, res, next) => {
 // PUT /api/clientes/:id
 router.put('/:id', async (req, res, next) => {
   try {
-    const id = Number(req.params.id);
+    const id = idNumerico(req.params.id, 'id');
     const b = req.body || {};
+
+    // El POST ya validaba esto, pero el PUT no: si al editar se ponía la identificación de
+    // otro cliente, se violaba la restricción UNIQUE de la base de datos y el usuario
+    // recibía un 500 ("error interno") en lugar del 409 que explica el problema. Lo mismo
+    // con los campos obligatorios: `numero_identificacion` es NOT NULL.
+    if (!b.tipoIdentificacion || !b.numeroIdentificacion || !b.nombreRazonSocial) {
+      throw new HttpError(400, 'Tipo de identificación, número de identificación y nombre son obligatorios');
+    }
+
     const exists = await pool.query('SELECT nombre_razon_social FROM clientes WHERE cliente_id = $1', [id]);
     if (!exists.rowCount) throw new HttpError(404, 'Cliente no encontrado');
+
+    const dup = await pool.query(
+      'SELECT 1 FROM clientes WHERE tipo_identificacion = $1 AND numero_identificacion = $2 AND cliente_id <> $3',
+      [b.tipoIdentificacion, b.numeroIdentificacion, id]
+    );
+    if (dup.rowCount) throw new HttpError(409, 'Ya existe otro cliente con esa identificación');
 
     await pool.query(
       `UPDATE clientes SET tipo_cliente = $1, tipo_identificacion = $2, numero_identificacion = $3,
@@ -99,7 +114,7 @@ router.put('/:id', async (req, res, next) => {
 // PATCH /api/clientes/:id/estado
 router.patch('/:id/estado', async (req, res, next) => {
   try {
-    const id = Number(req.params.id);
+    const id = idNumerico(req.params.id, 'id');
     const { estado } = req.body || {};
     if (!['ACTIVO', 'INACTIVO'].includes(estado)) throw new HttpError(400, 'Estado inválido');
     const r = await pool.query('UPDATE clientes SET estado = $1 WHERE cliente_id = $2 RETURNING nombre_razon_social', [estado, id]);
@@ -112,9 +127,10 @@ router.patch('/:id/estado', async (req, res, next) => {
 // POST /api/clientes/:id/cuenta  — crea cuenta de acceso del cliente
 router.post('/:id/cuenta', async (req, res, next) => {
   try {
-    const id = Number(req.params.id);
+    const id = idNumerico(req.params.id, 'id');
     const { username, password } = req.body || {};
     if (!username || !password) throw new HttpError(400, 'Usuario y contraseña son obligatorios');
+    validarPassword(password);
 
     const cli = await pool.query('SELECT nombre_razon_social, estado FROM clientes WHERE cliente_id = $1', [id]);
     if (!cli.rowCount) throw new HttpError(404, 'Cliente no encontrado');
@@ -139,7 +155,7 @@ router.post('/:id/cuenta', async (req, res, next) => {
 // GET /api/clientes/:id/resumen-correo — texto del estado financiero para enviar por correo
 router.get('/:id/resumen-correo', async (req, res, next) => {
   try {
-    const id = Number(req.params.id);
+    const id = idNumerico(req.params.id, 'id');
     const cli = await pool.query(
       `SELECT c.cliente_id, c.tipo_identificacion, c.numero_identificacion, c.nombre_razon_social,
               c.correo, c.telefono, c.ciudad, c.estado
@@ -164,6 +180,11 @@ router.get('/:id/resumen-correo', async (req, res, next) => {
 
     const fmt = (n) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(Number(n || 0));
     const fecha = new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
+    // Las fechas se formatean en la zona horaria de la empresa, no en UTC.
+    // Con toISOString() una factura emitida a las 20:00 en Colombia (UTC-5) se mostraba con
+    // la fecha del día siguiente, porque UTC ya había pasado de medianoche.
+    const ZONA = 'America/Bogota';
+    const fmtFecha = (v) => (v ? new Date(v).toLocaleDateString('es-CO', { timeZone: ZONA, year: 'numeric', month: '2-digit', day: '2-digit' }) : '—');
     const saldoPend = facturas.rows.reduce((s, f) => s + Number(f.saldo), 0);
     const pagado = facturas.rows.reduce((s, f) => s + Number(f.valor_pagado), 0);
 
@@ -178,7 +199,7 @@ router.get('/:id/resumen-correo', async (req, res, next) => {
       lineas.push('  No tiene facturas activas en este momento.');
     } else {
       for (const f of facturas.rows) {
-        lineas.push(`• ${f.numero_factura} · emitida ${f.fecha_emision.toISOString().slice(0, 10)} · total ${fmt(f.total)} · pagado ${fmt(f.valor_pagado)} · saldo ${fmt(f.saldo)} · ${f.estado_pago}`);
+        lineas.push(`• ${f.numero_factura} · emitida ${fmtFecha(f.fecha_emision)} · total ${fmt(f.total)} · pagado ${fmt(f.valor_pagado)} · saldo ${fmt(f.saldo)} · ${f.estado_pago}`);
       }
     }
     lineas.push('');
@@ -189,7 +210,7 @@ router.get('/:id/resumen-correo', async (req, res, next) => {
       lineas.push('NOTAS DE CRÉDITO ACTIVAS');
       lineas.push('────────────────────────');
       for (const n of notas.rows) {
-        lineas.push(`• ${n.numero_nota} · ${n.fecha.toISOString().slice(0, 10)} · ${fmt(n.valor)} · ${n.motivo}`);
+        lineas.push(`• ${n.numero_nota} · ${fmtFecha(n.fecha)} · ${fmt(n.valor)} · ${n.motivo}`);
       }
     }
     lineas.push('');

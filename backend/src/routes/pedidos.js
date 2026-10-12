@@ -2,7 +2,7 @@ import { Router } from 'express';
 import pool from '../db.js';
 import { requireAuth, requireRol } from '../middleware/auth.js';
 import { audit } from '../middleware/audit.js';
-import { HttpError, round2 } from '../utils.js';
+import { HttpError, round2, idNumerico } from '../utils.js';
 
 const router = Router();
 router.use(requireAuth, requireRol('ADMIN', 'FACTURADOR', 'CAJERO', 'SUPERVISOR'));
@@ -40,7 +40,7 @@ router.get('/', async (req, res, next) => {
 // GET /api/pedidos/:id  — detalle con líneas y factura
 router.get('/:id', async (req, res, next) => {
   try {
-    const id = Number(req.params.id);
+    const id = idNumerico(req.params.id, 'id');
     const ped = await pool.query(
       `SELECT p.*, p.subtotal::float8, p.impuestos::float8, p.total::float8,
               c.nombre_razon_social, c.numero_identificacion,
@@ -106,11 +106,17 @@ router.post('/', async (req, res, next) => {
       [numero, subtotal, impuestos, total, pedidoId]
     );
 
+    // Dentro de la transacción: el pedido no debe existir sin su registro de auditoría.
+    await audit({
+      client,
+      usuario: req.user.correo, modulo: MODULO, operacion: 'CREAR', registro: numero,
+      descripcion: `Pedido ${numero} por $${total}`,
+    });
+
     await client.query('COMMIT');
-    await audit({ usuario: req.user.correo, modulo: MODULO, operacion: 'CREAR', registro: numero, descripcion: `Pedido ${numero} por $${total}` });
     res.status(201).json({ pedido_id: pedidoId, numero_pedido: numero, total });
   } catch (e) {
-    await client.query('ROLLBACK');
+    await client.query('ROLLBACK').catch(() => {});
     next(e);
   } finally {
     client.release();
@@ -121,7 +127,7 @@ router.post('/', async (req, res, next) => {
 router.put('/:id', async (req, res, next) => {
   const client = await pool.connect();
   try {
-    const id = Number(req.params.id);
+    const id = idNumerico(req.params.id, 'id');
     const { observaciones = '', items = [] } = req.body || {};
 
     await client.query('BEGIN');
@@ -155,11 +161,16 @@ router.put('/:id', async (req, res, next) => {
       `UPDATE pedidos SET observaciones = $1, subtotal = $2, impuestos = $3, total = $4 WHERE pedido_id = $5`,
       [observaciones || null, subtotal, impuestos, total, id]
     );
+    await audit({
+      client,
+      usuario: req.user.correo, modulo: MODULO, operacion: 'ACTUALIZAR', registro: ped.rows[0].numero_pedido,
+      descripcion: `Modificación del pedido por $${total}`,
+    });
+
     await client.query('COMMIT');
-    await audit({ usuario: req.user.correo, modulo: MODULO, operacion: 'ACTUALIZAR', registro: ped.rows[0].numero_pedido, descripcion: `Modificación del pedido por $${total}` });
     res.json({ ok: true, total });
   } catch (e) {
-    await client.query('ROLLBACK');
+    await client.query('ROLLBACK').catch(() => {});
     next(e);
   } finally {
     client.release();
@@ -169,7 +180,7 @@ router.put('/:id', async (req, res, next) => {
 // PATCH /api/pedidos/:id/estado  — { estado: 'CONFIRMADO' | 'CANCELADO' }
 router.patch('/:id/estado', async (req, res, next) => {
   try {
-    const id = Number(req.params.id);
+    const id = idNumerico(req.params.id, 'id');
     const { estado } = req.body || {};
     const ped = await pool.query('SELECT estado, numero_pedido FROM pedidos WHERE pedido_id = $1', [id]);
     if (!ped.rowCount) throw new HttpError(404, 'Pedido no encontrado');

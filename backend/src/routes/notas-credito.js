@@ -2,7 +2,7 @@ import { Router } from 'express';
 import pool from '../db.js';
 import { requireAuth, requireRol } from '../middleware/auth.js';
 import { audit } from '../middleware/audit.js';
-import { HttpError, round2 } from '../utils.js';
+import { HttpError, round2, idNumerico } from '../utils.js';
 
 const router = Router();
 router.use(requireAuth, requireRol('ADMIN', 'FACTURADOR', 'CAJERO', 'SUPERVISOR'));
@@ -47,7 +47,7 @@ router.get('/:id', async (req, res, next) => {
        JOIN facturas f ON f.factura_id = nc.factura_id
        JOIN clientes c ON c.cliente_id = nc.cliente_id
        WHERE nc.nota_credito_id = $1`,
-      [Number(req.params.id)]
+      [idNumerico(req.params.id, 'id')]
     );
     if (!rows.rowCount) throw new HttpError(404, 'Nota de crédito no encontrada');
     res.json(rows.rows[0]);
@@ -104,15 +104,18 @@ router.post('/', async (req, res, next) => {
     await client.query('UPDATE notas_credito SET numero_nota = $1 WHERE nota_credito_id = $2', [numero, notaId]);
 
     const nuevoSaldo = round2(pagado - notasPrevias - valorNum);
-    await client.query('COMMIT');
 
+    // Dentro de la transacción: la devolución no debe existir sin su registro de auditoría.
     await audit({
+      client,
       usuario: req.user.correo, modulo: MODULO, operacion: 'CREAR', registro: numero,
       descripcion: `Nota crédito ${numero} de $${valorNum} sobre ${f.rows[0].numero_factura}: ${motivo}`,
     });
+
+    await client.query('COMMIT');
     res.status(201).json({ nota_credito_id: notaId, numero_nota: numero, valor: valorNum, saldo_restante_devolver: nuevoSaldo });
   } catch (e) {
-    await client.query('ROLLBACK');
+    await client.query('ROLLBACK').catch(() => {});
     next(e);
   } finally {
     client.release();
@@ -122,7 +125,7 @@ router.post('/', async (req, res, next) => {
 // POST /api/notas-credito/:id/anular — { motivo } · anulación lógica
 router.post('/:id/anular', async (req, res, next) => {
   try {
-    const id = Number(req.params.id);
+    const id = idNumerico(req.params.id, 'id');
     const { motivo } = req.body || {};
     if (!motivo || !String(motivo).trim()) throw new HttpError(400, 'Debe indicar el motivo de anulación');
 

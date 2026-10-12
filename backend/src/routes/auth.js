@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
+import crypto from 'node:crypto';
 import rateLimit from 'express-rate-limit';
 import pool from '../db.js';
 import { config } from '../config.js';
@@ -7,7 +8,7 @@ import { signToken } from '../middleware/auth.js';
 import { registrarFalloLogin, limpiarFallosLogin } from '../middleware/rateLimit.js';
 import { audit } from '../middleware/audit.js';
 import { enviarCodigo } from '../middleware/notificar.js';
-import { HttpError } from '../utils.js';
+import { HttpError, validarPassword } from '../utils.js';
 
 const router = Router();
 
@@ -38,7 +39,7 @@ router.post('/login', async (req, res, next) => {
 
     // 1) Buscar usuario interno por correo
     const interno = await pool.query(
-      `SELECT u.usuario_id, u.nombre, u.correo, u.password_hash, u.estado, r.nombre AS rol
+      `SELECT u.usuario_id, u.nombre, u.correo, u.password_hash, u.estado, u.token_version, r.nombre AS rol
        FROM usuarios u JOIN roles r ON r.rol_id = u.rol_id
        WHERE LOWER(u.correo) = LOWER($1)`,
       [username]
@@ -46,11 +47,16 @@ router.post('/login', async (req, res, next) => {
 
     if (interno.rowCount) {
       const u = interno.rows[0];
-      if (u.estado !== 'ACTIVO') throw new HttpError(403, 'La cuenta está inactiva');
       const ok = await bcrypt.compare(password, u.password_hash);
+      // Se comprueba la contraseña ANTES que el estado: así el mensaje "cuenta inactiva"
+      // solo lo ve quien ya demostró conocer la contraseña, y no sirve para averiguar
+      // qué correos están registrados (enumeración de cuentas).
       if (!ok) throw new HttpError(401, 'Credenciales incorrectas');
+      if (u.estado !== 'ACTIVO') throw new HttpError(403, 'La cuenta está inactiva');
 
-      const user = { tipo: 'interno', usuarioId: u.usuario_id, nombre: u.nombre, correo: u.correo, rol: u.rol };
+      // `ver` viaja en el token y se compara con usuarios.token_version en cada petición:
+      // al cambiar la contraseña se incrementa y los tokens anteriores dejan de valer.
+      const user = { tipo: 'interno', usuarioId: u.usuario_id, nombre: u.nombre, correo: u.correo, rol: u.rol, ver: u.token_version };
       const token = signToken(user);
       limpiarFallosLogin(req); // un acierto resetea el contador de fallos de la IP
       await audit({ usuario: u.correo, modulo: 'Autenticación', operacion: 'LOGIN', descripcion: `Inicio de sesión de ${u.correo} (${u.rol})` });
@@ -59,8 +65,8 @@ router.post('/login', async (req, res, next) => {
 
     // 2) Buscar cuenta de cliente
     const cli = await pool.query(
-      `SELECT uc.usuario_cliente_id, uc.cliente_id, uc.username, uc.password_hash, uc.estado AS cuenta_estado,
-              c.nombre_razon_social, c.estado AS cliente_estado
+      `SELECT uc.usuario_cliente_id, uc.cliente_id, uc.username, uc.password_hash, uc.token_version,
+              uc.estado AS cuenta_estado, c.nombre_razon_social, c.estado AS cliente_estado
        FROM usuario_cliente uc JOIN clientes c ON c.cliente_id = uc.cliente_id
        WHERE LOWER(uc.username) = LOWER($1)`,
       [username]
@@ -68,16 +74,16 @@ router.post('/login', async (req, res, next) => {
 
     if (cli.rowCount) {
       const c = cli.rows[0];
-      if (c.cuenta_estado !== 'ACTIVO') throw new HttpError(403, 'La cuenta está inactiva');
-      if (c.cliente_estado !== 'ACTIVO') throw new HttpError(403, 'El cliente está inactivo');
       const ok = await bcrypt.compare(password, c.password_hash);
       if (!ok) throw new HttpError(401, 'Credenciales incorrectas');
+      if (c.cuenta_estado !== 'ACTIVO') throw new HttpError(403, 'La cuenta está inactiva');
+      if (c.cliente_estado !== 'ACTIVO') throw new HttpError(403, 'El cliente está inactivo');
 
       await pool.query('UPDATE usuario_cliente SET ultimo_acceso = NOW() WHERE usuario_cliente_id = $1', [c.usuario_cliente_id]);
 
       const user = {
         tipo: 'cliente', usuarioClienteId: c.usuario_cliente_id, clienteId: c.cliente_id,
-        nombre: c.nombre_razon_social, username: c.username,
+        nombre: c.nombre_razon_social, username: c.username, ver: c.token_version,
       };
       const token = signToken(user);
       limpiarFallosLogin(req); // un acierto resetea el contador de fallos de la IP
@@ -105,7 +111,7 @@ router.post('/registro', registroLimiter, async (req, res, next) => {
   try {
     if (!numeroIdentificacion || !nombreRazonSocial) throw new HttpError(400, 'Número de identificación y nombre son obligatorios');
     if (!username || !password) throw new HttpError(400, 'Usuario y contraseña son obligatorios');
-    if (String(password).length < 6) throw new HttpError(400, 'La contraseña debe tener al menos 6 caracteres');
+    validarPassword(password);
     if (!/^[a-zA-Z0-9._@-]{3,}$/.test(String(username))) throw new HttpError(400, 'El usuario debe tener al menos 3 caracteres (letras, números, . _ @ -)');
 
     const client = await pool.connect();
@@ -137,19 +143,26 @@ router.post('/registro', registroLimiter, async (req, res, next) => {
 
       const hash = await bcrypt.hash(password, 10);
       const uc = await client.query(
-        'INSERT INTO usuario_cliente (cliente_id, username, password_hash) VALUES ($1, $2, $3) RETURNING usuario_cliente_id',
+        'INSERT INTO usuario_cliente (cliente_id, username, password_hash) VALUES ($1, $2, $3) RETURNING usuario_cliente_id, token_version',
         [clienteId, username, hash]
       );
 
-      await client.query('COMMIT');
-
       await audit({
+        client,
         usuario: username, usuarioTipo: 'CLIENTE', modulo: 'Clientes', operacion: 'AUTORREGISTRO',
         registro: clienteId, descripcion: `Autoregistro del cliente ${nombreRazonSocial} (${tipoIdentificacion} ${numeroIdentificacion})`,
       });
 
-      // El cliente queda autenticado y puede entrar al portal de inmediato
-      const user = { tipo: 'cliente', usuarioClienteId: uc.rows[0].usuario_cliente_id, clienteId, nombre: nombreRazonSocial, username };
+      await client.query('COMMIT');
+
+      // El cliente queda autenticado y puede entrar al portal de inmediato.
+      // `ver` es imprescindible: es la versión de sesión que requireAuth compara con
+      // usuario_cliente.token_version. Si se omite, el token se interpretaría como versión 1
+      // y dejaría de valer en cuanto la cuenta cambiara su contraseña alguna vez.
+      const user = {
+        tipo: 'cliente', usuarioClienteId: uc.rows[0].usuario_cliente_id, clienteId,
+        nombre: nombreRazonSocial, username, ver: uc.rows[0].token_version,
+      };
       const token = signToken(user);
       return res.status(201).json({ token, user });
     } catch (err) {
@@ -163,9 +176,15 @@ router.post('/registro', registroLimiter, async (req, res, next) => {
   }
 });
 
-/** Genera un código de un solo uso de 6 dígitos. */
+/**
+ * Genera un código de un solo uso de 6 dígitos.
+ *
+ * Se usa crypto.randomInt y NO Math.random: este código es un factor de seguridad (permite
+ * cambiar la contraseña de una cuenta), y Math.random no es criptográficamente seguro
+ * (su secuencia es predecible con suficientes muestras).
+ */
 function generarOtp() {
-  return String(Math.floor(100000 + Math.random() * 900000));
+  return String(crypto.randomInt(100000, 1000000));
 }
 
 /** Enmascara el destino (correo/teléfono) para mostrarlo de forma segura. */
@@ -191,6 +210,17 @@ router.post('/recuperar-solicitar', recuperarLimiter, async (req, res, next) => 
 
     if (uc.rowCount) {
       const destino = canal === 'SMS' ? uc.rows[0].telefono : uc.rows[0].correo;
+      // Sin un contacto al que enviarlo, el flujo no sirve: se avisa en vez de crear una
+      // solicitud imposible de completar (antes el código se generaba igual y nunca llegaba).
+      if (!destino) {
+        throw new HttpError(
+          400,
+          canal === 'SMS'
+            ? 'La cuenta no tiene un teléfono registrado. Solicite el código por correo electrónico.'
+            : 'La cuenta no tiene un correo registrado. Contacte con la oficina para restablecer su contraseña.'
+        );
+      }
+
       const codigo = generarOtp();
       // Solo una solicitud vigente por cuenta: invalida las anteriores
       await pool.query(
@@ -212,7 +242,7 @@ router.post('/recuperar-solicitar', recuperarLimiter, async (req, res, next) => 
         mensaje: `Si la cuenta existe, recibirá su código de seguridad por ${canal === 'SMS' ? 'SMS' : 'correo electrónico'}.`,
       };
       if (config.otpDemo) base.demo_otp = codigo;
-      if (config.otpDemo) base.destino = destino ? enmascarar(destino) : null;
+      if (config.otpDemo) base.destino = enmascarar(destino);
       if (config.otpDemo) base.canal = canal;
       return res.json(base);
     }
@@ -223,19 +253,25 @@ router.post('/recuperar-solicitar', recuperarLimiter, async (req, res, next) => 
 
 // POST /api/auth/recuperar-cambiar — valida el código de un solo uso y registra la nueva contraseña
 router.post('/recuperar-cambiar', recuperarLimiter, async (req, res, next) => {
+  const client = await pool.connect();
   try {
     const { username = '', codigo = '', nuevaClave = '' } = req.body || {};
     if (!username) throw new HttpError(400, 'Indique su usuario o correo');
     if (!/^\d{6}$/.test(String(codigo))) throw new HttpError(400, 'El código de seguridad debe tener 6 dígitos');
-    if (String(nuevaClave).length < 6) throw new HttpError(400, 'La nueva contraseña debe tener al menos 6 caracteres');
+    validarPassword(nuevaClave);
 
-    const uc = await pool.query(
+    await client.query('BEGIN');
+
+    const uc = await client.query(
       `SELECT usuario_cliente_id FROM usuario_cliente WHERE LOWER(username) = LOWER($1) AND estado = 'ACTIVO'`,
       [username]
     );
-    if (!uc.rowCount) throw new HttpError(404, 'Cuenta no encontrada o inactiva');
+    // Mensaje deliberadamente genérico: antes respondía 404 "Cuenta no encontrada o inactiva",
+    // lo que permitía averiguar qué cuentas existen. Ahora es el mismo error que un código
+    // inválido, así que no revela nada.
+    if (!uc.rowCount) throw new HttpError(400, 'No hay una solicitud vigente de recuperación. Solicite un código nuevo.');
 
-    const rec = await pool.query(
+    const rec = await client.query(
       `SELECT recuperacion_id, codigo_hash, intentos, expira_en FROM recuperaciones_clave
        WHERE usuario_cliente_id = $1 AND usado = FALSE
        ORDER BY recuperacion_id DESC LIMIT 1`,
@@ -244,7 +280,7 @@ router.post('/recuperar-cambiar', recuperarLimiter, async (req, res, next) => {
     if (!rec.rowCount) throw new HttpError(400, 'No hay una solicitud vigente de recuperación. Solicite un código nuevo.');
     const r = rec.rows[0];
     if (r.intentos >= config.otpMaxIntentos) {
-      await pool.query('UPDATE recuperaciones_clave SET usado = TRUE WHERE recuperacion_id = $1', [r.recuperacion_id]);
+      await client.query('UPDATE recuperaciones_clave SET usado = TRUE WHERE recuperacion_id = $1', [r.recuperacion_id]);
       throw new HttpError(429, 'Demasiados intentos con el código. Solicite uno nuevo.');
     }
     if (new Date(r.expira_en).getTime() < Date.now()) throw new HttpError(400, 'El código de seguridad expiró. Solicite uno nuevo.');
@@ -252,22 +288,39 @@ router.post('/recuperar-cambiar', recuperarLimiter, async (req, res, next) => {
     const ok = await bcrypt.compare(String(codigo), r.codigo_hash);
     if (!ok) {
       const nuevos = r.intentos + 1;
-      await pool.query('UPDATE recuperaciones_clave SET intentos = $1 WHERE recuperacion_id = $2', [nuevos, r.recuperacion_id]);
+      await client.query('UPDATE recuperaciones_clave SET intentos = $1 WHERE recuperacion_id = $2', [nuevos, r.recuperacion_id]);
       if (nuevos >= config.otpMaxIntentos) {
-        await pool.query('UPDATE recuperaciones_clave SET usado = TRUE WHERE recuperacion_id = $1', [r.recuperacion_id]);
+        await client.query('UPDATE recuperaciones_clave SET usado = TRUE WHERE recuperacion_id = $1', [r.recuperacion_id]);
       }
+      // El incremento de intentos SÍ debe persistir, así que se confirma antes de responder.
+      await client.query('COMMIT');
       throw new HttpError(401, 'Código de seguridad incorrecto');
     }
 
+    // Cambiar la contraseña e invalidar las sesiones abiertas van juntos: si algo falla,
+    // no queremos la contraseña cambiada a medias ni los tokens antiguos todavía vivos.
     const hash = await bcrypt.hash(String(nuevaClave), 10);
-    await pool.query('UPDATE usuario_cliente SET password_hash = $1 WHERE usuario_cliente_id = $2', [hash, uc.rows[0].usuario_cliente_id]);
-    await pool.query('UPDATE recuperaciones_clave SET usado = TRUE WHERE usuario_cliente_id = $1', [uc.rows[0].usuario_cliente_id]);
+    await client.query(
+      `UPDATE usuario_cliente
+         SET password_hash = $1, token_version = token_version + 1
+       WHERE usuario_cliente_id = $2`,
+      [hash, uc.rows[0].usuario_cliente_id]
+    );
+    await client.query('UPDATE recuperaciones_clave SET usado = TRUE WHERE usuario_cliente_id = $1', [uc.rows[0].usuario_cliente_id]);
     await audit({
+      client,
       usuario: username, usuarioTipo: 'CLIENTE', modulo: 'Autenticación', operacion: 'CLAVE_RECUPERADA',
-      descripcion: 'Contraseña restablecida mediante código de seguridad',
+      descripcion: 'Contraseña restablecida mediante código de seguridad (sesiones anteriores invalidadas)',
     });
+
+    await client.query('COMMIT');
     res.json({ mensaje: 'Contraseña actualizada. Ya puede iniciar sesión con su nueva contraseña.' });
-  } catch (e) { next(e); }
+  } catch (e) {
+    await client.query('ROLLBACK').catch(() => {});
+    next(e);
+  } finally {
+    client.release();
+  }
 });
 
 export default router;

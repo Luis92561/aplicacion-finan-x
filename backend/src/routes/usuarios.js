@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import pool from '../db.js';
 import { requireAuth, requireRol } from '../middleware/auth.js';
 import { audit } from '../middleware/audit.js';
-import { HttpError } from '../utils.js';
+import { HttpError, idNumerico, validarPassword } from '../utils.js';
 
 const router = Router();
 router.use(requireAuth, requireRol('ADMIN'));
@@ -33,6 +33,7 @@ router.post('/', async (req, res, next) => {
   try {
     const { nombre, correo, rol, password } = req.body || {};
     if (!nombre || !correo || !rol || !password) throw new HttpError(400, 'nombre, correo, rol y password son obligatorios');
+    validarPassword(password);
     const rolRes = await pool.query('SELECT rol_id FROM roles WHERE nombre = $1', [rol]);
     if (!rolRes.rowCount) throw new HttpError(400, `Rol inválido: ${rol}`);
     const dup = await pool.query('SELECT 1 FROM usuarios WHERE LOWER(correo) = LOWER($1)', [correo]);
@@ -49,23 +50,65 @@ router.post('/', async (req, res, next) => {
 
 // PATCH /api/usuarios/:id  — estado y/o contraseña
 router.patch('/:id', async (req, res, next) => {
+  const client = await pool.connect();
   try {
-    const id = Number(req.params.id);
+    const id = idNumerico(req.params.id);
     const { estado, password } = req.body || {};
-    const usu = await pool.query('SELECT correo FROM usuarios WHERE usuario_id = $1', [id]);
+
+    // `estado` se validaba contra nada: la columna no tiene CHECK, así que se podía guardar
+    // cualquier cadena y dejar la cuenta en un estado que el login no sabe interpretar.
+    // Clientes y productos ya usan esta misma lista.
+    if (estado !== undefined && !['ACTIVO', 'INACTIVO'].includes(estado)) {
+      throw new HttpError(400, 'Estado inválido (use ACTIVO o INACTIVO)');
+    }
+    // La contraseña se cambiaba sin exigir longitud mínima, a diferencia del registro y de la
+    // recuperación por OTP, que sí piden 6 caracteres.
+    if (password !== undefined && String(password).length < 6) {
+      throw new HttpError(400, 'La contraseña debe tener al menos 6 caracteres');
+    }
+
+    await client.query('BEGIN');
+
+    const usu = await client.query('SELECT correo FROM usuarios WHERE usuario_id = $1', [id]);
     if (!usu.rowCount) throw new HttpError(404, 'Usuario no encontrado');
 
     if (estado) {
-      await pool.query('UPDATE usuarios SET estado = $1 WHERE usuario_id = $2', [estado, id]);
-      await audit({ usuario: req.user.correo, modulo: 'Usuarios', operacion: 'ESTADO', registro: id, descripcion: `Usuario ${usu.rows[0].correo} → ${estado}` });
+      await client.query('UPDATE usuarios SET estado = $1 WHERE usuario_id = $2', [estado, id]);
+      // Al desactivar la cuenta se invalidan sus sesiones abiertas (A7): un usuario
+      // bloqueado no debe seguir usando el token que ya tenía.
+      if (estado === 'INACTIVO') {
+        await client.query('UPDATE usuarios SET token_version = token_version + 1 WHERE usuario_id = $1', [id]);
+      }
+      await audit({
+        client,
+        usuario: req.user.correo, modulo: 'Usuarios', operacion: 'ESTADO', registro: id,
+        descripcion: `Usuario ${usu.rows[0].correo} → ${estado}`,
+      });
     }
     if (password) {
       const hash = await bcrypt.hash(password, 10);
-      await pool.query('UPDATE usuarios SET password_hash = $1 WHERE usuario_id = $2', [hash, id]);
-      await audit({ usuario: req.user.correo, modulo: 'Usuarios', operacion: 'CLAVE', registro: id, descripcion: 'Cambio de contraseña' });
+      // Cambiar la contraseña cierra las sesiones anteriores.
+      await client.query(
+        'UPDATE usuarios SET password_hash = $1, token_version = token_version + 1 WHERE usuario_id = $2',
+        [hash, id]
+      );
+      await audit({
+        client,
+        usuario: req.user.correo, modulo: 'Usuarios', operacion: 'CLAVE', registro: id,
+        descripcion: 'Cambio de contraseña (sesiones anteriores invalidadas)',
+      });
     }
+
+    // Los dos UPDATE y sus auditorías se confirman juntos: antes iban sueltos y un fallo
+    // a mitad dejaba el estado inconsistente y sin traza.
+    await client.query('COMMIT');
     res.json({ ok: true });
-  } catch (e) { next(e); }
+  } catch (e) {
+    await client.query('ROLLBACK').catch(() => {});
+    next(e);
+  } finally {
+    client.release();
+  }
 });
 
 export default router;
