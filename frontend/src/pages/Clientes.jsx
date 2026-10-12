@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import api, { errMsg } from '../api.js';
 import { useAuth } from '../auth.jsx';
-import { Money, Estado, FechaHora, ErrorBox, Loading, Empty } from '../ui.jsx';
+import { Money, Estado, Badge, FechaHora, ErrorBox, Loading, Empty } from '../ui.jsx';
 
 const EMPTY = { tipoCliente: 'PERSONA', tipoIdentificacion: 'CC', numeroIdentificacion: '', nombreRazonSocial: '', telefono: '', correo: '', direccion: '', ciudad: '' };
 
@@ -156,7 +156,7 @@ export default function Clientes() {
                       <td>{r.correo || '—'}</td>
                       <td>{r.ciudad || '—'}</td>
                       <td><Estado value={r.estado} /></td>
-                      <td>{r.tiene_cuenta ? <Estado value="ACTIVO" tone="green">Cuenta</Estado> : <button className="btn btn-ghost btn-sm" onClick={() => { setCuentaPara(r.cliente_id); setCuenta({ username: '', password: '' }); }}>Crear cuenta</button>}</td>
+                      <td>{r.tiene_cuenta ? <Badge tone="green">Cuenta</Badge> : <button className="btn btn-ghost btn-sm" onClick={() => { setCuentaPara(r.cliente_id); setCuenta({ username: '', password: '' }); }}>Crear cuenta</button>}</td>
                       <td className="num"><Money value={r.saldo_pendiente} /></td>
                       <td>
                         <div className="row-actions">

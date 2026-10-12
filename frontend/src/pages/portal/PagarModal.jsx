@@ -209,7 +209,7 @@ export default function PagarModal({ facturaId, numeroFactura, saldoMax, onCerra
                     </div>
                   </div>
                 ) : (
-                  <button type="button" className="btn primary" style={{ width: '100%', justifyContent: 'center' }} disabled={genLoading} onClick={generarCodigoEfecty}>
+                  <button type="button" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }} disabled={genLoading} onClick={generarCodigoEfecty}>
                     {genLoading ? 'Generando código…' : 'Generar código de pago Efecty'}
                   </button>
                 )}

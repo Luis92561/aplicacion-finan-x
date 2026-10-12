@@ -61,7 +61,7 @@ export default function Facturas() {
             <div className="table-wrap">
               <table>
                 <thead>
-                  <tr><th>Factura</th><th>Fecha</th><th>Cliente</th><th className="num">Total</th><th className="num">Pagado</th><th className="num">Saldo</th><th>Estado</th><th>Pago</th><th></th></tr>
+                  <tr><th>Factura</th><th>Fecha</th><th>Cliente</th><th className="num">Total</th><th className="num">Pagado</th><th className="num">Saldo</th><th>Estado</th><th>Pago</th><th>Detalle</th><th>Vista previa</th></tr>
                 </thead>
                 <tbody>
                   {rows.map((r) => (

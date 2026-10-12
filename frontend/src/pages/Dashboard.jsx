@@ -1,26 +1,39 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api, { errMsg } from '../api.js';
+import { useAuth } from '../auth.jsx';
 import { Money, Section, FechaHora, Estado, ErrorBox, Loading, Empty } from '../ui.jsx';
 
 export default function Dashboard() {
+  const { user } = useAuth();
   const [resumen, setResumen] = useState(null);
   const [recientes, setRecientes] = useState([]);
   const [error, setError] = useState('');
 
+  // La auditoría solo está disponible para ADMIN y SUPERVISOR (ver backend/src/routes/auditoria.js).
+  // Pedirla con otro rol devuelve 403, así que se consulta únicamente si el rol tiene permiso.
+  const puedeVerAuditoria = user?.tipo === 'interno' && ['ADMIN', 'SUPERVISOR'].includes(user.rol);
+
   useEffect(() => {
     (async () => {
-      try {
-        const [r, a] = await Promise.all([api.get('/reportes/resumen'), api.get('/auditoria', { params: { limit: 8 } })]);
-        setResumen(r);
-        setRecientes(a);
-      } catch (e) {
-        setError(errMsg(e));
-      }
-    })();
-  }, []);
+      // allSettled y no all: con Promise.all, un solo fallo (por ejemplo un 403 en la
+      // auditoría) rechazaba la promesa entera y el panel mostraba una pantalla de error
+      // SIN ninguna tarjeta de resumen. Ahora cada parte se pinta si está disponible.
+      const [r, a] = await Promise.allSettled([
+        api.get('/reportes/resumen'),
+        puedeVerAuditoria ? api.get('/auditoria', { params: { limit: 8 } }) : Promise.resolve([]),
+      ]);
 
-  if (error) return <div className="content"><ErrorBox msg={error} /></div>;
+      if (r.status === 'fulfilled') {
+        setResumen(r.value);
+      } else {
+        setError(errMsg(r.reason));
+      }
+      setRecientes(a.status === 'fulfilled' && Array.isArray(a.value) ? a.value : []);
+    })();
+  }, [puedeVerAuditoria]);
+
+  if (error && !resumen) return <div className="content"><ErrorBox msg={error} /></div>;
   if (!resumen) return <div className="content"><Loading /></div>;
 
   return (

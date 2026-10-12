@@ -240,7 +240,10 @@ textarea { resize: vertical; min-height: 64px; }
 .alert { padding: 11px 14px; border-radius: 8px; font-weight: 600; margin-bottom: 14px; font-size: 13.5px; }
 .alert-error { background: var(--danger-light); color: var(--danger); }
 .alert-success { background: var(--success-light); color: var(--success); }
-.alert-info { background: var(--brand-light); color: var(--brand); }
+/* Antes usaba var(--brand-light) y var(--brand), que NO existen en :root (los tokens son
+   --accent / --accent-light). Una variable CSS inexistente no da error: deja el fondo y el
+   color sin aplicar, así que los avisos informativos salían sin estilo. */
+.alert-info { background: var(--accent-light); color: var(--primary); }
 .empty { text-align: center; color: var(--muted); padding: 34px 10px; font-style: italic; }
 
 /* ---------- Modal ---------- */
