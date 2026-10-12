@@ -19,16 +19,23 @@ import { html, portada, escribir, tabla } from './tema.mjs';
 /**
  * Linea en blanco para completar a mano.
  *
- * Antes estas lineas llevaban un marcador resaltado en amarillo ("[Nombre completo 1]",
- * "[NIT]"...). Ahora se entregan vacias, pero conservando la etiqueta de cada campo
- * para que se sepa que corresponde en cada renglon al rellenarlo.
+ * Los datos de las partes no llevan raya: se entregan como espacio en blanco dentro
+ * de su celda, conservando la franja y el borde de la tabla, que es lo que indica
+ * donde va cada cosa. Antes llevaban un marcador resaltado ("[Nombre completo 1]").
  */
-const vacio = (alto = 1.15) => `<span class="linea-vacia"${alto !== 1.15 ? ` style="height:${alto}em"` : ''}></span>`;
+const vacio = (alto = 1.3) => `<span class="hueco"${alto !== 1.3 ? ` style="height:${alto}em"` : ''}></span>`;
 
-/** Fila de etiqueta y valor(es). `valor` puede ser un texto o una lista de renglones. */
+/**
+ * Linea para firmar. Aqui si se dibuja una raya: no es un hueco de relleno, es la
+ * linea sobre la que se firma, y sin ella las firmas quedarian sin referencia.
+ */
+const lineaFirma = (alto = 2.6) => `<span class="linea-firma" style="height:${alto}em"></span>`;
+
+/** Fila de etiqueta y valor. `valor` puede ser un texto o una lista de renglones. */
 const fila = (etiqueta, valor) => {
   const v = Array.isArray(valor) ? valor.join('<br>') : valor;
-  return `<tr><td style="width:32%"><strong>${etiqueta}</strong></td><td>${v}</td></tr>`;
+  const celdas = `<td class="c-etiqueta">${etiqueta}</td><td>${v}</td>`;
+  return `<tr>${celdas}</tr>`;
 };
 
 const PARTES = [
@@ -75,7 +82,7 @@ ${portada({
 
 ${PARTES.map(([titulo, campos]) => `
 <h3>${titulo}</h3>
-<table class="compacta"><tbody>
+<table class="compacta formulario"><tbody>
 ${campos.map(([etiqueta, valor]) => fila(etiqueta, valor)).join('\n')}
 </tbody></table>`).join('\n')}
 
@@ -219,26 +226,32 @@ ${tabla(
 <div class="firma">
   <div>
     <div class="l">
+      ${lineaFirma(3.4)}
       <strong>EL LICENCIANTE</strong>
-      ${vacio(2.6)}
-      ${vacio()}<br>
-      CC ${vacio()}<br>
+      <span class="firma-datos">Nombre: ${vacio(1.2)}</span>
+      <span class="firma-datos">CC: ${vacio(1.2)}</span>
       En representación del equipo desarrollador
     </div>
   </div>
   <div>
     <div class="l">
+      ${lineaFirma(3.4)}
       <strong>EL LICENCIATARIO</strong>
-      ${vacio(2.6)}
-      ${vacio()}<br>
-      CC ${vacio()}<br>
-      Representante legal de ${vacio()}<br>
-      NIT ${vacio()}
+      <span class="firma-datos">Nombre: ${vacio(1.3)}</span>
+      <span class="firma-datos">CC: ${vacio(1.3)}</span>
+      Representante legal de ${vacio(1.3)}<br>
+      <span class="firma-datos">NIT: ${vacio(1.3)}</span>
     </div>
   </div>
 </div>
 
-<p style="margin-top:26px">Firmado en ${vacio()}, a los ${vacio()} días del mes de ${vacio()} de ${vacio()}.</p>
+<p style="margin-top:22px">Firmado en:</p>
+<table class="compacta formulario"><tbody>
+${fila('Ciudad', vacio())}
+${fila('Día', vacio())}
+${fila('Mes', vacio())}
+${fila('Año', vacio())}
+</tbody></table>
 
 <h1>Anexo · Resumen de la licencia en una página</h1>
 ${tabla(

@@ -112,10 +112,24 @@ export const CSS = `
   .indice{font-size:10pt}
   .indice li{margin:3px 0}
   .firma{margin-top:38px; display:grid; grid-template-columns:1fr 1fr; gap:28px}
-  .firma .l{border-top:1px solid #334155; padding-top:5px; font-size:9pt; color:#334155}
-  /* Linea en blanco para completar a mano (por ejemplo, los datos de las partes en
-     el contrato). Sustituye a los antiguos marcadores resaltados en amarillo. */
-  .linea-vacia{display:block; height:1.15em; border-bottom:1px solid #334155}
+  .firma .l{padding-top:5px; font-size:9pt; color:#334155}
+  .firma .l strong{display:block; color:#172554; font-size:9.5pt; margin-bottom:2px}
+  /* Cada dato bajo la firma va en su propio renglon, con el hueco para escribirlo. */
+  .firma .firma-datos{display:block; margin-bottom:1px}
+  /* Hueco en blanco para completar a mano (los datos de las partes en el contrato).
+     No lleva raya: la franja y el borde de la tabla ya indican donde va cada dato.
+     Es inline-block con ancho completo para que ocupe el ancho de su celda Y pueda
+     usarse dentro de una frase (la linea de la fecha de firma). */
+  .hueco{display:inline-block; width:100%; height:1.3em; vertical-align:bottom}
+  /* Linea sobre la que se firma. Aqui si hay raya: es la referencia de la firma. */
+  .linea-firma{display:block; border-bottom:1px solid #334155}
+  /* Columna de etiquetas de las tablas de formulario. */
+  table.formulario .c-etiqueta{width:32%; font-weight:600}
+  /* En las tablas de formulario la etiqueta va arriba, a la altura de la primera
+     linea de escritura. */
+  table.formulario td{vertical-align:top}
+  /* La ultima fila no necesita el borde inferior: la tabla ya cierra ahi. */
+  table.formulario tbody tr:last-child td{border-bottom:none}
   footer.pie-doc{margin-top:26px; border-top:1px solid var(--border); padding-top:7px; font-size:8pt; color:var(--muted)}
 `;
 
