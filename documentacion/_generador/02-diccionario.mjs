@@ -207,21 +207,6 @@ ${tabla(
   ],
 )}
 
-<h1>6. Coherencia con los demás documentos</h1>
-<ul>
-  <li><strong>Evidencia 1 · MER</strong>: mismas entidades y mismas claves. El diagrama y este diccionario salen del mismo esquema extraído.</li>
-  <li><strong>Evidencia 3 · ERS</strong>: los requisitos se refieren a estos campos (por ejemplo, «el pago no puede superar el saldo» usa <code>factura_saldo.saldo</code>).</li>
-  <li><strong>Evidencia 6 · Trazabilidad</strong>: cada requisito queda ligado a su entidad.</li>
-  <li><strong>Evidencia 7 · Pruebas</strong>: las restricciones de la sección 5 se verifican contra el sistema real.</li>
-</ul>
-
-<div class="caja">
-  <span class="titulo">Cómo regenerar este documento</span>
-  <pre><code>cd backend &amp;&amp; node scripts/generar-esquema.mjs   # extrae el esquema de PostgreSQL
-cd .. &amp;&amp; node documentacion/_generador/02-diccionario.mjs</code></pre>
-  <p style="margin-bottom:0">Si se añade una columna sin descripción en <code>deep-docs/_descripciones.json</code>, el primer comando lo avisa.</p>
-</div>
-
 <footer class="pie-doc">FINAN-X · Evidencia 2 de 7 · Diccionario de datos · ${totalColumnas} campos en tablas + ${colsVista.length} en la vista, extraídos de PostgreSQL 16.</footer>
 `;
 
