@@ -42,7 +42,7 @@ export default function Pagos() {
             <div className="table-wrap">
               <table>
                 <thead>
-                  <tr><th>Pago</th><th>Fecha</th><th>Factura</th><th>Cliente</th><th className="num">Valor</th><th>Método</th><th>Referencia</th><th>Observaciones</th></tr>
+                  <tr><th>Pago</th><th>Fecha</th><th>Factura</th><th>Cliente</th><th className="num">Valor</th><th>Método</th><th>Registrado por</th><th>Referencia</th><th>Observaciones</th></tr>
                 </thead>
                 <tbody>
                   {rows.map((r) => (
@@ -53,6 +53,7 @@ export default function Pagos() {
                       <td>{r.nombre_razon_social}</td>
                       <td className="num"><b><Money value={r.valor} /></b></td>
                       <td>{r.metodo_pago}<div style={{ fontSize: 12, color: 'var(--muted)' }}><DatosPago p={r} /></div></td>
+                      <td>{r.registrado_por ? <>{r.registrado_por}<div style={{ fontSize: 12, color: 'var(--muted)' }}>{r.registrado_por_tipo === 'CLIENTE' ? 'Portal del cliente' : 'Personal interno'}</div></> : '—'}</td>
                       <td>{r.referencia || '—'}</td>
                       <td>{r.observaciones || '—'}</td>
                     </tr>

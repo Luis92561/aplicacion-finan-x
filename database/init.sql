@@ -103,12 +103,17 @@ CREATE TABLE IF NOT EXISTS detalle_pedido (
 );
 
 -- ------------------------------------------------------------
--- Facturas  (PEDIDO 1 ─── 0..1 FACTURA)
+-- Facturas  (PEDIDO 1 ─── 0..N FACTURA, como mucho UNA ACTIVA)
 -- ------------------------------------------------------------
+-- `pedido_id` NO es UNIQUE: un pedido puede tener varias facturas a lo largo del
+-- tiempo (una activa y las anteriores anuladas, que se conservan como historial).
+-- La regla "como mucho una ACTIVA por pedido" la impone el índice único parcial
+-- uq_factura_activa_por_pedido, más abajo. Antes era UNIQUE, y eso hacía que
+-- anular una factura dejara el pedido imposible de refacturar.
 CREATE TABLE IF NOT EXISTS facturas (
   factura_id        SERIAL PRIMARY KEY,
   numero_factura    VARCHAR(20) UNIQUE,
-  pedido_id         INT NOT NULL UNIQUE REFERENCES pedidos(pedido_id),
+  pedido_id         INT NOT NULL REFERENCES pedidos(pedido_id),
   cliente_id        INT NOT NULL REFERENCES clientes(cliente_id),
   fecha_emision     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   fecha_vencimiento DATE,
@@ -134,7 +139,13 @@ CREATE TABLE IF NOT EXISTS pagos (
   metodo_pago   VARCHAR(30) NOT NULL,   -- EFECTIVO / TARJETA / TRANSFERENCIA / CHEQUE
   referencia    VARCHAR(60),
   observaciones TEXT,
-  usuario_id    INT REFERENCES usuarios(usuario_id),
+  -- Quién registró el pago. Son dos actores distintos, así que van en dos columnas:
+  --   usuario_id         -> personal interno (routes/pagos.js)
+  --   usuario_cliente_id -> cliente desde el portal (routes/mis.js)
+  -- Antes solo existía usuario_id, que apunta a `usuarios`, así que los pagos del
+  -- portal quedaban con NULL y no se sabía quién había pagado.
+  usuario_id         INT REFERENCES usuarios(usuario_id),
+  usuario_cliente_id INT REFERENCES usuario_cliente(usuario_cliente_id),
   fecha_registro TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -232,10 +243,19 @@ CREATE INDEX IF NOT EXISTS idx_pedidos_estado         ON pedidos(estado);
 CREATE INDEX IF NOT EXISTS idx_detalle_pedido_pedido  ON detalle_pedido(pedido_id);
 CREATE INDEX IF NOT EXISTS idx_facturas_cliente       ON facturas(cliente_id);
 CREATE INDEX IF NOT EXISTS idx_facturas_estado        ON facturas(estado);
+CREATE INDEX IF NOT EXISTS idx_facturas_pedido        ON facturas(pedido_id);
 CREATE INDEX IF NOT EXISTS idx_pagos_factura          ON pagos(factura_id);
+CREATE INDEX IF NOT EXISTS idx_pagos_usuario_cliente  ON pagos(usuario_cliente_id);
 CREATE INDEX IF NOT EXISTS idx_notas_credito_factura  ON notas_credito(factura_id);
 CREATE INDEX IF NOT EXISTS idx_notas_credito_cliente  ON notas_credito(cliente_id);
 CREATE INDEX IF NOT EXISTS idx_auditoria_fecha        ON auditoria(fecha_hora DESC);
+
+-- Regla de negocio "como mucho UNA factura ACTIVA por pedido", impuesta por la
+-- propia base de datos. Es un índice único PARCIAL: permite varias facturas del
+-- mismo pedido mientras solo una esté ACTIVA (las ANULADAS se conservan como
+-- historial), y es lo que hace posible refacturar un pedido tras anular.
+CREATE UNIQUE INDEX IF NOT EXISTS uq_factura_activa_por_pedido
+  ON facturas (pedido_id) WHERE estado = 'ACTIVA';
 
 -- ------------------------------------------------------------
 -- Recuperación de contraseña con código de un solo uso (OTP)
@@ -275,3 +295,30 @@ ALTER TABLE pagos ADD COLUMN IF NOT EXISTS numero_cuenta TEXT;            -- tra
 -- ------------------------------------------------------------
 ALTER TABLE usuarios        ADD COLUMN IF NOT EXISTS token_version INT NOT NULL DEFAULT 1;
 ALTER TABLE usuario_cliente ADD COLUMN IF NOT EXISTS token_version INT NOT NULL DEFAULT 1;
+
+-- ------------------------------------------------------------
+-- Dominios válidos de las columnas de estado
+-- Los valores admitidos vivían solo en comentarios SQL y en la lógica de la
+-- aplicación, así que nada impedía guardar un estado que el sistema no sabe
+-- interpretar (rompe filtros e informes). Se eliminan primero por si el script
+-- se re-ejecuta: ADD CONSTRAINT no admite IF NOT EXISTS.
+-- ------------------------------------------------------------
+ALTER TABLE usuarios        DROP CONSTRAINT IF EXISTS ck_usuarios_estado;
+ALTER TABLE clientes        DROP CONSTRAINT IF EXISTS ck_clientes_estado;
+ALTER TABLE productos       DROP CONSTRAINT IF EXISTS ck_productos_estado;
+ALTER TABLE pedidos         DROP CONSTRAINT IF EXISTS ck_pedidos_estado;
+ALTER TABLE facturas        DROP CONSTRAINT IF EXISTS ck_facturas_estado;
+ALTER TABLE notas_credito   DROP CONSTRAINT IF EXISTS ck_notas_credito_estado;
+ALTER TABLE usuario_cliente DROP CONSTRAINT IF EXISTS ck_usuario_cliente_estado;
+ALTER TABLE pagos           DROP CONSTRAINT IF EXISTS ck_pagos_metodo;
+ALTER TABLE auditoria       DROP CONSTRAINT IF EXISTS ck_auditoria_usuario_tipo;
+
+ALTER TABLE usuarios        ADD CONSTRAINT ck_usuarios_estado        CHECK (estado IN ('ACTIVO', 'INACTIVO'));
+ALTER TABLE clientes        ADD CONSTRAINT ck_clientes_estado        CHECK (estado IN ('ACTIVO', 'INACTIVO'));
+ALTER TABLE productos       ADD CONSTRAINT ck_productos_estado       CHECK (estado IN ('ACTIVO', 'INACTIVO'));
+ALTER TABLE usuario_cliente ADD CONSTRAINT ck_usuario_cliente_estado CHECK (estado IN ('ACTIVO', 'INACTIVO'));
+ALTER TABLE pedidos         ADD CONSTRAINT ck_pedidos_estado         CHECK (estado IN ('BORRADOR', 'CONFIRMADO', 'CANCELADO', 'FACTURADO'));
+ALTER TABLE facturas        ADD CONSTRAINT ck_facturas_estado        CHECK (estado IN ('ACTIVA', 'ANULADA'));
+ALTER TABLE notas_credito   ADD CONSTRAINT ck_notas_credito_estado   CHECK (estado IN ('ACTIVA', 'ANULADA'));
+ALTER TABLE pagos           ADD CONSTRAINT ck_pagos_metodo           CHECK (metodo_pago IN ('EFECTIVO', 'TARJETA', 'TRANSFERENCIA', 'CHEQUE'));
+ALTER TABLE auditoria       ADD CONSTRAINT ck_auditoria_usuario_tipo CHECK (usuario_tipo IN ('INTERNO', 'CLIENTE'));

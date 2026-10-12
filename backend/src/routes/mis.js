@@ -29,7 +29,8 @@ router.get('/mis-pedidos', async (req, res, next) => {
   try {
     const rows = await pool.query(
       `SELECT p.pedido_id, p.numero_pedido, p.fecha, p.subtotal::float8, p.impuestos::float8, p.total::float8, p.estado,
-              (SELECT numero_factura FROM facturas WHERE pedido_id = p.pedido_id LIMIT 1) AS numero_factura
+              (SELECT f.numero_factura FROM facturas f WHERE f.pedido_id = p.pedido_id
+                ORDER BY (f.estado = 'ACTIVA') DESC, f.factura_id DESC LIMIT 1) AS numero_factura
        FROM pedidos p WHERE p.cliente_id = $1 ORDER BY p.pedido_id DESC LIMIT 300`,
       [req.user.clienteId]
     );
@@ -102,8 +103,13 @@ router.get('/mis-pagos', async (req, res, next) => {
     const rows = await pool.query(
       `SELECT pg.pago_id, pg.numero_pago, pg.fecha, pg.valor::float8, pg.metodo_pago, pg.referencia, pg.observaciones,
               pg.banco, pg.titular, pg.tipo_tarjeta, pg.ultimos_digitos_tarjeta, pg.vencimiento_tarjeta, pg.numero_cuenta,
+              COALESCE(ui.nombre, uc.username) AS registrado_por,
+              CASE WHEN pg.usuario_cliente_id IS NOT NULL THEN 'CLIENTE' ELSE 'INTERNO' END AS registrado_por_tipo,
               f.numero_factura, f.estado
-       FROM pagos pg JOIN facturas f ON f.factura_id = pg.factura_id
+       FROM pagos pg
+       JOIN facturas f ON f.factura_id = pg.factura_id
+       LEFT JOIN usuarios ui ON ui.usuario_id = pg.usuario_id
+       LEFT JOIN usuario_cliente uc ON uc.usuario_cliente_id = pg.usuario_cliente_id
        WHERE f.cliente_id = $1 ORDER BY pg.fecha DESC LIMIT 300`,
       [req.user.clienteId]
     );
@@ -213,8 +219,14 @@ router.get('/mi-historial', async (req, res, next) => {
     );
     const pagos = await pool.query(
       `SELECT pg.numero_pago, pg.fecha, pg.valor::float8, pg.metodo_pago, pg.banco, pg.tipo_tarjeta,
-              pg.ultimos_digitos_tarjeta, pg.numero_cuenta, f.numero_factura
-       FROM pagos pg JOIN facturas f ON f.factura_id = pg.factura_id
+              pg.ultimos_digitos_tarjeta, pg.numero_cuenta,
+              COALESCE(ui.nombre, uc.username) AS registrado_por,
+              CASE WHEN pg.usuario_cliente_id IS NOT NULL THEN 'CLIENTE' ELSE 'INTERNO' END AS registrado_por_tipo,
+              f.numero_factura
+       FROM pagos pg
+       JOIN facturas f ON f.factura_id = pg.factura_id
+       LEFT JOIN usuarios ui ON ui.usuario_id = pg.usuario_id
+       LEFT JOIN usuario_cliente uc ON uc.usuario_cliente_id = pg.usuario_cliente_id
        WHERE f.cliente_id = $1 ORDER BY pg.fecha DESC`,
       [req.user.clienteId]
     );
@@ -279,10 +291,10 @@ router.post('/mis-pagos', async (req, res, next) => {
     const datosPago = validarDatosPago(metodo, req.body);
 
     const ins = await client.query(
-      `INSERT INTO pagos (factura_id, valor, metodo_pago, referencia, observaciones,
+      `INSERT INTO pagos (factura_id, valor, metodo_pago, referencia, observaciones, usuario_cliente_id,
                           banco, titular, tipo_tarjeta, ultimos_digitos_tarjeta, vencimiento_tarjeta, numero_cuenta)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING pago_id`,
-      [facturaIdNum, valorNum, metodo, referencia || null, observaciones || null,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING pago_id`,
+      [facturaIdNum, valorNum, metodo, referencia || null, observaciones || null, req.user.usuarioClienteId,
         datosPago.banco || null, datosPago.titular || null, datosPago.tipo_tarjeta || null,
         datosPago.ultimos_digitos_tarjeta || null, datosPago.vencimiento_tarjeta || null, datosPago.numero_cuenta || null]
     );

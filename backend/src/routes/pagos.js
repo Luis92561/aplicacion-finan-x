@@ -28,10 +28,14 @@ router.get('/', async (req, res, next) => {
     const rows = await pool.query(
       `SELECT pg.pago_id, pg.numero_pago, pg.fecha, pg.valor::float8, pg.metodo_pago, pg.referencia, pg.observaciones,
               pg.banco, pg.titular, pg.tipo_tarjeta, pg.ultimos_digitos_tarjeta, pg.vencimiento_tarjeta, pg.numero_cuenta,
+              COALESCE(ui.nombre, uc.username) AS registrado_por,
+              CASE WHEN pg.usuario_cliente_id IS NOT NULL THEN 'CLIENTE' ELSE 'INTERNO' END AS registrado_por_tipo,
               f.factura_id, f.numero_factura, c.cliente_id, c.nombre_razon_social
        FROM pagos pg
        JOIN facturas f ON f.factura_id = pg.factura_id
        JOIN clientes c ON c.cliente_id = f.cliente_id
+       LEFT JOIN usuarios ui ON ui.usuario_id = pg.usuario_id
+       LEFT JOIN usuario_cliente uc ON uc.usuario_cliente_id = pg.usuario_cliente_id
        ${where} ORDER BY pg.pago_id DESC LIMIT 300`,
       params
     );

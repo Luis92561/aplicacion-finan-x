@@ -19,7 +19,7 @@ export default function MisPagos() {
       {rows.length === 0 ? <Empty text="No tiene pagos registrados" /> : (
         <div className="table-wrap">
           <table>
-            <thead><tr><th>Pago</th><th>Fecha</th><th>Factura</th><th className="num">Valor</th><th>Método</th><th>Referencia</th></tr></thead>
+            <thead><tr><th>Pago</th><th>Fecha</th><th>Factura</th><th className="num">Valor</th><th>Método</th><th>Registrado por</th><th>Referencia</th></tr></thead>
             <tbody>
               {rows.map((p) => (
                 <tr key={p.pago_id}>
@@ -28,6 +28,7 @@ export default function MisPagos() {
                   <td>{p.numero_factura}</td>
                   <td className="num"><b><Money value={p.valor} /></b></td>
                   <td>{p.metodo_pago}<div style={{ fontSize: 12, color: 'var(--muted)' }}><DatosPago p={p} /></div></td>
+                  <td>{p.registrado_por_tipo === 'CLIENTE' ? 'Yo (portal)' : (p.registrado_por || 'Oficina')}</td>
                   <td>{p.referencia || '—'}</td>
                 </tr>
               ))}

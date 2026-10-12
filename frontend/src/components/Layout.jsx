@@ -80,22 +80,3 @@ export function Shell() {
     </div>
   );
 }
-
-export function Topbar({ title, crumb }) {
-  const { user } = useAuth();
-  return (
-    <div className="topbar">
-      <div>
-        <h2>{title}</h2>
-        {crumb && <div className="crumb">{crumb}</div>}
-      </div>
-      <div>
-        {user?.tipo === 'interno' && <EntityPill />}
-      </div>
-    </div>
-  );
-}
-
-function EntityPill() {
-  return null;
-}

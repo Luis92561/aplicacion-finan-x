@@ -39,8 +39,48 @@ async function call(method, path, { token, body } = {}) {
 
 const suffix = Date.now().toString().slice(-6);
 
+/**
+ * La suite es una demostración y necesita el OTP de prueba: con `OTP_RETORNO_DEMO=off`
+ * (el valor por defecto en producción, por seguridad) la API no devuelve el código y las
+ * pruebas del flujo de recuperación no pueden completarse.
+ *
+ * En vez de fallar con 10 errores confusos, se avisa y se explica cómo activarlo.
+ */
+async function comprobarModoDemo() {
+  const sonda = `sondeo-${Date.now()}`;
+  const r = await call('POST', '/auth/recuperar-solicitar', { body: { username: sonda, canal: 'EMAIL' } });
+  if (r.status !== 200) {
+    console.error(
+      `\n⚠️  No se puede ejecutar la suite: /auth/recuperar-solicitar respondió ${r.status}.\n` +
+      '   Compruebe que el backend esté corriendo en ' + BASE + '\n'
+    );
+    process.exit(2);
+  }
+  // Con una cuenta inexistente nunca llega OTP, así que no sirve para detectar el modo demo.
+  // Se detecta de otra forma: la respuesta incluye `demo_otp` solo cuando está activo, y con
+  // una cuenta real. Por eso se prueba contra la cuenta demo del seed.
+  const real = await call('POST', '/auth/recuperar-solicitar', { body: { username: 'cliente@finanx.test', canal: 'EMAIL' } });
+  if (real.status === 200 && !real.data?.demo_otp) {
+    console.error(
+      '\n⚠️  La API no devuelve el código OTP, así que las pruebas del flujo de recuperación\n' +
+      '   no pueden completarse.\n\n' +
+      '   Esto es CORRECTO en producción: con NODE_ENV=production el OTP no se expone en la\n' +
+      '   respuesta (sería un agujero de seguridad: cualquiera podría cambiar la contraseña\n' +
+      '   de otra cuenta). La suite es una demostración y necesita el modo demo.\n\n' +
+      '   Opciones para ejecutarla:\n' +
+      '     a) Modo desarrollo:  cd backend && npm run dev   (y luego: npm test)\n' +
+      '     b) Con Docker:       OTP_RETORNO_DEMO=on docker compose up -d --build\n' +
+      '        (solo para demostraciones; no lo deje así en producción)\n'
+    );
+    process.exit(2);
+  }
+}
+
 async function main() {
   console.log('\n=== FINAN-X · Pruebas end-to-end ===\n');
+
+  // Avisa y explica si el OTP demo está desactivado, en vez de fallar con errores confusos.
+  await comprobarModoDemo();
 
   // ---------- Autenticación ----------
   console.log('1) Autenticación');
@@ -55,6 +95,7 @@ async function main() {
   check('Login cliente → 200', clienteLogin.status === 200 && clienteLogin.data?.user?.tipo === 'cliente');
   const AT = admin.data?.token;
   const CT = clienteLogin.data?.token;
+  const ADMIN_ID = admin.data?.user?.usuarioId;
 
   // ---------- Autoregistro de clientes ----------
   console.log('1b) Autoregistro de clientes');
@@ -413,6 +454,60 @@ async function main() {
   check('Login de cuenta inexistente → mismo 401 (sin enumeración)',
     loginNoExiste.status === 401 && loginNoExiste.data?.error === loginInactivo.data?.error,
     `${loginNoExiste.data?.error} vs ${loginInactivo.data?.error}`);
+
+  // ---------- Refacturación tras anular (C4) ----------
+  console.log('9f) Refacturación: una factura activa + historial de anuladas');
+  const pedR = await call('POST', '/pedidos', { token: AT, body: { clienteId: cliFanId, items: [{ productoId: prodFanId, cantidad: 1 }] } });
+  await call('PATCH', `/pedidos/${pedR.data?.pedido_id}/estado`, { token: AT, body: { estado: 'CONFIRMADO' } });
+  const facR1 = await call('POST', '/facturas', { token: AT, body: { pedidoId: pedR.data?.pedido_id } });
+  check('Factura 1 emitida', facR1.status === 201, JSON.stringify(facR1.data));
+
+  const refacConActiva = await call('POST', '/facturas', { token: AT, body: { pedidoId: pedR.data?.pedido_id } });
+  check('No se puede facturar con una factura ACTIVA → 409', refacConActiva.status === 409, JSON.stringify(refacConActiva.data));
+
+  const anuR = await call('POST', `/facturas/${facR1.data?.factura_id}/anular`, { token: AT, body: { motivo: 'Prueba de refacturación' } });
+  check('Anular la factura → 200', anuR.status === 200, JSON.stringify(anuR.data));
+
+  // Éste es el caso que antes devolvía 500: facturas.pedido_id era UNIQUE.
+  const facR2 = await call('POST', '/facturas', { token: AT, body: { pedidoId: pedR.data?.pedido_id } });
+  check('Refacturar el pedido tras anular → 201 (antes 500)', facR2.status === 201, JSON.stringify(facR2.data));
+  check('La nueva factura tiene otro número', facR2.data?.numero_factura && facR2.data.numero_factura !== facR1.data?.numero_factura, `${facR1.data?.numero_factura} vs ${facR2.data?.numero_factura}`);
+
+  // El pedido muestra la factura ACTIVA, no la anulada.
+  const pedRDet = await call('GET', `/pedidos/${pedR.data?.pedido_id}`, { token: AT });
+  check('El pedido apunta a la factura ACTIVA (no a la anulada)', pedRDet.data?.numero_factura === facR2.data?.numero_factura, JSON.stringify({ pedido: pedRDet.data?.numero_factura, activa: facR2.data?.numero_factura, anulada: facR1.data?.numero_factura }));
+
+  // La anulada sigue existiendo (historial), no se borró.
+  const facAntigua = await call('GET', `/facturas/${facR1.data?.factura_id}`, { token: AT });
+  check('La factura anulada se conserva como historial', facAntigua.status === 200 && facAntigua.data?.estado === 'ANULADA', JSON.stringify(facAntigua.data));
+
+  const listaPed = await call('GET', `/facturas?q=${facR1.data?.numero_factura}`, { token: AT });
+  check('La factura anulada sigue listada con su estado', listaPed.status === 200 && listaPed.data.some((f) => f.factura_id === facR1.data?.factura_id && f.estado === 'ANULADA'));
+
+  // ---------- M12 · quién registró cada pago ----------
+  console.log('9g) M12: trazabilidad del pagador (interno vs portal)');
+  const pagosLista = await call('GET', '/pagos', { token: AT });
+  check('GET /pagos expone registrado_por y su tipo', pagosLista.status === 200 && pagosLista.data.every((p) => p.registrado_por !== undefined && ['INTERNO', 'CLIENTE'].includes(p.registrado_por_tipo)), JSON.stringify(pagosLista.data?.[0]));
+  const pagoPortal = pagosLista.data.find((p) => p.registrado_por_tipo === 'CLIENTE');
+  check('Un pago del portal queda identificado como CLIENTE', !!pagoPortal && !!pagoPortal.registrado_por, JSON.stringify(pagoPortal));
+  const pagoInterno = pagosLista.data.find((p) => p.registrado_por_tipo === 'INTERNO');
+  check('Un pago interno queda identificado como INTERNO', !!pagoInterno && !!pagoInterno.registrado_por, JSON.stringify(pagoInterno));
+
+  const misPagosM12 = await call('GET', '/mis-pagos', { token: REGT });
+  check('El portal ve quién registró sus pagos', misPagosM12.status === 200 && misPagosM12.data.every((p) => p.registrado_por !== undefined), JSON.stringify(misPagosM12.data?.[0]));
+
+  // ---------- Salvaguardas de administrador ----------
+  console.log('9h) Salvaguardas: no quedarse sin administradores');
+  const autoOff = await call('PATCH', `/usuarios/${ADMIN_ID}`, { token: AT, body: { estado: 'INACTIVO' } });
+  check('Un ADMIN no puede desactivar su propia cuenta → 409', autoOff.status === 409, JSON.stringify(autoOff.data));
+
+  // Con dos administradores activos, desactivar a uno sí debe permitirse… pero el
+  // usuario con el que se prueba (admin@finanx.test) es el que se va a desactivar, así
+  // que primero se crea un segundo administrador y se prueba con él.
+  const admin2 = await call('POST', '/usuarios', { token: AT, body: { nombre: `Admin Dos ${suffix}`, correo: `admin2-${suffix}@finanx.test`, rol: 'ADMIN', password: 'clave12345' } });
+  check('Crear un segundo administrador → 201', admin2.status === 201, JSON.stringify(admin2.data));
+  const offAdmin2 = await call('PATCH', `/usuarios/${admin2.data?.usuario_id}`, { token: AT, body: { estado: 'INACTIVO' } });
+  check('Con otro ADMIN activo, desactivar a uno se permite', offAdmin2.status === 200, JSON.stringify(offAdmin2.data));
 
   // ---------- Balance por cliente y envío por correo ----------
   console.log('9d) Balance por cliente y envío del estado financiero');

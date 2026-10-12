@@ -28,7 +28,8 @@ router.get('/', async (req, res, next) => {
     const rows = await pool.query(
       `SELECT p.pedido_id, p.numero_pedido, p.fecha, p.subtotal::float8, p.impuestos::float8, p.total::float8,
               p.estado, p.observaciones, c.cliente_id, c.nombre_razon_social, c.numero_identificacion,
-              (SELECT numero_factura FROM facturas WHERE pedido_id = p.pedido_id LIMIT 1) AS numero_factura
+              (SELECT f.numero_factura FROM facturas f WHERE f.pedido_id = p.pedido_id
+                ORDER BY (f.estado = 'ACTIVA') DESC, f.factura_id DESC LIMIT 1) AS numero_factura
        FROM pedidos p JOIN clientes c ON c.cliente_id = p.cliente_id
        ${where} ORDER BY p.pedido_id DESC LIMIT 300`,
       params
@@ -44,8 +45,10 @@ router.get('/:id', async (req, res, next) => {
     const ped = await pool.query(
       `SELECT p.*, p.subtotal::float8, p.impuestos::float8, p.total::float8,
               c.nombre_razon_social, c.numero_identificacion,
-              (SELECT factura_id FROM facturas WHERE pedido_id = p.pedido_id LIMIT 1) AS factura_id,
-              (SELECT numero_factura FROM facturas WHERE pedido_id = p.pedido_id LIMIT 1) AS numero_factura
+              (SELECT f.factura_id FROM facturas f WHERE f.pedido_id = p.pedido_id
+                ORDER BY (f.estado = 'ACTIVA') DESC, f.factura_id DESC LIMIT 1) AS factura_id,
+              (SELECT f.numero_factura FROM facturas f WHERE f.pedido_id = p.pedido_id
+                ORDER BY (f.estado = 'ACTIVA') DESC, f.factura_id DESC LIMIT 1) AS numero_factura
        FROM pedidos p JOIN clientes c ON c.cliente_id = p.cliente_id WHERE p.pedido_id = $1`,
       [id]
     );

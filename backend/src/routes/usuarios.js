@@ -73,6 +73,24 @@ router.patch('/:id', async (req, res, next) => {
     if (!usu.rowCount) throw new HttpError(404, 'Usuario no encontrado');
 
     if (estado) {
+      // Salvaguardas al desactivar: sin esto, un ADMIN podía dejar el sistema sin ningún
+      // administrador activo (desactivándose a sí mismo, o al último que quedaba) y ya no
+      // habría forma de gestionar usuarios desde la aplicación.
+      if (estado === 'INACTIVO') {
+        if (Number(req.user.usuarioId) === id) {
+          throw new HttpError(409, 'No puede desactivar su propia cuenta. Pida a otro administrador que lo haga.');
+        }
+        const admins = await client.query(
+          `SELECT COUNT(*)::int AS total
+           FROM usuarios u JOIN roles r ON r.rol_id = u.rol_id
+           WHERE r.nombre = 'ADMIN' AND u.estado = 'ACTIVO' AND u.usuario_id <> $1`,
+          [id]
+        );
+        if (admins.rows[0].total === 0) {
+          throw new HttpError(409, 'No puede desactivar al último administrador activo: el sistema quedaría sin acceso a la gestión de usuarios.');
+        }
+      }
+
       await client.query('UPDATE usuarios SET estado = $1 WHERE usuario_id = $2', [estado, id]);
       // Al desactivar la cuenta se invalidan sus sesiones abiertas (A7): un usuario
       // bloqueado no debe seguir usando el token que ya tenía.

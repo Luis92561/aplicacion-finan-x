@@ -128,8 +128,13 @@ router.get('/historial/:clienteId', async (req, res, next) => {
       [clienteId]
     );
     const pagos = await pool.query(
-      `SELECT pg.pago_id, pg.numero_pago, pg.fecha, pg.valor::float8, pg.metodo_pago, pg.referencia, f.numero_factura
-       FROM pagos pg JOIN facturas f ON f.factura_id = pg.factura_id
+      `SELECT pg.pago_id, pg.numero_pago, pg.fecha, pg.valor::float8, pg.metodo_pago, pg.referencia, f.numero_factura,
+              COALESCE(ui.nombre, uc.username) AS registrado_por,
+              CASE WHEN pg.usuario_cliente_id IS NOT NULL THEN 'CLIENTE' ELSE 'INTERNO' END AS registrado_por_tipo
+       FROM pagos pg
+       JOIN facturas f ON f.factura_id = pg.factura_id
+       LEFT JOIN usuarios ui ON ui.usuario_id = pg.usuario_id
+       LEFT JOIN usuario_cliente uc ON uc.usuario_cliente_id = pg.usuario_cliente_id
        WHERE f.cliente_id = $1 ORDER BY pg.fecha DESC`,
       [clienteId]
     );

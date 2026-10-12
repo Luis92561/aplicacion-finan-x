@@ -60,8 +60,15 @@ router.post('/', async (req, res, next) => {
     if (p.estado === 'CANCELADO') throw new HttpError(409, 'No se puede facturar un pedido cancelado');
     if (p.estado !== 'CONFIRMADO') throw new HttpError(409, 'El pedido debe estar CONFIRMADO antes de facturarse');
 
-    const yaFacturado = await client.query('SELECT 1 FROM facturas WHERE pedido_id = $1', [pedidoId]);
-    if (yaFacturado.rowCount) throw new HttpError(409, 'El pedido ya tiene una factura asociada');
+    // Un pedido puede haberse facturado antes y haber anulado esa factura: en ese caso se
+    // emite una nueva y la anulada se conserva como historial. Lo que no puede haber es
+    // DOS facturas ACTIVAS del mismo pedido (lo garantiza además el índice único parcial
+    // uq_factura_activa_por_pedido).
+    const yaFacturado = await client.query(
+      `SELECT 1 FROM facturas WHERE pedido_id = $1 AND estado = 'ACTIVA'`,
+      [pedidoId]
+    );
+    if (yaFacturado.rowCount) throw new HttpError(409, 'El pedido ya tiene una factura activa');
 
     const cli = await client.query('SELECT nombre_razon_social FROM clientes WHERE cliente_id = $1', [p.cliente_id]);
     if (!cli.rowCount) throw new HttpError(400, 'El cliente del pedido no existe');
@@ -193,11 +200,10 @@ router.post('/:id/anular', async (req, res, next) => {
       [motivo, req.user.usuarioId, id]
     );
 
-    // El pedido vuelve a CONFIRMADO.
-    // ⚠️ OJO: `facturas.pedido_id` es UNIQUE, así que la factura anulada sigue ocupando el
-    // pedido y volver a facturarlo da conflicto. Antes el comentario decía que el pedido
-    // "queda disponible para refacturación" y eso no era cierto: ver C4 en
-    // deep-docs/09-OBSERVACIONES-Y-RIESGOS.md (requiere decidir la regla de negocio).
+    // El pedido vuelve a CONFIRMADO para poder emitir una factura nueva.
+    // Es posible porque `facturas.pedido_id` ya NO es UNIQUE y el índice único parcial
+    // uq_factura_activa_por_pedido solo limita las ACTIVA: esta factura queda anulada en el
+    // historial y el pedido puede facturarse otra vez.
     await client.query('UPDATE pedidos SET estado = $1 WHERE pedido_id = $2', ['CONFIRMADO', f.rows[0].pedido_id]);
 
     // La anulación y la reversión del pedido se confirman juntas: antes eran dos UPDATE
