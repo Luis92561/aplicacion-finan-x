@@ -103,9 +103,14 @@ export const CSS = `
   .kpi .n{font-size:17pt; font-weight:800; color:var(--primary); line-height:1.1}
   .kpi .t{font-size:8pt; color:var(--muted); text-transform:uppercase; letter-spacing:.4px}
 
-  .captura{border:1px solid var(--border); border-radius:8px; overflow:hidden; margin:9px 0; page-break-inside:avoid}
+  .captura{border:1px solid var(--border); border-radius:8px; overflow:hidden; margin:9px 0; page-break-inside:avoid; break-inside:avoid}
   .captura img{width:100%; display:block}
+  /* Capturas muy altas: sin limite ocuparian varias paginas y el navegador partiria el
+     marco, dejando un recuadro vacio en una pagina y la imagen suelta en la siguiente.
+     Se limitan a un alto que quepa de una vez y se centran. */
+  .captura img.alta{width:auto; max-width:100%; max-height:200mm; margin:0 auto}
   .captura .pie{background:var(--bg); padding:5px 9px; font-size:8pt; color:var(--muted); border-top:1px solid var(--border)}
+  .captura .aviso{font-size:7.6pt; color:var(--muted); font-style:italic}
 
   .salto{page-break-before:always}
   .evitar-corte{page-break-inside:avoid}

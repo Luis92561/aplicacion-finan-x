@@ -139,6 +139,39 @@ for (const l of lineas) {
 }
 if (actual) bloques.push(actual);
 
+/** Lee las dimensiones de un PNG desde su cabecera IHDR (bytes 16-24). */
+function dimensionesPng(rel) {
+  const p = path.join(RAIZ, 'documentacion', rel);
+  if (!fs.existsSync(p)) return null;
+  const buf = fs.readFileSync(p);
+  if (buf.toString('latin1', 1, 4) !== 'PNG') return null;
+  return { ancho: buf.readUInt32BE(16), alto: buf.readUInt32BE(20) };
+}
+
+/** ¿La captura, escalada al ancho de la pagina, seria mas alta que una pagina A4? */
+function esCapturaAlta(rel) {
+  const d = dimensionesPng(rel);
+  if (!d) return false;
+  const altoMm = (d.alto / d.ancho) * 178; // 178 mm = ancho util de la A4
+  return altoMm > 240;                     // 240 mm = alto util disponible
+}
+
+/**
+ * Bloque de captura. Las muy altas (por ejemplo la tabla de auditoria completa) se
+ * limitan en altura: sin eso ocuparian varias paginas, el navegador partiria el marco
+ * y quedaria un recuadro vacio en una pagina con la imagen suelta en la siguiente.
+ */
+function captura(rel, texto) {
+  const alta = esCapturaAlta(rel);
+  const aviso = alta
+    ? '<br><span class="aviso">Imagen reducida para que quepa en una página. El archivo a tamaño completo está en la carpeta <code>capturas/</code> del proyecto.</span>'
+    : '';
+  return `<div class="captura">
+  <img src="${rel}"${alta ? ' class="alta"' : ''} alt="">
+  <div class="pie">${texto}${aviso}</div>
+</div>`;
+}
+
 // ============================================================
 // Documento
 // ============================================================
@@ -314,35 +347,17 @@ ${tabla(
 <h1>8. Evidencia visual</h1>
 <p>La suite verifica la API; estas capturas demuestran que el <strong>sistema completo</strong> —con su interfaz— funciona sobre datos reales.</p>
 
-<div class="captura">
-  <img src="capturas/11-dashboard.png" alt="Panel de inicio con datos reales">
-  <div class="pie">Panel de inicio con datos reales: clientes y productos activos, pedidos por facturar, facturas activas, cuentas por cobrar (1.345.800 COP), pagos recibidos y las últimas operaciones registradas en la auditoría. <strong>Requisitos:</strong> RF-26, RF-30.</div>
-</div>
+${captura('capturas/11-dashboard.png', 'Panel de inicio con datos reales: clientes y productos activos, pedidos por facturar, facturas activas, cuentas por cobrar (1.345.800 COP), pagos recibidos y las últimas operaciones registradas en la auditoría. <strong>Requisitos:</strong> RF-26, RF-30.')}
 
-<div class="captura">
-  <img src="capturas/13-facturas.png" alt="Listado de facturas">
-  <div class="pie">Listado de facturas con su estado y su estado de cobro (pendiente, pago parcial, pagada, anulada) calculados a partir del saldo. <strong>Requisitos:</strong> RF-12, RF-19, RF-20.</div>
-</div>
+${captura('capturas/13-facturas.png', 'Listado de facturas con su estado y su estado de cobro (pendiente, pago parcial, pagada, anulada) calculados a partir del saldo. <strong>Requisitos:</strong> RF-12, RF-19, RF-20.')}
 
-<div class="captura">
-  <img src="capturas/14-pagos.png" alt="Listado de pagos">
-  <div class="pie">Pagos registrados, con el medio de pago enmascarado (se ven solo los últimos 4 dígitos de la tarjeta) y la columna «Registrado por», que distingue los pagos hechos por el personal de los hechos por el cliente desde el portal. <strong>Requisitos:</strong> RF-17, RNF-02, RF-37.</div>
-</div>
+${captura('capturas/14-pagos.png', 'Pagos registrados, con el medio de pago enmascarado (se ven solo los últimos 4 dígitos de la tarjeta) y la columna «Registrado por», que distingue los pagos hechos por el personal de los hechos por el cliente desde el portal. <strong>Requisitos:</strong> RF-17, RNF-02, RF-37.')}
 
-<div class="captura">
-  <img src="capturas/15-balance-clientes.png" alt="Balance por cliente">
-  <div class="pie">Balance y cuentas por cobrar por cliente, con los totales de facturación y de lo recaudado. <strong>Requisitos:</strong> RF-27.</div>
-</div>
+${captura('capturas/15-balance-clientes.png', 'Balance y cuentas por cobrar por cliente, con los totales de facturación y de lo recaudado. <strong>Requisitos:</strong> RF-27.')}
 
-<div class="captura">
-  <img src="capturas/16-auditoria.png" alt="Auditoría de operaciones">
-  <div class="pie">Registro de auditoría: cada operación sensible queda con su usuario, tipo, módulo, operación, registro afectado y fecha. <strong>Requisitos:</strong> RF-30, RF-31.</div>
-</div>
+${captura('capturas/16-auditoria-recorte.png', 'Registro de auditoría: cada operación sensible queda con su usuario, tipo, módulo, operación, registro afectado y fecha. <strong>Requisitos:</strong> RF-30, RF-31.')}
 
-<div class="captura">
-  <img src="capturas/18-portal-saldo.png" alt="Portal del cliente, mi saldo">
-  <div class="pie">Portal del cliente: el cliente ve únicamente su propia información y puede pagar en línea. <strong>Requisitos:</strong> RF-36, RF-37, RF-38.</div>
-</div>
+${captura('capturas/18-portal-saldo.png', 'Portal del cliente: el cliente ve únicamente su propia información y puede pagar en línea. <strong>Requisitos:</strong> RF-36, RF-37, RF-38.')}
 
 <h1>9. Conclusiones</h1>
 <ul>

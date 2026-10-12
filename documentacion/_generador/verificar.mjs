@@ -47,6 +47,17 @@ for (const [id, base, nombre] of EVIDENCIAS) {
     `  ${id.padEnd(4)} ${nombre.padEnd(30)} ${(kbHtml + ' KB').padStart(7)}  ${(kbPdf ? kbPdf + ' KB' : '—').padStart(7)}  ${String(tablas).padStart(5)}  ${String(filas).padStart(4)}`,
   );
 
+  // Las imagenes citadas deben existir en disco: si no, el PDF sale sin ellas.
+  // Las rutas del documento son relativas a documentacion/.
+  const rutas = [...html.matchAll(/<img[^>]+src="([^"]+)"/g)].map((m) => m[1]);
+  const faltan = rutas.filter((r) => !fs.existsSync(path.join(DOC, r)));
+  if (faltan.length) {
+    console.log(`        ⚠ ${faltan.length} imagen(es) NO encontradas (el PDF saldra sin ellas): ${faltan.slice(0, 3).join(', ')}`);
+    problemas++;
+  } else if (rutas.length) {
+    console.log(`        ✓ imágenes: ${rutas.length} referenciadas, todas presentes`);
+  }
+
   // Comprobaciones basicas de calidad.
   // Ojo con los falsos positivos: "NaN" aparece dentro de "Consolas" (una fuente) y
   // "undefined" podria aparecer dentro de un identificador. Se exige que sean valores
