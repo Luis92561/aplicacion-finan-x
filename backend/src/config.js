@@ -2,18 +2,71 @@ import 'dotenv/config';
 
 const esProduccion = process.env.NODE_ENV === 'production';
 
-// Refuerzo de seguridad: en producción se exige un secreto JWT fuerte (≥32 caracteres).
-if (esProduccion) {
-  if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
+/**
+ * Valores que aparecen en el repositorio (docker-compose, .env.example, código) o en
+ * documentación. Si alguno se usa como JWT_SECRET, cualquiera puede leerlo y FORJAR
+ * tokens: bastaría un secreto válido para entrar como ADMIN. Se rechazan siempre.
+ */
+const SECRETOS_DEBILES = [
+  'finanx-prod-secret',   // valor por defecto que tenía docker-compose.yml
+  'finanx-dev-secret',    // valor por defecto de este archivo
+  'cambiar',              // "cambiar-por-una-clave-segura", "cambiar-en-produccion"
+  'cambia-esta-clave',    // backend/.env.example
+  'changeme',
+  'change-me',
+];
+
+const MIN_LARGO = 32;
+/**
+ * Comprueba el JWT_SECRET antes de arrancar.
+ *
+ * Antes solo se miraba la LONGITUD y únicamente en producción, así que el valor por defecto
+ * de docker-compose (que ya tenía ≥32 caracteres) pasaba la validación y un despliegue sin
+ * variables de entorno arrancaba con un secreto público en el repositorio.
+ */
+function revisarJwtSecret() {
+  const secreto = process.env.JWT_SECRET;
+
+  if (!secreto) {
     console.error(
-      'FINAN-X: en producción es obligatorio definir JWT_SECRET con al menos 32 caracteres. ' +
-      'Configúrelo en docker-compose o en las variables de entorno antes de arrancar.'
+      'FINAN-X: falta JWT_SECRET.\n' +
+      '  El secreto firma los tokens de sesión; sin él no se puede arrancar de forma segura.\n' +
+      '  Genere uno y guárdelo en un archivo .env (que NO se sube a git):\n' +
+      '    node -e "console.log(require(\'crypto\').randomBytes(48).toString(\'base64url\'))"'
     );
     process.exit(1);
   }
-} else if (!process.env.JWT_SECRET) {
-  console.warn('FINAN-X: usando JWT_SECRET de desarrollo "finanx-dev-secret". Defina JWT_SECRET para producción.');
+
+  const minuscula = secreto.toLowerCase();
+  const debil = SECRETOS_DEBILES.find((p) => minuscula.includes(p));
+
+  if (debil) {
+    console.error(
+      `FINAN-X: JWT_SECRET contiene el valor de ejemplo "${debil}", que está publicado en el repositorio.\n` +
+      '  Con un secreto conocido se pueden FABRICAR tokens y suplantar a cualquier usuario, incluido ADMIN.\n' +
+      '  Defina un JWT_SECRET propio y aleatorio (≥32 caracteres) en su archivo .env:\n' +
+      '    node -e "console.log(require(\'crypto\').randomBytes(48).toString(\'base64url\'))"'
+    );
+    process.exit(1);
+  }
+
+  if (secreto.length < MIN_LARGO) {
+    console.error(
+      `FINAN-X: JWT_SECRET es demasiado corto (${secreto.length} caracteres; mínimo ${MIN_LARGO}).\n` +
+      '  Genere uno aleatorio con:\n' +
+      '    node -e "console.log(require(\'crypto\').randomBytes(48).toString(\'base64url\'))"'
+    );
+    process.exit(1);
+  }
+
+  if (!esProduccion) {
+    console.warn('FINAN-X: JWT_SECRET de desarrollo en uso. Use un secreto distinto en producción.');
+  }
+
+  return secreto;
 }
+
+const jwtSecret = revisarJwtSecret();
 
 export const config = {
   port: Number(process.env.PORT || 4000),
@@ -24,7 +77,7 @@ export const config = {
     password: process.env.PGPASSWORD || 'finanx',
     database: process.env.PGDATABASE || 'finanx',
   },
-  jwtSecret: process.env.JWT_SECRET || 'finanx-dev-secret',
+  jwtSecret,
   jwtExpiresIn: process.env.JWT_EXPIRES || '8h',
   /** Orígenes permitidos por CORS (el navegador solo recibe la cabecera si el origen está aquí). */
   corsOrigins: (process.env.CORS_ORIGINS || 'http://localhost:5173,http://localhost:8080,http://127.0.0.1:5173,http://127.0.0.1:8080')
@@ -34,7 +87,18 @@ export const config = {
   /** Máximo de solicitudes de autoregistro por IP en 1 hora (anti-spam). */
   registroRateMax: Number(process.env.REGISTRO_RATE_LIMIT) || 20,
   /** OTP (código de un solo uso) para recuperar contraseña. */
-  otpDemo: (process.env.OTP_RETORNO_DEMO || 'on') !== 'off',      // 'on': el código vuelve en la respuesta (solo demo)
+  /**
+   * OTP (código de un solo uso) para recuperar contraseña.
+   *
+   * ⚠️ Con esto en `true`, el código viaja en la RESPUESTA de la API y la interfaz lo muestra:
+   * cualquiera podría pedir el código de otra cuenta y cambiarle la contraseña. Es cómodo para
+   * demostrar el flujo, pero anula el segundo factor, así que NO debe estar activo en producción.
+   *
+   * Por eso el valor por defecto depende del entorno:
+   *   - producción: off  (salvo que se ponga OTP_RETORNO_DEMO=on explícitamente y a conciencia)
+   *   - desarrollo: on   (para poder probar el flujo sin proveedor real de SMS/correo)
+   */
+  otpDemo: (process.env.OTP_RETORNO_DEMO || (esProduccion ? 'off' : 'on')) !== 'off',
   otpValidezMinutos: Number(process.env.OTP_VALIDEZ_MINUTOS) || 10,
   otpMaxIntentos: Number(process.env.OTP_MAX_INTENTOS) || 5,
   /** Máximo de solicitudes/intentos de recuperación de contraseña por IP en 15 min (anti-spam OTP). */
