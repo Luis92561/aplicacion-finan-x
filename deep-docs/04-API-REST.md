@@ -1,5 +1,11 @@
 # 4 · API REST — contrato completo
 
+> ⚠️ **Documento actualizado tras la segunda revisión.** Varios comportamientos descritos aquí
+> cambiaron a propósito: errores genéricos en el login (M1), `404` en pagos de factura inexistente
+> (M8), `400` en ids no numéricos (M9), lista blanca de métodos de pago (M6), contraseñas mínimas
+> (M4), `token_version` en el token (A7). El detalle de cada cambio está en
+> [`10-MEJORAS-APLICADAS.md`](10-MEJORAS-APLICADAS.md).
+
 Prefijo global: **`/api`**. Todos los routers se montan en `backend/src/index.js`.
 Formato de error uniforme: **`{ "error": "mensaje" }`**.
 

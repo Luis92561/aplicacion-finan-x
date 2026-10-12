@@ -9,10 +9,18 @@
 
 ## Resumen ejecutivo
 
-> ✅ **ACTUALIZACIÓN: C1, C2 y C3 ya están CORREGIDOS y verificados** (commit `5877ef8`).
-> Los hallazgos se conservan abajo como registro de lo que estaba mal y de cómo se comprobó.
-> La suite e2e pasó de **99 a 112 comprobaciones**, con 14 nuevas de regresión que
-> **fallan si el bug reaparece**. Ver la sección *Estado de la corrección*, al final.
+> ✅ **ACTUALIZACIÓN (segunda revisión).** Además de C1, C2 y C3, se corrigieron **todos los
+> hallazgos de severidad Alta y Media** de este documento (A1–A7, M1–M11) y la limpieza de la
+> sección Baja. La suite pasó de **99 a 139 comprobaciones**, todas en verde contra PostgreSQL 16
+> real. El registro completo —qué, por qué y cómo se verificó— está en
+> [`10-MEJORAS-APLICADAS.md`](10-MEJORAS-APLICADAS.md).
+>
+> Siguen **pendientes** C4 (refacturación tras anular), M12 (pagador del portal queda NULL) y M13
+> (expectativas de arquitectura), porque requieren una decisión de negocio o un cambio de esquema.
+
+> ✅ **ACTUALIZACIÓN (primera corrección): C1, C2 y C3 ya están CORREGIDOS y verificados**
+> (commit `5877ef8`). Los hallazgos se conservan abajo como registro de lo que estaba mal y de cómo
+> se comprobó. Ver la sección *Estado de la corrección*, al final.
 
 El proyecto está **bien pensado y bien documentado**. Las reglas de negocio están correctamente
 identificadas, la separación de roles es coherente, el aislamiento del portal por token es sólido y hay

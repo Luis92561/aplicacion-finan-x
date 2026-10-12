@@ -3,10 +3,13 @@
 > **Carpeta creada por el agente DSH.** No forma parte del código de la aplicación.
 > Contiene notas de familiarización para recordar cómo funciona el proyecto.
 
-> ✅ **Estado:** el bug crítico del saldo (producto cartesiano en `factura_saldo`) **está corregido y
-> verificado** — commit `5877ef8`, suite e2e en **112/112**. Ver
-> [`09-OBSERVACIONES-Y-RIESGOS.md`](09-OBSERVACIONES-Y-RIESGOS.md) → *Estado de la corrección*.
-> Quedan pendientes los hallazgos C4 y los de severidad Alta/Media/Baja.
+> ✅ **Estado:** corregidos y verificados el **bug crítico del saldo** (producto cartesiano en
+> `factura_saldo`, commits `5877ef8`) y **todos los hallazgos de severidad Alta y Media** de la
+> revisión de seguridad y robustez (commit posterior). La suite e2e pasó de **99 a 139
+> comprobaciones**, todas en verde contra PostgreSQL 16 real.
+> Ver [`10-MEJORAS-APLICADAS.md`](10-MEJORAS-APLICADAS.md).
+> Siguen pendientes **C4** (refacturación tras anular) y **M12** (pagador del portal), que requieren
+> una decisión de negocio o un cambio de esquema.
 
 ---
 
@@ -29,6 +32,7 @@ autorización expresa**, y están aisladas en un único commit (`5877ef8`).
 | [`07-LEVANTAR-Y-PROBAR.md`](07-LEVANTAR-Y-PROBAR.md) | Cómo arrancar (Docker y modo dev), credenciales demo, suite e2e, solución de problemas. | Cuando quieras ejecutarlo. |
 | [`08-ESTADO-GIT-Y-GITHUB.md`](08-ESTADO-GIT-Y-GITHUB.md) | **Estado del control de versiones y conexión con GitHub.** | Si la pregunta es "¿está subido a algún lado?". |
 | [`09-OBSERVACIONES-Y-RIESGOS.md`](09-OBSERVACIONES-Y-RIESGOS.md) | Cosas que noté: deuda técnica, pendientes declarados, detalles a revisar. | Antes de planear cambios. |
+| [`10-MEJORAS-APLICADAS.md`](10-MEJORAS-APLICADAS.md) | **Segunda revisión: qué se corrigió, por qué y cómo** (A1–A7, M1–M11, limpieza), con la verificación de cada punto. | Si quieres saber qué cambió y por qué. |
 
 ## Resumen en 10 líneas
 

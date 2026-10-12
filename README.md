@@ -20,6 +20,26 @@ Aplicación independiente de **facturación y pagos** — Frontend React, Backen
 - Docker (con Docker Compose)
 - Node.js 20+ y npm (solo para modo desarrollo)
 
+## ⚠️ Configuración obligatoria: `JWT_SECRET`
+
+El backend **no arranca sin un `JWT_SECRET` propio**. El secreto firma los tokens de sesión: con uno
+conocido se pueden fabricar tokens y suplantar a cualquier usuario, incluido el administrador.
+
+Genere uno y guárdelo en un archivo `.env` en la **raíz del proyecto** (está en `.gitignore`, así que
+no se sube al repositorio):
+
+```bash
+# 1. Generar el secreto
+node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
+
+# 2. Guardarlo en .env (raíz del proyecto) — lo lee docker compose
+echo "JWT_SECRET=<el secreto generado>" > .env
+```
+
+El backend **rechaza** arrancar si el secreto falta, mide menos de 32 caracteres o contiene alguno de
+los valores de ejemplo que aparecen en el repositorio. Para el modo desarrollo, haga lo mismo en
+`backend/.env` (hay una plantilla comentada en `backend/.env.example`).
+
 ## Puesta en marcha
 
 > **Forma rápida:** ejecuta `./levantar.sh` desde la raíz: levanta todo con Docker y abre el navegador automáticamente. `./levantar.sh --dev` usa modo desarrollo (hot reload); `--stop` y `--purge` detienen el stack. Guía completa en `documentacion/Instrucciones_Despliegue.md`.
@@ -135,7 +155,7 @@ POST   /api/mis-pagos               Abonar/pagar una factura propia desde el por
 ```bash
 cd backend
 npm run seed   # una vez, para crear datos demo
-npm test       # suite e2e (99 casos) — requiere backend corriendo
+npm test       # suite e2e (139 casos) — requiere backend corriendo
 ```
 
 ## Documentación
