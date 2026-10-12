@@ -125,7 +125,7 @@ JWT_EXPIRES=8h
 | `npm run dev` | `node --watch src/index.js` | Desarrollo con recarga automática |
 | `npm start` | `node src/index.js` | Producción |
 | `npm run seed` | `node src/seed.js` | Carga datos demo (idempotente) |
-| `npm test` | `node scripts/e2e.mjs` | **Suite e2e de 99 casos** |
+| `npm test` | `node scripts/e2e.mjs` | **Suite e2e de 154 comprobaciones** |
 
 **frontend:**
 
@@ -153,7 +153,7 @@ vencimiento `12/30`, CVV `123`. Solo se guardan los últimos 4 dígitos.
 ```bash
 cd backend
 npm run seed   # una vez, para crear datos demo
-npm test       # suite e2e (99 casos) — REQUIERE el backend corriendo
+npm test       # suite e2e (154 comprobaciones) — REQUIERE el backend corriendo
 ```
 
 La suite es **e2e contra una API viva**, no tests unitarios. La "definición de terminado" del

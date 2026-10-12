@@ -1,7 +1,7 @@
 # FINAN-X · Instrucciones de Despliegue
 
 > **Proyecto:** FINAN-X · **Desarrolladores:** Luis Alfredo Jaramillo Restrepo · Mayra Juliana Velez
-> **Estado:** producción local verificada (suite e2e 99/99) · **Última actualización:** 20 de septiembre de 2026
+> **Estado:** producción local verificada (suite e2e 154/154) · **Última actualización:** 12 de octubre de 2026
 >
 > Este documento explica **cómo abrir FINAN-X en tu navegador**, tanto con Docker (recomendado) como en modo desarrollo (hot reload), y **en qué orden leer el código** del backend y del frontend. Complementa a `A_Explicacion_Proyecto.html`, `B_Guia_Tecnica_Desarrolladores.html` y `SPEC_*.md`.
 
@@ -131,7 +131,7 @@ Con un usuario interno entras al **panel** (Dashboard → módulos). Con el usua
 | API sana | `curl http://localhost:4000/api/health` → `{"ok":true,...}` |
 | Contenedores | `docker compose ps` → los tres `Up` (db/backend `healthy`) |
 | Logs backend | `docker compose logs backend` |
-| **Suite e2e (99 casos)** | con el backend corriendo: `cd backend && npm test` |
+| **Suite e2e (154 comprobaciones)** | con el backend corriendo: `cd backend && npm test` |
 | Seed repetible | `cd backend && npm run seed` (idempotente, se puede correr varias veces) |
 
 ---
@@ -151,7 +151,7 @@ Seguir el **flujo de negocio**: primero los datos, luego las reglas y la API (ba
 | 5 | `backend/src/middleware/` | Seguridad y cortes de flujo: `auth.js` (JWT, `requireRol`, `requireCliente`), `rateLimit.js` (anti fuerza bruta → 429), `audit.js`, `notificar.js` (OTP demo). |
 | 6 | `backend/src/routes/` | **Los módulos de la API, en el orden del flujo**: `auth` → `clientes` → `productos` → `pedidos` → `facturas` → `pagos` → `notas-credito` → `reportes` → `auditoria` → `usuarios` → `mis` (portal del cliente, aislado). |
 | 7 | `backend/src/seed.js` | Datos demo idempotentes (roles, usuarios, clientes, productos). |
-| 8 | `backend/scripts/e2e.mjs` | (Opcional) Las **99 pruebas** end-to-end: cada una describe un comportamiento esperado. |
+| 8 | `backend/scripts/e2e.mjs` | (Opcional) Las **154 comprobaciones** end-to-end: cada una describe un comportamiento esperado. |
 
 ### 8.2 Frontend (`frontend/src/`)
 

@@ -185,7 +185,7 @@ Project Facturacion Finan-x/
 │           ├── reportes.js     ← resumen, facturación, balances, historial
 │           ├── auditoria.js    ← consulta de auditoría
 │           └── mis.js          ← PORTAL DEL CLIENTE (mis-*)
-│   └── scripts/e2e.mjs         ← 99 pruebas automáticas de extremo a extremo
+│   └── scripts/e2e.mjs         ← 154 comprobaciones automáticas de extremo a extremo
 │
 └── frontend/                   🎨
     ├── package.json            ← dependencias y comandos (vite)
@@ -682,7 +682,7 @@ Navegador ──► POST /api/pagos ──► middleware (auth, roles) ──►
 
 **Léelo así:**
 - `"type": "module"` → usa los `import` modernos de JavaScript (verás `import ... from '...'`).
-- `npm start` → arranca la API; `npm run dev` → la arranca y la reinicia sola al guardar; `npm run seed` → carga los datos demo; `npm test` → corre las 99 pruebas e2e.
+- `npm start` → arranca la API; `npm run dev` → la arranca y la reinicia sola al guardar; `npm run seed` → carga los datos demo; `npm test` → corre las 154 comprobaciones e2e.
 - Dependencias principales: **express** (servidor), **pg** (hablar con PostgreSQL), **jsonwebtoken** (JWT), **bcryptjs** (hashes), **helmet** (cabeceras de seguridad), **cors** (permitir orígenes), **express-rate-limit** (anti-abuso), **dotenv** (variables de entorno).
 
 ## 2.3 El punto de entrada: `index.js`
@@ -7336,7 +7336,7 @@ server {
 
 # Anexo B · Pruebas automáticas (e2e)
 
-El proyecto incluye una suite de **99 pruebas automáticas** (`backend/scripts/e2e.mjs`) que prueban la aplicación completa por su API: registro, login, CRUD de clientes/productos, pedidos, facturación, pagos, notas de crédito, recuperación de contraseña, aislamiento del portal y muchos casos borde (pagos sobre saldo, anulaciones, etc.). Se ejecutan con:
+El proyecto incluye una suite de **154 comprobaciones automáticas** (`backend/scripts/e2e.mjs`) que prueban la aplicación completa por su API: registro, login, CRUD de clientes/productos, pedidos, facturación, pagos, notas de crédito, recuperación de contraseña, aislamiento del portal y muchos casos borde (pagos sobre saldo, anulaciones, etc.). Se ejecutan con:
 
 ```bash
 cd backend

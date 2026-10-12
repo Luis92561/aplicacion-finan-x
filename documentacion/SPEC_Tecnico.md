@@ -3,7 +3,7 @@
 > **Propósito de este documento:** describir **cómo** está construido FINAN-X hasta el último detalle necesario para **recrearlo desde cero** con Claude Code u OpenCode (léalo junto con `SPEC_Funcional.md`; la secuencia de ejecución está en `PLAN_Creacion.md`).
 >
 > **Proyecto:** FINAN-X · **Desarrolladores:** Luis Alfredo Jaramillo Restrepo · Mayra Juliana Velez
-> **Estado:** funcional · **Verificación:** suite e2e 99/99 aprobadas.
+> **Estado:** funcional · **Verificación:** suite e2e 154/154 aprobadas.
 
 ---
 
@@ -100,7 +100,7 @@ project/
 │   ├── package.json                # ESM; scripts: dev/start/seed/test
 │   ├── scripts/
 │   │   ├── seed.js                 # Datos demo idempotentes (roles, usuarios, clientes, producto)
-│   │   └── e2e.mjs                 # Suite end-to-end (99 casos) — npm test
+│   │   └── e2e.mjs                 # Suite end-to-end (154 comprobaciones) — npm test
 │   └── src/
 │       ├── index.js                # Express bootstrap: helmet, CORS, JSON, montaje de rutas, error handler
 │       ├── config.js               # Variables de entorno (BD, JWT, CORS, límites, OTP)
@@ -557,7 +557,7 @@ curl -X POST http://localhost:4000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"username":"admin@finanx.test","password":"admin123"}'
 
-# 3. Pruebas end-to-end (99 casos)
+# 3. Pruebas end-to-end (154 comprobaciones)
 cd backend && npm test
 
 # 4. Aplicar migraciones posteriores (si la BD ya existía)
@@ -584,7 +584,7 @@ Credenciales demo: `admin@finanx.test/admin123` · `facturador@finanx.test/factu
 | `database/init.sql` | Esquema (fuente única) |
 | `backend/src/seed.js` | Datos demo idempotentes |
 | `backend/src/routes/*.js` | Contrato exacto de la API |
-| `backend/scripts/e2e.mjs` | Pruebas de aceptación (99) |
+| `backend/scripts/e2e.mjs` | Pruebas de aceptación (154 comprobaciones) |
 | `docker-compose.yml` + Dockerfiles | Infraestructura reproducible |
 | `frontend/src/App.jsx` | Mapa de rutas y guardas |
 | `frontend/src/styles.css` | Sistema visual (clases `.card`, `.table-wrap`, `.alert-*`, `.login-card`, `.badge`, etc.) |

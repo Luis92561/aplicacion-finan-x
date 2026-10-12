@@ -171,6 +171,30 @@ Toda la documentación del proyecto está centralizada en la carpeta **`document
 | `mockups/` (raíz) | Prototipos de demostración para el cliente (`mockups/index.html`) | HTML |
 | `diagrams/*.puml` y `*.svg` | Diagramas PlantUML fuente y renderizados | SVG |
 
+### Evidencias académicas (E1–E7)
+
+Las siete evidencias de la asignatura se entregan en PDF dentro de `documentacion/`. **No se
+escribieron a mano**: se generan a partir del esquema real de la base de datos, del árbol de
+dependencias y de la salida real de la suite de pruebas, de modo que no pueden contradecir a la
+implementación.
+
+| Evidencia | Contenido |
+|---|---|
+| `E1_Modelo_Entidad_Relacion.pdf` | Modelo entidad-relación: 12 entidades, 117 campos, 16 claves foráneas y sus cardinalidades (diagrama en notación pata de gallo). |
+| `E2_Diccionario_de_Datos.pdf` | Diccionario de datos: cada campo con tipo, longitud, PK, FK, obligatoriedad y descripción, más la vista `factura_saldo`. |
+| `E3_ERS_IEEE830.pdf` | Especificación de requisitos (IEEE 830): 40 requisitos funcionales, 27 no funcionales, 15 reglas de negocio y 20 criterios de aceptación. |
+| `E4_Matriz_Propiedad_Intelectual.pdf` | Propiedad intelectual: lo propio del equipo, lo de terceros y bajo qué licencia. Revisión de las 238 dependencias (ninguna copyleft). |
+| `E5_Contrato_Licencia_Software.pdf` | Contrato de licencia: el equipo conserva la titularidad y la empresa recibe una licencia no exclusiva de uso interno. |
+| `E6_Matriz_Trazabilidad.pdf` | Trazabilidad: cada requisito encadenado a historia de usuario, caso de uso, endpoint, pantalla, entidad, prueba y requisito no funcional. |
+| `E7_Pruebas_Integracion.pdf` | Pruebas de integración: las 154 comprobaciones con su registro, 48 casos de control, capturas del sistema y los defectos corregidos. |
+
+Los generadores están en `documentacion/_generador/` y el detalle para regenerarlas en
+`documentacion/LEEME.md`. La comprobación de coherencia entre documentos se ejecuta con:
+
+```bash
+node documentacion/_generador/verificar.mjs
+```
+
 Para recrear los diagramas: `bash documentacion/diagrams/render.sh`.
 
 El **backlog de historias de usuario** (22 historias, formato «Como…, quiero…, para…», con criterios de aceptación y trazabilidad a fases) está en `documentacion/SPEC_Funcional.md` §2.3.

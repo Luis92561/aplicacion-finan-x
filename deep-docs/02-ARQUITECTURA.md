@@ -108,7 +108,7 @@ Project Facturacion Finan-x/
 │   ├── package.json             ← 8 dependencias, scripts: dev / start / seed / test
 │   ├── Dockerfile
 │   ├── .env / .env.example
-│   ├── scripts/e2e.mjs          ← suite e2e de 99 casos
+│   ├── scripts/e2e.mjs          ← suite e2e de 154 comprobaciones
 │   └── src/
 │       ├── index.js             ← arranque de Express, montaje de routers, manejo de errores
 │       ├── config.js            ← TODA la configuración por variables de entorno

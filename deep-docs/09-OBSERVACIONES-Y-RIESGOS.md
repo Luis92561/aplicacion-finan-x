@@ -28,7 +28,7 @@ El proyecto está **bien pensado y bien documentado**. Las reglas de negocio est
 identificadas, la separación de roles es coherente, el aislamiento del portal por token es sólido y hay
 detalles de calidad poco habituales en un proyecto de semestre: `round2()` en cada acumulación
 monetaria, validación de Luhn, no persistir nunca el CVV, hash bcrypt del OTP, `IF NOT EXISTS` en todo
-el esquema, seed idempotente, y **99 pruebas e2e que cubren las reglas críticas**.
+el esquema, seed idempotente, y **154 comprobaciones e2e que cubren las reglas críticas**.
 
 Dicho eso, encontré **un bug de datos serio** que afecta a todos los saldos del sistema, y varios
 problemas menores reales. Los ordeno por gravedad.
@@ -414,7 +414,7 @@ Para ser justo, esto merece reconocimiento explícito:
 11. **El contador de fuerza bruta se resetea con un login correcto** — un usuario legítimo que se
     equivoca no queda bloqueado. Buen detalle de UX y seguridad.
 12. **La respuesta de `recuperar-solicitar` es genérica** para no revelar si la cuenta existe.
-13. **La suite e2e de 99 casos es notable**, e incluye pruebas de aislamiento entre clientes, de las
+13. **La suite e2e de 154 comprobaciones es notable**, e incluye pruebas de aislamiento entre clientes, de las
     validaciones de tarjeta (Luhn, CVV, vencimiento) y de privacidad PCI. Es la mejor red de seguridad
     del proyecto.
 14. **La documentación es excepcionalmente completa**: PDFs, HTMLs, specs en Markdown, 14 diagramas
@@ -431,7 +431,7 @@ Transparencia sobre los límites del análisis inicial y de lo que se comprobó 
 1. **Al principio no ejecuté la aplicación.** El sandbox de la sesión no tenía acceso al named pipe de
    Docker Desktop. **Después sí se pudo** (con permisos ampliados) y **la corrección se verificó contra
    PostgreSQL 16 real**, ejecutando la suite completa.
-2. **Al inicio la suite e2e no se ejecutó**; los 99 casos se contaron leyendo `e2e.mjs`.
+2. **Al inicio la suite e2e no se ejecutó**; los 99 casos iniciales se contaron leyendo `e2e.mjs` (hoy son 154 y se ejecutan realmente).
    **Después se ejecutó: 112/112 en verde** con la corrección aplicada.
 3. **El bug C1 se verificó primero aritméticamente** ([`_verificacion-fanout.mjs`](_verificacion-fanout.mjs))
    y **después contra la base de datos real**, reproduciéndolo antes de corregirlo. Ver

@@ -3,7 +3,7 @@
 > **Propósito de este documento:** describir **qué** hace FINAN-X, para quién, bajo qué reglas, y qué debe poder comprobarse al final. Es la guía de requisitos para **recrear el proyecto desde cero** con Claude Code u OpenCode (léalo junto con `SPEC_Tecnico.md` y ejecute `PLAN_Creacion.md`).
 >
 > **Proyecto:** FINAN-X · **Desarrolladores:** Luis Alfredo Jaramillo Restrepo · Mayra Juliana Velez
-> **Estado:** funcional · **Verificación:** suite e2e 99/99 aprobadas.
+> **Estado:** funcional · **Verificación:** suite e2e 154/154 aprobadas.
 > **Proceso:** se desarrolló con **metodología ágil (entregas semanales, 6 sprints: 21 ago – 28 sep 2026)** y **arquitectura hexagonal** (núcleo de reglas de negocio + puertos/adaptadores). Ver sección 10 y `PLAN_Creacion.md`.
 
 ---
@@ -49,7 +49,7 @@ Solo ve y opera **sus propios datos** (aislamiento estricto por `clienteId`):
 
 ### 2.3 Historias de usuario (backlog)
 
-El producto se especificó como **historias de usuario** en formato «Como **rol**, quiero **acción**, para **beneficio**», con criterios de aceptación y trazabilidad a las fases del `PLAN_Creacion.md` (columna *Fases*; las fases se distribuyen en los 6 sprints de la sección 10). Cada historia está cubierta por la suite e2e (99 casos, sección 8).
+El producto se especificó como **historias de usuario** en formato «Como **rol**, quiero **acción**, para **beneficio**», con criterios de aceptación y trazabilidad a las fases del `PLAN_Creacion.md` (columna *Fases*; las fases se distribuyen en los 6 sprints de la sección 10). Cada historia está cubierta por la suite e2e (154 comprobaciones, sección 8).
 
 | ID | Épica | Historia de usuario | Criterios de aceptación (clave) | Fases |
 |---|---|---|---|---|
@@ -76,7 +76,7 @@ El producto se especificó como **historias de usuario** en formato «Como **rol
 | **HU-21** | Portal del cliente | Como **cliente**, quiero **ver mi saldo, facturas, compras, pagos y notas de crédito**, para **controlar mis finanzas en línea**. | Solo mis datos (aislamiento); detalle no sensible de medios de pago. | 5 |
 | **HU-22** | Portal del cliente | Como **cliente**, quiero **consultar y actualizar mis datos personales**, para **mantener mi información al día**. | Acceso solo a la propia información (ajena → 404). | 5 |
 
-**Nota de trazabilidad:** las historias se agrupan en **épicas** y se resuelven en las **fases** del `PLAN_Creacion.md` (columna *Fases*); las fases se distribuyen en los 6 sprints de la sección 10. Todas quedan cubiertas por la suite e2e (99 casos). El mismo backlog aparece en `FINAN-X_Documentacion.html` §2.4 (completo) y en `B_Guia_Tecnica_Desarrolladores.html` §2.3 (resumen).
+**Nota de trazabilidad:** las historias se agrupan en **épicas** y se resuelven en las **fases** del `PLAN_Creacion.md` (columna *Fases*); las fases se distribuyen en los 6 sprints de la sección 10. Todas quedan cubiertas por la suite e2e (154 comprobaciones). El mismo backlog aparece en `FINAN-X_Documentacion.html` §2.4 (completo) y en `B_Guia_Tecnica_Desarrolladores.html` §2.3 (resumen).
 
 ---
 
@@ -217,7 +217,7 @@ Al levantar el proyecto por primera vez (BD vacía + seed idempotente) debe exis
 
 ## 8. Criterios de aceptación finales (qué debe comprobarse)
 
-Verificación automatizada: **99 casos e2e aprobados** (`backend/scripts/e2e.mjs`). Cubre al menos:
+Verificación automatizada: **154 comprobaciones e2e aprobadas** (`backend/scripts/e2e.mjs`). Cubre al menos:
 
 1. Login válido/inválido/sin token; 401 correctos; login correcto tras bloqueo.
 2. RBAC: 403 para roles sin permiso (p. ej. cliente tocando rutas internas).

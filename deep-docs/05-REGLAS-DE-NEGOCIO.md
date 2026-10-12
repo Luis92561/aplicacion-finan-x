@@ -344,7 +344,7 @@ La única excepción real es `detalle_pedido`, que sí se borra al reeditar un p
 ```bash
 cd backend
 npm run seed   # datos demo (idempotente)
-npm test       # 99 comprobaciones e2e
+npm test       # 154 comprobaciones e2e
 ```
 
 La suite cubre específicamente: las reglas 1–14 de la tabla de arriba, el aislamiento del portal, las
