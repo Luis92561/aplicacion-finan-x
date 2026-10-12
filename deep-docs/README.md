@@ -4,12 +4,12 @@
 > Contiene notas de familiarización para recordar cómo funciona el proyecto.
 
 > ✅ **Estado:** corregidos y verificados el **bug crítico del saldo** (producto cartesiano en
-> `factura_saldo`, commits `5877ef8`) y **todos los hallazgos de severidad Alta y Media** de la
-> revisión de seguridad y robustez (commit posterior). La suite e2e pasó de **99 a 139
+> `factura_saldo`), **todos los hallazgos de severidad Alta y Media**, y **los pendientes C4**
+> (refacturación tras anular) **y M12** (pagador del portal). La suite e2e pasó de **99 a 154
 > comprobaciones**, todas en verde contra PostgreSQL 16 real.
 > Ver [`10-MEJORAS-APLICADAS.md`](10-MEJORAS-APLICADAS.md).
-> Siguen pendientes **C4** (refacturación tras anular) y **M12** (pagador del portal), que requieren
-> una decisión de negocio o un cambio de esquema.
+> Lo único que queda es **M13**, que es una observación sobre cómo se describe la arquitectura en la
+> documentación, no un defecto del código.
 
 ---
 

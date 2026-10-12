@@ -15,8 +15,10 @@
 > real. El registro completo —qué, por qué y cómo se verificó— está en
 > [`10-MEJORAS-APLICADAS.md`](10-MEJORAS-APLICADAS.md).
 >
-> Siguen **pendientes** C4 (refacturación tras anular), M12 (pagador del portal queda NULL) y M13
-> (expectativas de arquitectura), porque requieren una decisión de negocio o un cambio de esquema.
+> También se corrigieron **C4** (refacturación tras anular), **M12** (pagador del portal) y **B12**
+> (dominios en la base de datos), además de las salvaguardas de administrador. La suite quedó en
+> **154 comprobaciones en verde**. Lo único que queda es **M13**, que es una observación de
+> expectativas sobre la documentación, no un defecto del código.
 
 > ✅ **ACTUALIZACIÓN (primera corrección): C1, C2 y C3 ya están CORREGIDOS y verificados**
 > (commit `5877ef8`). Los hallazgos se conservan abajo como registro de lo que estaba mal y de cómo
@@ -150,7 +152,7 @@ Además, las pantallas muestran **cifras distintas para la misma factura** segú
 **Corrección:** unificar. Lo más simple es que estos puntos lean de `factura_saldo` en lugar de
 recalcular.
 
-### C4. Anular una factura deja el pedido imposible de refacturar (500) — ⚠️ PENDIENTE
+### C4. Anular una factura deja el pedido imposible de refacturar (500) — ✅ CORREGIDO
 
 **Dónde:** `backend/src/routes/facturas.js` líneas 171–179.
 
@@ -341,7 +343,7 @@ case-insensitive, probablemente no lo que se pretendía. Y no hay paginación (`
 20:00 se muestra con **la fecha del día siguiente**. Los filtros `hasta` con `+ interval '1 day'`
 incluyen además el instante 00:00 del día posterior.
 
-### M12. Los pagos del portal quedan sin `usuario_id`
+### M12. Los pagos del portal quedan sin `usuario_id` — ✅ CORREGIDO
 
 `pagos.usuario_id` referencia `usuarios` (internos), así que los pagos del portal se insertan con
 `NULL`. El esquema **no puede representar por FK** quién pagó desde el portal; la trazabilidad depende

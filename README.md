@@ -155,7 +155,7 @@ POST   /api/mis-pagos               Abonar/pagar una factura propia desde el por
 ```bash
 cd backend
 npm run seed   # una vez, para crear datos demo
-npm test       # suite e2e (139 casos) — requiere backend corriendo
+npm test       # suite e2e (154 casos) — requiere backend corriendo
 ```
 
 ## Documentación

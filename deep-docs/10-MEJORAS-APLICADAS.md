@@ -230,30 +230,124 @@ token con firma manipulada → 401).
 | `className="btn primary"` en vez de `btn-primary` | `PagarModal.jsx` | La clase `.primary` no existe: el botón "Generar código Efecty" perdía el estilo |
 | Cabecera con 9 `<th>` y cuerpo con 10 `<td>` | `Facturas.jsx` | Tabla desalineada. Añadidas las dos columnas que faltaban |
 | `<Estado value="ACTIVO" tone="green">Cuenta</Estado>` | `Clientes.jsx` | `Estado` ignora `tone` y los `children`: renderizaba la insignia "ACTIVO" en vez de "Cuenta". Sustituido por `<Badge tone="green">` |
-| Código muerto: `AUDITOR` (nunca usado), `num()` (nunca usado) | `audit.js`, `utils.js` | Eliminado |
-| `GET /productos/:id` no existe, pero el id se parseaba igual | — | Documentado; la prueba de M9 usa el `PUT` |
+| **B12** | Los valores válidos de `estado`, `metodo_pago` y `usuario_tipo` solo estaban en comentarios SQL | Se añadieron **9 CHECK constraints**. La columna era TEXT sin restricción, así que nada impedía guardar un estado que el sistema no sabe interpretar (rompe filtros e informes) | La base rechaza un estado inventado |
+| **B** | Un ADMIN podía desactivarse a sí mismo o al último ADMIN activo | Salvaguardas: **409** en ambos casos | Desactivarse a sí mismo → 409; con otro ADMIN activo → 200 |
 
-*(No toqué `Topbar` y `EntityPill` de `Layout.jsx`: siguen siendo código muerto, pero eliminarlos
-toca el layout y prefiero no arriesgar cambios visuales sin que los pidas.)*
+*(No toqué `Topbar` ni `EntityPill` en esta primera pasada; se eliminaron después — ver la sección siguiente.)*
 
 ---
 
-## ⚠️ Lo que tienes que hacer tú: la migración
+## Segunda tanda: los pendientes que quedaban
 
-`init.sql` **solo se ejecuta al crear el volumen de PostgreSQL desde cero**. Tu base de datos actual
-**no** tiene las columnas nuevas, así que la aplicación daría error al autenticar.
+Tras la segunda revisión quedaban C4, M12 y algunas mejoras. Se resolvieron con una decisión de
+negocio previa (te la pregunté porque no es solo técnica).
 
-Aplica la migración una vez:
+### C4 · Refacturar un pedido tras anular su factura
+
+**Qué pasaba.** `facturas.pedido_id` era **UNIQUE**, así que un pedido no podía tener nunca una
+segunda factura. Al anular una factura, el código devolvía el pedido a `CONFIRMADO` *"para poder
+refacturarlo"*, pero al intentarlo se violaba el UNIQUE y el usuario recibía un **500**. La anulación
+era un callejón sin salida.
+
+**Decisión tomada:** permitir **una factura ACTIVA por pedido** y conservar las anuladas como
+historial. Es lo que hace cualquier sistema de facturación real: la factura anulada es un documento
+que debe existir (para auditoría) y el pedido debe poder facturarse de nuevo.
+
+**Qué se hizo.**
+
+1. Se **quita el UNIQUE** de `pedido_id`.
+2. Se sustituye por un **índice único parcial**, que aplica solo a las facturas ACTIVA:
+   ```sql
+   CREATE UNIQUE INDEX uq_factura_activa_por_pedido
+     ON facturas (pedido_id) WHERE estado = 'ACTIVA';
+   ```
+   La regla la impone **la base de datos**, no solo el código: si el código fallara, no podrían
+   existir dos facturas activas del mismo pedido.
+3. `POST /facturas` ahora comprueba solo las ACTIVA (`409` si ya hay una).
+4. Las subconsultas que mostraban "la factura del pedido" usaban `LIMIT 1` y podían devolver **la
+   anulada**. Ahora ordenan por `(estado = 'ACTIVA') DESC, factura_id DESC`, así que priorizan la
+   activa y, si no hay, muestran la última anulada.
+
+**Cómo se comprobó** (6 pruebas nuevas + prueba manual en el stack desplegado): facturar → 409 al
+intentar facturar otra vez con una activa → anular → **refacturar devuelve 201 con otro número** →
+el pedido apunta a la activa → la anulada sigue existiendo con estado `ANULADA`.
+
+### M12 · Saber quién pagó desde el portal
+
+**Qué pasaba.** `pagos.usuario_id` apunta a `usuarios` (personal interno). Un pago hecho por el
+cliente desde el portal se guardaba con `usuario_id` **NULL**: el esquema no podía representar quién
+pagó, y la trazabilidad dependía de `auditoria` (texto libre).
+
+**Qué se hizo.** Se añadió `pagos.usuario_cliente_id` (FK a `usuario_cliente`). Ahora los dos actores
+se distinguen:
+
+| Origen del pago | `usuario_id` | `usuario_cliente_id` |
+|---|---|---|
+| Personal interno (`POST /api/pagos`) | el usuario | NULL |
+| Cliente desde el portal (`POST /api/mis-pagos`) | NULL | el cliente |
+
+Se conservan **las dos** columnas porque son dos tipos de actor distintos (no es un descuido: un
+`usuario_id` polimórfico perdería la integridad referencial).
+
+Además, `GET /api/pagos`, `GET /api/mis-pagos`, `GET /api/mi-historial` y
+`GET /api/reportes/historial/:id` devuelven ahora `registrado_por` y `registrado_por_tipo`, y las
+pantallas de pagos muestran esa columna ("Portal del cliente" vs "Personal interno").
+
+**Cómo se comprobó:** pruebas de que hay pagos identificados como `CLIENTE` y como `INTERNO`, con
+nombre, tanto en el panel interno como en el portal.
+
+**Los pagos anteriores** quedan con ambas columnas NULL. Si quieres rellenarlos, se puede cruzar con
+`auditoria` (los pagos del portal se registran con la operación `PAGO_PORTAL`).
+
+### B12 · Dominios válidos en la base de datos
+
+Se añadieron **9 CHECK constraints**: `estado` en usuarios, clientes, productos, usuario_cliente,
+pedidos, facturas y notas_credito; `metodo_pago` en pagos; y `usuario_tipo` en auditoria. Antes los
+valores válidos solo existían en comentarios SQL, así que un error de programación o una llamada
+directa a la API podían dejar una fila con un estado que el sistema no interpreta.
+
+### Salvaguardas de administrador
+
+Un ADMIN podía **desactivarse a sí mismo** o **al último administrador activo**, dejando el sistema
+sin acceso a la gestión de usuarios y sin forma de arreglarlo desde la aplicación. Ahora ambas cosas
+devuelven **409** con un mensaje que explica qué hacer.
+
+### Limpieza final
+
+Eliminados `Topbar` y `EntityPill` de `Layout.jsx`: eran código muerto (nadie los importaba y
+`EntityPill` siempre devolvía `null`).
+
+### Estado final
+
+**Suite e2e: 154 comprobaciones, todas en verde** (empezó en 99). Verificado contra PostgreSQL 16
+real, y el frontend **compila** con los cambios (build de Vite en Docker).
+
+---
+
+## ⚠️ Las migraciones (ya aplicadas en esta máquina)
+
+`init.sql` **solo se ejecuta al crear el volumen de PostgreSQL desde cero**. Si tu base ya existía,
+necesita las migraciones; si la creas de nuevo, `init.sql` ya lo incluye todo.
+
+Ya las apliqué a tu base de datos en ejecución. Para otra máquina, el orden es:
 
 ```bash
 docker exec -i finanx-db psql -U finanx -d finanx < database/migracion_version_token.sql
+docker exec -i finanx-db psql -U finanx -d finanx < database/migracion_notas_credito.sql
+docker exec -i finanx-db psql -U finanx -d finanx < database/migracion_refacturacion_y_dominios.sql
 ```
 
-Crea `usuarios.token_version` y `usuario_cliente.token_version`. Es **idempotente** (se puede
-ejecutar varias veces sin efectos).
+| Migración | Qué añade |
+|---|---|
+| `migracion_version_token.sql` | `token_version` en usuarios y usuario_cliente (revocar sesiones) |
+| `migracion_notas_credito.sql` | La vista `factura_saldo` corregida (sin producto cartesiano) |
+| `migracion_refacturacion_y_dominios.sql` | Refacturación (quita el UNIQUE, índice parcial), `pagos.usuario_cliente_id` y los 9 CHECK |
 
-**Consecuencia esperada:** los tokens emitidos **antes** de la migración dejan de valer (no traen
-`ver`), así que **hay que volver a iniciar sesión**. Es el precio de poder revocar sesiones.
+Todas son **idempotentes**: se pueden ejecutar varias veces sin efectos secundarios.
+
+**Consecuencia esperada:** los tokens emitidos **antes** de `migracion_version_token.sql` dejan de
+valer (no traen `ver`), así que **hay que volver a iniciar sesión**. Es el precio de poder revocar
+sesiones.
 
 Si prefieres empezar de cero: `docker compose down -v && docker compose up -d --build`
 (⚠️ **borra los datos**).
@@ -289,7 +383,7 @@ los cambios "pequeños" hechos en masa:
    parámetros → `bind message supplies 4 parameters, but prepared statement requires 2`. Corregido
    reutilizando los mismos índices `$n`.
 
-6. **Purebas mal planteadas por mí.** `/productos/abc` no existe como `GET` (daba 403), y en
+6. **Pruebas mal planteadas por mí.** `/productos/abc` no existe como `GET` (daba 403), y en
    `/mis-pagos` con `facturaId: 999999` el método por defecto `EFECTIVO` disparaba el 400 antes que
    el 404. Corregí las aserciones, no el producto.
 
@@ -299,22 +393,21 @@ antiguo) y parece que las correcciones no funcionan.
 
 ---
 
-## Qué sigue pendiente
+## Qué queda pendiente (y por qué)
 
-De la revisión anterior quedan sin tocar, por decisión de alcance o porque requieren una decisión de
-negocio:
+Resueltos en esta tercera tanda: **C4** (refacturación), **M12** (pagador del portal), **B12** (CHECK
+constraints), las salvaguardas de administrador y la limpieza final. Lo que queda **no son bugs**:
 
 | # | Qué | Por qué no se hizo |
 |---|---|---|
-| **C4** | Anular una factura deja el pedido imposible de refacturar (500, por el `UNIQUE` en `pedido_id`) | Hay que **decidir la regla de negocio**: ¿permitir N facturas por pedido, reemplazar la anulada, o un estado nuevo? No es solo técnica. Documenté el motivo en el código |
-| **M12** | Los pagos del portal quedan con `usuario_id` NULL | El esquema no puede representar al pagador cliente por FK (`usuario_id` apunta a `usuarios`). Requiere cambio de esquema con impacto en datos existentes |
-| **M13** | La documentación declara arquitectura hexagonal "pura" y el código es un monolito de 3 capas | Es una observación de expectativas, no un defecto. Corregirla es reescribir la documentación del proyecto, que no es mía |
-| — | `Topbar` y `EntityPill` (código muerto) | Eliminarlos toca el layout; prefiero no arriesgar cambios visuales sin pedírtelo |
-| — | Sin paginación (LIMIT 300/500 fijos) | Cambio de UX y de contrato de API; merece su propia decisión |
-| — | `Efecty` es una simulación (el código no se persiste ni se redime) y su `vigencia_horas` está fijo en 24 | Requiere la integración real, que no existe |
-| — | `auditoria` sin paginación/exportación | Mejora, no corrección |
+| **M13** | La documentación declara arquitectura hexagonal "pura" y el código es un monolito de 3 capas con buenas guardas | Es una **observación de expectativas**, no un defecto. Corregirlo es reescribir la documentación del proyecto (PDFs, HTMLs, specs), que no es mía |
+| — | Sin paginación (los listados usan `LIMIT 300`/`500` fijos) | Es una **mejora de UX y un cambio de contrato de API** (hay que decidir el formato de paginación y tocar todas las pantallas). No es una corrección; dime si la quieres y la planteo aparte |
+| — | `Efecty` es una **simulación**: el código se genera pero no se persiste, no hay endpoint que lo redima y `vigencia_horas` está fijo en 24 | Requiere la **integración real con Efecty**, que no existe. El código está preparado y documentado para conectarla |
+| — | Entrega real del OTP por SMS/correo | Es una decisión de producto: hay que contratar un proveedor y conectarlo en `notificar.js`. El adaptador ya está aislado justo para eso |
+| — | Sin verificación de correo en el autoregistro (el cliente nace ACTIVO) | Es una **decisión de negocio** (¿aprobación manual del administrador?). El código actual funciona así a propósito |
+| — | Sin tests unitarios (la cobertura es e2e) | La suite e2e cubre las reglas de negocio de punta a punta; añadir unitarios es una mejora de proceso, no una corrección |
 
 ---
 
-*Segunda revisión. Ver [`09-OBSERVACIONES-Y-RIESGOS.md`](09-OBSERVACIONES-Y-RIESGOS.md) para el
+*Tercera revisión. Ver [`09-OBSERVACIONES-Y-RIESGOS.md`](09-OBSERVACIONES-Y-RIESGOS.md) para el
 registro de la primera (el bug de saldos) y [`README.md`](README.md) para el índice.*
