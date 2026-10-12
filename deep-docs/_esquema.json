@@ -1,0 +1,1783 @@
+{
+  "columnas": [
+    {
+      "table_name": "auditoria",
+      "column_name": "auditoria_id",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "NO",
+      "column_default": "nextval('auditoria_auditoria_id_seq'::regclass)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "auditoria",
+      "column_name": "usuario",
+      "data_type": "character varying",
+      "character_maximum_length": 200,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "auditoria",
+      "column_name": "usuario_tipo",
+      "data_type": "character varying",
+      "character_maximum_length": 20,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": "'INTERNO'::character varying",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "auditoria",
+      "column_name": "fecha_hora",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": "now()",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "auditoria",
+      "column_name": "modulo",
+      "data_type": "character varying",
+      "character_maximum_length": 50,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "auditoria",
+      "column_name": "operacion",
+      "data_type": "character varying",
+      "character_maximum_length": 30,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "auditoria",
+      "column_name": "registro_afectado",
+      "data_type": "character varying",
+      "character_maximum_length": 50,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "auditoria",
+      "column_name": "descripcion",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "clientes",
+      "column_name": "cliente_id",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "NO",
+      "column_default": "nextval('clientes_cliente_id_seq'::regclass)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "clientes",
+      "column_name": "tipo_cliente",
+      "data_type": "character varying",
+      "character_maximum_length": 20,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": "'PERSONA'::character varying",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "clientes",
+      "column_name": "tipo_identificacion",
+      "data_type": "character varying",
+      "character_maximum_length": 20,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": "'CC'::character varying",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "clientes",
+      "column_name": "numero_identificacion",
+      "data_type": "character varying",
+      "character_maximum_length": 30,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "clientes",
+      "column_name": "nombre_razon_social",
+      "data_type": "character varying",
+      "character_maximum_length": 200,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "clientes",
+      "column_name": "telefono",
+      "data_type": "character varying",
+      "character_maximum_length": 30,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "clientes",
+      "column_name": "correo",
+      "data_type": "character varying",
+      "character_maximum_length": 150,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "clientes",
+      "column_name": "direccion",
+      "data_type": "character varying",
+      "character_maximum_length": 200,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "clientes",
+      "column_name": "ciudad",
+      "data_type": "character varying",
+      "character_maximum_length": 100,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "clientes",
+      "column_name": "estado",
+      "data_type": "character varying",
+      "character_maximum_length": 20,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": "'ACTIVO'::character varying",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "clientes",
+      "column_name": "fecha_creacion",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": "now()",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "detalle_pedido",
+      "column_name": "detalle_id",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "NO",
+      "column_default": "nextval('detalle_pedido_detalle_id_seq'::regclass)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "detalle_pedido",
+      "column_name": "pedido_id",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "detalle_pedido",
+      "column_name": "producto_id",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "detalle_pedido",
+      "column_name": "cantidad",
+      "data_type": "numeric",
+      "character_maximum_length": null,
+      "numeric_precision": 12,
+      "numeric_scale": 2,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "detalle_pedido",
+      "column_name": "precio_unitario",
+      "data_type": "numeric",
+      "character_maximum_length": null,
+      "numeric_precision": 14,
+      "numeric_scale": 2,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "detalle_pedido",
+      "column_name": "subtotal",
+      "data_type": "numeric",
+      "character_maximum_length": null,
+      "numeric_precision": 14,
+      "numeric_scale": 2,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "facturas",
+      "column_name": "factura_id",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "NO",
+      "column_default": "nextval('facturas_factura_id_seq'::regclass)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "facturas",
+      "column_name": "numero_factura",
+      "data_type": "character varying",
+      "character_maximum_length": 20,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "facturas",
+      "column_name": "pedido_id",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "facturas",
+      "column_name": "cliente_id",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "facturas",
+      "column_name": "fecha_emision",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": "now()",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "facturas",
+      "column_name": "fecha_vencimiento",
+      "data_type": "date",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "facturas",
+      "column_name": "subtotal",
+      "data_type": "numeric",
+      "character_maximum_length": null,
+      "numeric_precision": 14,
+      "numeric_scale": 2,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "facturas",
+      "column_name": "impuestos",
+      "data_type": "numeric",
+      "character_maximum_length": null,
+      "numeric_precision": 14,
+      "numeric_scale": 2,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "facturas",
+      "column_name": "total",
+      "data_type": "numeric",
+      "character_maximum_length": null,
+      "numeric_precision": 14,
+      "numeric_scale": 2,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "facturas",
+      "column_name": "estado",
+      "data_type": "character varying",
+      "character_maximum_length": 20,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": "'ACTIVA'::character varying",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "facturas",
+      "column_name": "motivo_anulacion",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "facturas",
+      "column_name": "fecha_anulacion",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "facturas",
+      "column_name": "usuario_anulacion",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 13
+    },
+    {
+      "table_name": "facturas",
+      "column_name": "fecha_creacion",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": "now()",
+      "ordinal_position": 14
+    },
+    {
+      "table_name": "notas_credito",
+      "column_name": "nota_credito_id",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "NO",
+      "column_default": "nextval('notas_credito_nota_credito_id_seq'::regclass)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "notas_credito",
+      "column_name": "numero_nota",
+      "data_type": "character varying",
+      "character_maximum_length": 20,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "notas_credito",
+      "column_name": "factura_id",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "notas_credito",
+      "column_name": "cliente_id",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "notas_credito",
+      "column_name": "fecha",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": "now()",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "notas_credito",
+      "column_name": "valor",
+      "data_type": "numeric",
+      "character_maximum_length": null,
+      "numeric_precision": 14,
+      "numeric_scale": 2,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "notas_credito",
+      "column_name": "motivo",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "notas_credito",
+      "column_name": "estado",
+      "data_type": "character varying",
+      "character_maximum_length": 20,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": "'ACTIVA'::character varying",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "notas_credito",
+      "column_name": "fecha_creacion",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": "now()",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "notas_credito",
+      "column_name": "usuario_id",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "notas_credito",
+      "column_name": "fecha_anulacion",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "notas_credito",
+      "column_name": "usuario_anulacion",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "notas_credito",
+      "column_name": "motivo_anulacion",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 13
+    },
+    {
+      "table_name": "pagos",
+      "column_name": "pago_id",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "NO",
+      "column_default": "nextval('pagos_pago_id_seq'::regclass)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "pagos",
+      "column_name": "numero_pago",
+      "data_type": "character varying",
+      "character_maximum_length": 20,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "pagos",
+      "column_name": "factura_id",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "pagos",
+      "column_name": "fecha",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": "now()",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "pagos",
+      "column_name": "valor",
+      "data_type": "numeric",
+      "character_maximum_length": null,
+      "numeric_precision": 14,
+      "numeric_scale": 2,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "pagos",
+      "column_name": "metodo_pago",
+      "data_type": "character varying",
+      "character_maximum_length": 30,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "pagos",
+      "column_name": "referencia",
+      "data_type": "character varying",
+      "character_maximum_length": 60,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "pagos",
+      "column_name": "observaciones",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "pagos",
+      "column_name": "usuario_id",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "pagos",
+      "column_name": "usuario_cliente_id",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "pagos",
+      "column_name": "fecha_registro",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": "now()",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "pagos",
+      "column_name": "banco",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "pagos",
+      "column_name": "titular",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 13
+    },
+    {
+      "table_name": "pagos",
+      "column_name": "tipo_tarjeta",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 14
+    },
+    {
+      "table_name": "pagos",
+      "column_name": "ultimos_digitos_tarjeta",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 15
+    },
+    {
+      "table_name": "pagos",
+      "column_name": "vencimiento_tarjeta",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 16
+    },
+    {
+      "table_name": "pagos",
+      "column_name": "numero_cuenta",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 17
+    },
+    {
+      "table_name": "pedidos",
+      "column_name": "pedido_id",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "NO",
+      "column_default": "nextval('pedidos_pedido_id_seq'::regclass)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "pedidos",
+      "column_name": "numero_pedido",
+      "data_type": "character varying",
+      "character_maximum_length": 20,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "pedidos",
+      "column_name": "cliente_id",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "pedidos",
+      "column_name": "fecha",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": "now()",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "pedidos",
+      "column_name": "subtotal",
+      "data_type": "numeric",
+      "character_maximum_length": null,
+      "numeric_precision": 14,
+      "numeric_scale": 2,
+      "is_nullable": "NO",
+      "column_default": "0",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "pedidos",
+      "column_name": "impuestos",
+      "data_type": "numeric",
+      "character_maximum_length": null,
+      "numeric_precision": 14,
+      "numeric_scale": 2,
+      "is_nullable": "NO",
+      "column_default": "0",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "pedidos",
+      "column_name": "total",
+      "data_type": "numeric",
+      "character_maximum_length": null,
+      "numeric_precision": 14,
+      "numeric_scale": 2,
+      "is_nullable": "NO",
+      "column_default": "0",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "pedidos",
+      "column_name": "estado",
+      "data_type": "character varying",
+      "character_maximum_length": 20,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": "'BORRADOR'::character varying",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "pedidos",
+      "column_name": "observaciones",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "pedidos",
+      "column_name": "fecha_creacion",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": "now()",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "productos",
+      "column_name": "producto_id",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "NO",
+      "column_default": "nextval('productos_producto_id_seq'::regclass)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "productos",
+      "column_name": "codigo",
+      "data_type": "character varying",
+      "character_maximum_length": 30,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "productos",
+      "column_name": "nombre",
+      "data_type": "character varying",
+      "character_maximum_length": 150,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "productos",
+      "column_name": "descripcion",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "productos",
+      "column_name": "categoria",
+      "data_type": "character varying",
+      "character_maximum_length": 60,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "productos",
+      "column_name": "precio",
+      "data_type": "numeric",
+      "character_maximum_length": null,
+      "numeric_precision": 14,
+      "numeric_scale": 2,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "productos",
+      "column_name": "impuesto",
+      "data_type": "numeric",
+      "character_maximum_length": null,
+      "numeric_precision": 5,
+      "numeric_scale": 2,
+      "is_nullable": "NO",
+      "column_default": "0",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "productos",
+      "column_name": "unidad_medida",
+      "data_type": "character varying",
+      "character_maximum_length": 20,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": "'UND'::character varying",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "productos",
+      "column_name": "estado",
+      "data_type": "character varying",
+      "character_maximum_length": 20,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": "'ACTIVO'::character varying",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "productos",
+      "column_name": "fecha_creacion",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": "now()",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "productos",
+      "column_name": "fecha_actualizacion",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": "now()",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "recuperaciones_clave",
+      "column_name": "recuperacion_id",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "NO",
+      "column_default": "nextval('recuperaciones_clave_recuperacion_id_seq'::regclass)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "recuperaciones_clave",
+      "column_name": "usuario_cliente_id",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "recuperaciones_clave",
+      "column_name": "canal",
+      "data_type": "character varying",
+      "character_maximum_length": 10,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "recuperaciones_clave",
+      "column_name": "codigo_hash",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "recuperaciones_clave",
+      "column_name": "intentos",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "NO",
+      "column_default": "0",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "recuperaciones_clave",
+      "column_name": "usado",
+      "data_type": "boolean",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": "false",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "recuperaciones_clave",
+      "column_name": "expira_en",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "recuperaciones_clave",
+      "column_name": "creado_en",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": "now()",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "roles",
+      "column_name": "rol_id",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "NO",
+      "column_default": "nextval('roles_rol_id_seq'::regclass)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "roles",
+      "column_name": "nombre",
+      "data_type": "character varying",
+      "character_maximum_length": 50,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "roles",
+      "column_name": "descripcion",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "usuario_cliente",
+      "column_name": "usuario_cliente_id",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "NO",
+      "column_default": "nextval('usuario_cliente_usuario_cliente_id_seq'::regclass)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "usuario_cliente",
+      "column_name": "cliente_id",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "usuario_cliente",
+      "column_name": "username",
+      "data_type": "character varying",
+      "character_maximum_length": 150,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "usuario_cliente",
+      "column_name": "password_hash",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "usuario_cliente",
+      "column_name": "estado",
+      "data_type": "character varying",
+      "character_maximum_length": 20,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": "'ACTIVO'::character varying",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "usuario_cliente",
+      "column_name": "fecha_creacion",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": "now()",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "usuario_cliente",
+      "column_name": "ultimo_acceso",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "usuario_cliente",
+      "column_name": "token_version",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "NO",
+      "column_default": "1",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "usuarios",
+      "column_name": "usuario_id",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "NO",
+      "column_default": "nextval('usuarios_usuario_id_seq'::regclass)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "usuarios",
+      "column_name": "nombre",
+      "data_type": "character varying",
+      "character_maximum_length": 120,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "usuarios",
+      "column_name": "correo",
+      "data_type": "character varying",
+      "character_maximum_length": 150,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "usuarios",
+      "column_name": "password_hash",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "usuarios",
+      "column_name": "rol_id",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "NO",
+      "column_default": null,
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "usuarios",
+      "column_name": "estado",
+      "data_type": "character varying",
+      "character_maximum_length": 20,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": "'ACTIVO'::character varying",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "usuarios",
+      "column_name": "fecha_creacion",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": "now()",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "usuarios",
+      "column_name": "token_version",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "NO",
+      "column_default": "1",
+      "ordinal_position": 8
+    }
+  ],
+  "pks": [
+    {
+      "table_name": "roles",
+      "column_name": "rol_id"
+    },
+    {
+      "table_name": "usuarios",
+      "column_name": "usuario_id"
+    },
+    {
+      "table_name": "clientes",
+      "column_name": "cliente_id"
+    },
+    {
+      "table_name": "usuario_cliente",
+      "column_name": "usuario_cliente_id"
+    },
+    {
+      "table_name": "productos",
+      "column_name": "producto_id"
+    },
+    {
+      "table_name": "pedidos",
+      "column_name": "pedido_id"
+    },
+    {
+      "table_name": "detalle_pedido",
+      "column_name": "detalle_id"
+    },
+    {
+      "table_name": "facturas",
+      "column_name": "factura_id"
+    },
+    {
+      "table_name": "pagos",
+      "column_name": "pago_id"
+    },
+    {
+      "table_name": "notas_credito",
+      "column_name": "nota_credito_id"
+    },
+    {
+      "table_name": "auditoria",
+      "column_name": "auditoria_id"
+    },
+    {
+      "table_name": "recuperaciones_clave",
+      "column_name": "recuperacion_id"
+    }
+  ],
+  "fks": [
+    {
+      "table_name": "usuarios",
+      "column_name": "rol_id",
+      "tabla_referenciada": "roles",
+      "columna_referenciada": "rol_id",
+      "delete_rule": "NO ACTION"
+    },
+    {
+      "table_name": "usuario_cliente",
+      "column_name": "cliente_id",
+      "tabla_referenciada": "clientes",
+      "columna_referenciada": "cliente_id",
+      "delete_rule": "NO ACTION"
+    },
+    {
+      "table_name": "pedidos",
+      "column_name": "cliente_id",
+      "tabla_referenciada": "clientes",
+      "columna_referenciada": "cliente_id",
+      "delete_rule": "NO ACTION"
+    },
+    {
+      "table_name": "detalle_pedido",
+      "column_name": "pedido_id",
+      "tabla_referenciada": "pedidos",
+      "columna_referenciada": "pedido_id",
+      "delete_rule": "CASCADE"
+    },
+    {
+      "table_name": "detalle_pedido",
+      "column_name": "producto_id",
+      "tabla_referenciada": "productos",
+      "columna_referenciada": "producto_id",
+      "delete_rule": "NO ACTION"
+    },
+    {
+      "table_name": "facturas",
+      "column_name": "pedido_id",
+      "tabla_referenciada": "pedidos",
+      "columna_referenciada": "pedido_id",
+      "delete_rule": "NO ACTION"
+    },
+    {
+      "table_name": "facturas",
+      "column_name": "cliente_id",
+      "tabla_referenciada": "clientes",
+      "columna_referenciada": "cliente_id",
+      "delete_rule": "NO ACTION"
+    },
+    {
+      "table_name": "facturas",
+      "column_name": "usuario_anulacion",
+      "tabla_referenciada": "usuarios",
+      "columna_referenciada": "usuario_id",
+      "delete_rule": "NO ACTION"
+    },
+    {
+      "table_name": "pagos",
+      "column_name": "factura_id",
+      "tabla_referenciada": "facturas",
+      "columna_referenciada": "factura_id",
+      "delete_rule": "NO ACTION"
+    },
+    {
+      "table_name": "pagos",
+      "column_name": "usuario_id",
+      "tabla_referenciada": "usuarios",
+      "columna_referenciada": "usuario_id",
+      "delete_rule": "NO ACTION"
+    },
+    {
+      "table_name": "pagos",
+      "column_name": "usuario_cliente_id",
+      "tabla_referenciada": "usuario_cliente",
+      "columna_referenciada": "usuario_cliente_id",
+      "delete_rule": "NO ACTION"
+    },
+    {
+      "table_name": "notas_credito",
+      "column_name": "factura_id",
+      "tabla_referenciada": "facturas",
+      "columna_referenciada": "factura_id",
+      "delete_rule": "NO ACTION"
+    },
+    {
+      "table_name": "notas_credito",
+      "column_name": "cliente_id",
+      "tabla_referenciada": "clientes",
+      "columna_referenciada": "cliente_id",
+      "delete_rule": "NO ACTION"
+    },
+    {
+      "table_name": "notas_credito",
+      "column_name": "usuario_id",
+      "tabla_referenciada": "usuarios",
+      "columna_referenciada": "usuario_id",
+      "delete_rule": "NO ACTION"
+    },
+    {
+      "table_name": "notas_credito",
+      "column_name": "usuario_anulacion",
+      "tabla_referenciada": "usuarios",
+      "columna_referenciada": "usuario_id",
+      "delete_rule": "NO ACTION"
+    },
+    {
+      "table_name": "recuperaciones_clave",
+      "column_name": "usuario_cliente_id",
+      "tabla_referenciada": "usuario_cliente",
+      "columna_referenciada": "usuario_cliente_id",
+      "delete_rule": "CASCADE"
+    }
+  ],
+  "uniques": [
+    {
+      "table_name": "clientes",
+      "column_name": "numero_identificacion",
+      "constraint_name": "uq_cliente_identificacion"
+    },
+    {
+      "table_name": "clientes",
+      "column_name": "tipo_identificacion",
+      "constraint_name": "uq_cliente_identificacion"
+    },
+    {
+      "table_name": "facturas",
+      "column_name": "numero_factura",
+      "constraint_name": "facturas_numero_factura_key"
+    },
+    {
+      "table_name": "notas_credito",
+      "column_name": "numero_nota",
+      "constraint_name": "notas_credito_numero_nota_key"
+    },
+    {
+      "table_name": "pagos",
+      "column_name": "numero_pago",
+      "constraint_name": "pagos_numero_pago_key"
+    },
+    {
+      "table_name": "pedidos",
+      "column_name": "numero_pedido",
+      "constraint_name": "pedidos_numero_pedido_key"
+    },
+    {
+      "table_name": "productos",
+      "column_name": "codigo",
+      "constraint_name": "productos_codigo_key"
+    },
+    {
+      "table_name": "roles",
+      "column_name": "nombre",
+      "constraint_name": "roles_nombre_key"
+    },
+    {
+      "table_name": "usuario_cliente",
+      "column_name": "cliente_id",
+      "constraint_name": "usuario_cliente_cliente_id_key"
+    },
+    {
+      "table_name": "usuario_cliente",
+      "column_name": "username",
+      "constraint_name": "usuario_cliente_username_key"
+    },
+    {
+      "table_name": "usuarios",
+      "column_name": "correo",
+      "constraint_name": "usuarios_correo_key"
+    }
+  ],
+  "checks": [
+    {
+      "table_name": "auditoria",
+      "constraint_name": "ck_auditoria_usuario_tipo",
+      "definicion": "CHECK (((usuario_tipo)::text = ANY ((ARRAY['INTERNO'::character varying, 'CLIENTE'::character varying])::text[])))"
+    },
+    {
+      "table_name": "clientes",
+      "constraint_name": "ck_clientes_estado",
+      "definicion": "CHECK (((estado)::text = ANY ((ARRAY['ACTIVO'::character varying, 'INACTIVO'::character varying])::text[])))"
+    },
+    {
+      "table_name": "detalle_pedido",
+      "constraint_name": "detalle_pedido_cantidad_check",
+      "definicion": "CHECK ((cantidad > (0)::numeric))"
+    },
+    {
+      "table_name": "facturas",
+      "constraint_name": "ck_facturas_estado",
+      "definicion": "CHECK (((estado)::text = ANY ((ARRAY['ACTIVA'::character varying, 'ANULADA'::character varying])::text[])))"
+    },
+    {
+      "table_name": "notas_credito",
+      "constraint_name": "ck_notas_credito_estado",
+      "definicion": "CHECK (((estado)::text = ANY ((ARRAY['ACTIVA'::character varying, 'ANULADA'::character varying])::text[])))"
+    },
+    {
+      "table_name": "notas_credito",
+      "constraint_name": "notas_credito_valor_check",
+      "definicion": "CHECK ((valor > (0)::numeric))"
+    },
+    {
+      "table_name": "pagos",
+      "constraint_name": "ck_pagos_metodo",
+      "definicion": "CHECK (((metodo_pago)::text = ANY ((ARRAY['EFECTIVO'::character varying, 'TARJETA'::character varying, 'TRANSFERENCIA'::character varying, 'CHEQUE'::character varying])::text[])))"
+    },
+    {
+      "table_name": "pagos",
+      "constraint_name": "pagos_valor_check",
+      "definicion": "CHECK ((valor > (0)::numeric))"
+    },
+    {
+      "table_name": "pedidos",
+      "constraint_name": "ck_pedidos_estado",
+      "definicion": "CHECK (((estado)::text = ANY ((ARRAY['BORRADOR'::character varying, 'CONFIRMADO'::character varying, 'CANCELADO'::character varying, 'FACTURADO'::character varying])::text[])))"
+    },
+    {
+      "table_name": "productos",
+      "constraint_name": "ck_productos_estado",
+      "definicion": "CHECK (((estado)::text = ANY ((ARRAY['ACTIVO'::character varying, 'INACTIVO'::character varying])::text[])))"
+    },
+    {
+      "table_name": "productos",
+      "constraint_name": "productos_impuesto_check",
+      "definicion": "CHECK (((impuesto >= (0)::numeric) AND (impuesto <= (100)::numeric)))"
+    },
+    {
+      "table_name": "productos",
+      "constraint_name": "productos_precio_check",
+      "definicion": "CHECK ((precio >= (0)::numeric))"
+    },
+    {
+      "table_name": "recuperaciones_clave",
+      "constraint_name": "recuperaciones_clave_canal_check",
+      "definicion": "CHECK (((canal)::text = ANY ((ARRAY['EMAIL'::character varying, 'SMS'::character varying])::text[])))"
+    },
+    {
+      "table_name": "usuario_cliente",
+      "constraint_name": "ck_usuario_cliente_estado",
+      "definicion": "CHECK (((estado)::text = ANY ((ARRAY['ACTIVO'::character varying, 'INACTIVO'::character varying])::text[])))"
+    },
+    {
+      "table_name": "usuarios",
+      "constraint_name": "ck_usuarios_estado",
+      "definicion": "CHECK (((estado)::text = ANY ((ARRAY['ACTIVO'::character varying, 'INACTIVO'::character varying])::text[])))"
+    }
+  ],
+  "indices": [
+    {
+      "tablename": "auditoria",
+      "indexname": "auditoria_pkey",
+      "indexdef": "CREATE UNIQUE INDEX auditoria_pkey ON public.auditoria USING btree (auditoria_id)"
+    },
+    {
+      "tablename": "auditoria",
+      "indexname": "idx_auditoria_fecha",
+      "indexdef": "CREATE INDEX idx_auditoria_fecha ON public.auditoria USING btree (fecha_hora DESC)"
+    },
+    {
+      "tablename": "clientes",
+      "indexname": "clientes_pkey",
+      "indexdef": "CREATE UNIQUE INDEX clientes_pkey ON public.clientes USING btree (cliente_id)"
+    },
+    {
+      "tablename": "clientes",
+      "indexname": "idx_clientes_estado",
+      "indexdef": "CREATE INDEX idx_clientes_estado ON public.clientes USING btree (estado)"
+    },
+    {
+      "tablename": "clientes",
+      "indexname": "uq_cliente_identificacion",
+      "indexdef": "CREATE UNIQUE INDEX uq_cliente_identificacion ON public.clientes USING btree (tipo_identificacion, numero_identificacion)"
+    },
+    {
+      "tablename": "detalle_pedido",
+      "indexname": "detalle_pedido_pkey",
+      "indexdef": "CREATE UNIQUE INDEX detalle_pedido_pkey ON public.detalle_pedido USING btree (detalle_id)"
+    },
+    {
+      "tablename": "detalle_pedido",
+      "indexname": "idx_detalle_pedido_pedido",
+      "indexdef": "CREATE INDEX idx_detalle_pedido_pedido ON public.detalle_pedido USING btree (pedido_id)"
+    },
+    {
+      "tablename": "facturas",
+      "indexname": "facturas_numero_factura_key",
+      "indexdef": "CREATE UNIQUE INDEX facturas_numero_factura_key ON public.facturas USING btree (numero_factura)"
+    },
+    {
+      "tablename": "facturas",
+      "indexname": "facturas_pkey",
+      "indexdef": "CREATE UNIQUE INDEX facturas_pkey ON public.facturas USING btree (factura_id)"
+    },
+    {
+      "tablename": "facturas",
+      "indexname": "idx_facturas_cliente",
+      "indexdef": "CREATE INDEX idx_facturas_cliente ON public.facturas USING btree (cliente_id)"
+    },
+    {
+      "tablename": "facturas",
+      "indexname": "idx_facturas_estado",
+      "indexdef": "CREATE INDEX idx_facturas_estado ON public.facturas USING btree (estado)"
+    },
+    {
+      "tablename": "facturas",
+      "indexname": "idx_facturas_pedido",
+      "indexdef": "CREATE INDEX idx_facturas_pedido ON public.facturas USING btree (pedido_id)"
+    },
+    {
+      "tablename": "facturas",
+      "indexname": "uq_factura_activa_por_pedido",
+      "indexdef": "CREATE UNIQUE INDEX uq_factura_activa_por_pedido ON public.facturas USING btree (pedido_id) WHERE ((estado)::text = 'ACTIVA'::text)"
+    },
+    {
+      "tablename": "notas_credito",
+      "indexname": "idx_notas_credito_cliente",
+      "indexdef": "CREATE INDEX idx_notas_credito_cliente ON public.notas_credito USING btree (cliente_id)"
+    },
+    {
+      "tablename": "notas_credito",
+      "indexname": "idx_notas_credito_factura",
+      "indexdef": "CREATE INDEX idx_notas_credito_factura ON public.notas_credito USING btree (factura_id)"
+    },
+    {
+      "tablename": "notas_credito",
+      "indexname": "notas_credito_numero_nota_key",
+      "indexdef": "CREATE UNIQUE INDEX notas_credito_numero_nota_key ON public.notas_credito USING btree (numero_nota)"
+    },
+    {
+      "tablename": "notas_credito",
+      "indexname": "notas_credito_pkey",
+      "indexdef": "CREATE UNIQUE INDEX notas_credito_pkey ON public.notas_credito USING btree (nota_credito_id)"
+    },
+    {
+      "tablename": "pagos",
+      "indexname": "idx_pagos_factura",
+      "indexdef": "CREATE INDEX idx_pagos_factura ON public.pagos USING btree (factura_id)"
+    },
+    {
+      "tablename": "pagos",
+      "indexname": "idx_pagos_usuario_cliente",
+      "indexdef": "CREATE INDEX idx_pagos_usuario_cliente ON public.pagos USING btree (usuario_cliente_id)"
+    },
+    {
+      "tablename": "pagos",
+      "indexname": "pagos_numero_pago_key",
+      "indexdef": "CREATE UNIQUE INDEX pagos_numero_pago_key ON public.pagos USING btree (numero_pago)"
+    },
+    {
+      "tablename": "pagos",
+      "indexname": "pagos_pkey",
+      "indexdef": "CREATE UNIQUE INDEX pagos_pkey ON public.pagos USING btree (pago_id)"
+    },
+    {
+      "tablename": "pedidos",
+      "indexname": "idx_pedidos_cliente",
+      "indexdef": "CREATE INDEX idx_pedidos_cliente ON public.pedidos USING btree (cliente_id)"
+    },
+    {
+      "tablename": "pedidos",
+      "indexname": "idx_pedidos_estado",
+      "indexdef": "CREATE INDEX idx_pedidos_estado ON public.pedidos USING btree (estado)"
+    },
+    {
+      "tablename": "pedidos",
+      "indexname": "pedidos_numero_pedido_key",
+      "indexdef": "CREATE UNIQUE INDEX pedidos_numero_pedido_key ON public.pedidos USING btree (numero_pedido)"
+    },
+    {
+      "tablename": "pedidos",
+      "indexname": "pedidos_pkey",
+      "indexdef": "CREATE UNIQUE INDEX pedidos_pkey ON public.pedidos USING btree (pedido_id)"
+    },
+    {
+      "tablename": "productos",
+      "indexname": "idx_productos_estado",
+      "indexdef": "CREATE INDEX idx_productos_estado ON public.productos USING btree (estado)"
+    },
+    {
+      "tablename": "productos",
+      "indexname": "productos_codigo_key",
+      "indexdef": "CREATE UNIQUE INDEX productos_codigo_key ON public.productos USING btree (codigo)"
+    },
+    {
+      "tablename": "productos",
+      "indexname": "productos_pkey",
+      "indexdef": "CREATE UNIQUE INDEX productos_pkey ON public.productos USING btree (producto_id)"
+    },
+    {
+      "tablename": "recuperaciones_clave",
+      "indexname": "idx_recuperaciones_cliente",
+      "indexdef": "CREATE INDEX idx_recuperaciones_cliente ON public.recuperaciones_clave USING btree (usuario_cliente_id, usado)"
+    },
+    {
+      "tablename": "recuperaciones_clave",
+      "indexname": "recuperaciones_clave_pkey",
+      "indexdef": "CREATE UNIQUE INDEX recuperaciones_clave_pkey ON public.recuperaciones_clave USING btree (recuperacion_id)"
+    },
+    {
+      "tablename": "roles",
+      "indexname": "roles_nombre_key",
+      "indexdef": "CREATE UNIQUE INDEX roles_nombre_key ON public.roles USING btree (nombre)"
+    },
+    {
+      "tablename": "roles",
+      "indexname": "roles_pkey",
+      "indexdef": "CREATE UNIQUE INDEX roles_pkey ON public.roles USING btree (rol_id)"
+    },
+    {
+      "tablename": "usuario_cliente",
+      "indexname": "usuario_cliente_cliente_id_key",
+      "indexdef": "CREATE UNIQUE INDEX usuario_cliente_cliente_id_key ON public.usuario_cliente USING btree (cliente_id)"
+    },
+    {
+      "tablename": "usuario_cliente",
+      "indexname": "usuario_cliente_pkey",
+      "indexdef": "CREATE UNIQUE INDEX usuario_cliente_pkey ON public.usuario_cliente USING btree (usuario_cliente_id)"
+    },
+    {
+      "tablename": "usuario_cliente",
+      "indexname": "usuario_cliente_username_key",
+      "indexdef": "CREATE UNIQUE INDEX usuario_cliente_username_key ON public.usuario_cliente USING btree (username)"
+    },
+    {
+      "tablename": "usuarios",
+      "indexname": "usuarios_correo_key",
+      "indexdef": "CREATE UNIQUE INDEX usuarios_correo_key ON public.usuarios USING btree (correo)"
+    },
+    {
+      "tablename": "usuarios",
+      "indexname": "usuarios_pkey",
+      "indexdef": "CREATE UNIQUE INDEX usuarios_pkey ON public.usuarios USING btree (usuario_id)"
+    }
+  ],
+  "vistas": [
+    {
+      "table_name": "factura_saldo",
+      "view_definition": " SELECT f.factura_id,\n    f.numero_factura,\n    f.pedido_id,\n    f.cliente_id,\n    f.fecha_emision,\n    f.fecha_vencimiento,\n    (f.subtotal)::double precision AS subtotal,\n    (f.impuestos)::double precision AS impuestos,\n    (f.total)::double precision AS total,\n    (COALESCE(pg.valor_pagado, (0)::numeric))::double precision AS valor_pagado,\n    (((f.total - COALESCE(pg.valor_pagado, (0)::numeric)) + COALESCE(nc.notas_credito, (0)::numeric)))::double precision AS saldo,\n    f.estado,\n        CASE\n            WHEN ((f.estado)::text = 'ANULADA'::text) THEN 'ANULADA'::text\n            WHEN ((COALESCE(pg.valor_pagado, (0)::numeric) - COALESCE(nc.notas_credito, (0)::numeric)) <= (0)::numeric) THEN 'PENDIENTE'::text\n            WHEN (((f.total - COALESCE(pg.valor_pagado, (0)::numeric)) + COALESCE(nc.notas_credito, (0)::numeric)) <= (0)::numeric) THEN 'PAGADA'::text\n            ELSE 'PAGO_PARCIAL'::text\n        END AS estado_pago,\n    f.motivo_anulacion,\n    f.fecha_anulacion,\n    (COALESCE(nc.notas_credito, (0)::numeric))::double precision AS notas_credito\n   FROM ((facturas f\n     LEFT JOIN ( SELECT pagos.factura_id,\n            sum(pagos.valor) AS valor_pagado\n           FROM pagos\n          GROUP BY pagos.factura_id) pg ON ((pg.factura_id = f.factura_id)))\n     LEFT JOIN ( SELECT notas_credito.factura_id,\n            sum(notas_credito.valor) AS notas_credito\n           FROM notas_credito\n          WHERE ((notas_credito.estado)::text = 'ACTIVA'::text)\n          GROUP BY notas_credito.factura_id) nc ON ((nc.factura_id = f.factura_id)));"
+    }
+  ],
+  "generado": "2026-10-12T01:03:02.736Z"
+}

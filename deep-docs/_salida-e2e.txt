@@ -1,0 +1,182 @@
+
+=== FINAN-X · Pruebas end-to-end ===
+
+1) Autenticación
+  ✔ Login inválido → 401
+  ✔ Sin token → 401
+  ✔ Login admin → 200
+  ✔ Login cliente → 200
+1b) Autoregistro de clientes
+  ✔ Registrar cliente → 201 con token
+  ✔ Identificación duplicada → 409
+  ✔ Usuario duplicado → 409
+  ✔ Contraseña corta → 400
+  ✔ Faltan datos obligatorios → 400
+  ✔ Cliente registrado entra al portal aislado
+2) Autorización por rol
+  ✔ Facturador en /usuarios → 403
+  ✔ Cliente en /clientes → 403
+3) Gestión de clientes (RF-C01..C06)
+  ✔ Crear cliente → 201
+  ✔ Cliente duplicado → 409
+  ✔ Búsqueda de cliente
+  ✔ Inactivar cliente
+4) Gestión de productos (CU-15..CU-19)
+  ✔ Crear producto → 201
+  ✔ Código duplicado → 409
+  ✔ Precio negativo → 400
+5) Pedidos (CU-20..CU-24) — cálculo en servidor
+  ✔ Crear pedido → 201 con total calculado
+  ✔ Totales calculados por el servidor
+  ✔ Confirmar pedido
+  ✔ Modificar pedido CONFIRMADO → 409
+6) Facturación (CU-25..CU-30)
+  ✔ Generar factura → 201
+  ✔ Refacturar mismo pedido → 409
+  ✔ Saldo inicial = total (PENDIENTE)
+7) Pagos (RF-04..RF-06)
+  ✔ Pago parcial → PAGO_PARCIAL
+  ✔ Sobrepago → 400
+  ✔ Pago completo → PAGADA
+  ✔ Saldo final = 0
+8) Anulación (RF-03)
+  ✔ Anular factura sin pagos → OK
+  ✔ Anular factura con pagos → 409
+  ✔ Anular sin motivo → 400
+9) Portal del cliente (CU-09..CU-14) — aislamiento
+  ✔ Mis facturas (solo las propias)
+  ✔ Ninguna factura de otro cliente
+  ✔ Mi saldo disponible
+  ✔ Mis datos = cliente autenticado
+9b) Pago desde el portal del cliente
+  ✔ Factura creada para cliente nuevo
+  ✔ No paga factura ajena → 404 (aislamiento)
+  ✔ Factura inexistente → 404
+  ✔ Abono desde portal → 201 PAGO_PARCIAL
+  ✔ Sobrepago desde portal → 400
+  ✔ Pago visible en «mis pagos»
+  ✔ Saldo del cliente refleja el abono
+  ✔ Pago desde portal sin token → 401
+9c) Notas de crédito
+  ✔ CN sobre factura anulada → 409
+  ✔ CN sin pagos disponibles → 409
+  ✔ CN sin motivo → 400
+  ✔ CN valor 0 → 400
+  ✔ CN supera lo pagado → 400
+  ✔ Crear CN → 201 con número NC-
+  ✔ Detalle de CN
+  ✔ Saldo sube tras la CN (reversa el pago devuelto)
+  ✔ Lista de CN activas incluye la creada
+  ✔ Portal: mis notas crédito (aislado al cliente)
+  ✔ Anular CN → OK
+  ✔ Reanular CN → 409
+  ✔ Anular CN sin motivo → 400
+9c-bis) Regresión: saldo con múltiples pagos y notas de crédito
+  ✔ Factura de prueba con total > 0
+  ✔ Valor pagado con 2 pagos es correcto (no multiplicado)
+  ✔ Saldo 0 tras pagar el total con 2 pagos
+  ✔ Nota de crédito 1 creada sobre factura con 2 pagos
+  ✔ Tras la 1ª nota el saldo sube exactamente el valor devuelto
+  ✔ Notas de crédito devueltas = valor de la nota (no duplicado)
+  ✔ Nota de crédito 2 creada sobre factura con 2 pagos
+  ✔ CN que supera lo pagado disponible → 400 (disponible no inflado)
+  ✔ CN que agota exactamente el disponible → 201
+  ✔ Valor pagado sigue siendo el total (no multiplicado por 3 notas)
+  ✔ Notas de crédito acumuladas = total pagado
+  ✔ Saldo vuelve al total tras devolver todo lo pagado
+  ✔ El pago usa el saldo de la vista (coherente con las notas)
+9e) Regresión: validaciones, robustez y cierre de sesiones
+  ✔ Editar cliente con identificación ya usada → 409 (antes 500)
+  ✔ Editar cliente sin campos obligatorios → 400 (antes 500)
+  ✔ id no numérico en /facturas/abc → 400 (antes 500)
+  ✔ id no numérico en /clientes/abc → 400 (antes 500)
+  ✔ id no numérico en /pedidos/abc → 400 (antes 500)
+  ✔ id no numérico en /notas-credito/abc → 400 (antes 500)
+  ✔ id no numérico en PUT /productos/abc → 400 (antes 500)
+  ✔ Pago con facturaId no numérico → 400 (antes 500)
+  ✔ Método de pago inventado → 400 (lista blanca)
+  ✔ Crear usuario con contraseña de 1 carácter → 400
+  ✔ Crear cuenta de portal con contraseña de 1 carácter → 400
+  ✔ Estado de usuario inválido → 400 (antes se guardaba tal cual)
+  ✔ Reporte de facturación con rango → 200
+  ✔ Reporte con rango: saldo_pendiente es numérico y finito
+  ✔ Reporte sin rango responde y es coherente
+  ✔ Pagos de factura inexistente → 404 (antes [])
+  ✔ Auditoría con limit negativo → 200 acotado (antes 500)
+  ✔ Filtro de auditoría por módulo parcial (ILIKE con comodines)
+  ✔ Login de cuenta existente con contraseña mala → 401 (no revela el estado)
+  ✔ Login de cuenta inexistente → mismo 401 (sin enumeración)
+9f) Refacturación: una factura activa + historial de anuladas
+  ✔ Factura 1 emitida
+  ✔ No se puede facturar con una factura ACTIVA → 409
+  ✔ Anular la factura → 200
+  ✔ Refacturar el pedido tras anular → 201 (antes 500)
+  ✔ La nueva factura tiene otro número
+  ✔ El pedido apunta a la factura ACTIVA (no a la anulada)
+  ✔ La factura anulada se conserva como historial
+  ✔ La factura anulada sigue listada con su estado
+9g) M12: trazabilidad del pagador (interno vs portal)
+  ✔ GET /pagos expone registrado_por y su tipo
+  ✔ Un pago del portal queda identificado como CLIENTE
+  ✔ Un pago interno queda identificado como INTERNO
+  ✔ El portal ve quién registró sus pagos
+9h) Salvaguardas: no quedarse sin administradores
+  ✔ Un ADMIN no puede desactivar su propia cuenta → 409
+  ✔ Crear un segundo administrador → 201
+  ✔ Con otro ADMIN activo, desactivar a uno se permite
+9d) Balance por cliente y envío del estado financiero
+  ✔ Balance por cliente → 200 con resumen y lista
+  ✔ Resumen del balance coherente
+  ✔ El cliente nuevo aparece en el balance
+  ✔ Resumen financiero para correo → asunto + cuerpo + destinatario
+  ✔ Cuerpo incluye facturas y saldos
+  ✔ Resumen de cliente inexistente → 404
+10) Reportes y auditoría
+  ✔ Resumen de reportes
+  ✔ Auditoría registra pagos
+11) Seguridad (cabeceras HTTP, CORS y rate limit)
+  ✔ Cabecera de seguridad X-Content-Type-Options: nosniff
+  ✔ Cabecera de seguridad X-Frame-Options presente
+  ✔ No se revela el motor web (sin X-Powered-By)
+  ✔ CORS: origen permitido recibe la cabecera
+  ✔ CORS: origen no permitido es bloqueado
+  ✔ Fuerza bruta: intentos fallidos consecutivos → 429
+  ✔ Login correcto tras bloqueo → 200 (el acierto resetea el contador)
+  ✔ Token renovado sigue aislado en el portal
+12) Recuperación de contraseña (OTP) y datos de pago en línea
+  ✔ Solicitar código → 200 y en demo llega el OTP
+  ✔ Solicitud sin usuario → 400
+  ✔ Cuenta inexistente no se revela (200 genérica sin OTP)
+  ✔ Código incorrecto → 401 en cada intento y se bloquea a los 5
+  ✔ Con intentos agotados el código correcto ya no vale
+  ✔ Nuevo código tras agotar el anterior
+  ✔ Código incorrecto rechazado → 401
+  ✔ Cambiar contraseña con código válido → 200
+  ✔ Login con la nueva contraseña → 200
+  ✔ La contraseña anterior ya no sirve → 401
+  ✔ El código usado no se puede reutilizar
+12b) A7: el cambio de contraseña cierra las sesiones anteriores
+  ✔ Token nuevo funciona antes de cambiar la contraseña
+  ✔ Segundo cambio de contraseña → 200
+  ✔ Token ANTERIOR al cambio de contraseña → 401 (sesión cerrada)
+  ✔ El token del registro también queda invalidado → 401
+  ✔ Token emitido DESPUÉS del cambio → 200
+  ✔ Token con firma manipulada → 401
+  ✔ Sesión retomada tras el cambio de contraseña (REGT renovado)
+  ✔ Factura nueva para pruebas de pago en línea
+  ✔ Tarjeta sin datos → 400 (campos obligatorios)
+  ✔ Tarjeta con CVV inválido → 400
+  ✔ Tarjeta que no pasa Luhn → 400
+  ✔ Tarjeta vencida → 400
+  ✔ Pago con tarjeta válida → 201
+  ✔ Transferencia sin datos → 400
+  ✔ Pago por transferencia válido → 201
+  ✔ Cheque sin banco → 400
+  ✔ Interno: tarjeta sin datos → 400 (validación compartida)
+  ✔ Interno: pago con tarjeta válida → 201
+  ✔ Interno: cheque con banco y número → 201
+  ✔ Se guardan solo los últimos 4 dígitos y la marca de la tarjeta
+  ✔ Nunca se exponen CVV ni número completo de tarjeta
+
+=== Resultado: 154 aprobadas, 0 fallidas ===
+

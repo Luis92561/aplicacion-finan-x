@@ -1,0 +1,1671 @@
+{
+  "generado": "2026-10-12T01:24:48.277Z",
+  "filas": [
+    {
+      "ambito": "backend",
+      "nombre": "accepts",
+      "version": "1.3.8",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "array-flatten",
+      "version": "1.1.1",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "bcryptjs",
+      "version": "2.4.3",
+      "licencia": "MIT",
+      "tipo": "directa"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "body-parser",
+      "version": "1.20.8",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "buffer-equal-constant-time",
+      "version": "1.0.1",
+      "licencia": "BSD-3-Clause",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "bytes",
+      "version": "3.1.2",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "call-bind-apply-helpers",
+      "version": "1.0.2",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "call-bound",
+      "version": "1.0.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "content-disposition",
+      "version": "0.5.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "content-type",
+      "version": "1.0.5",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "cookie",
+      "version": "0.7.2",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "cookie-signature",
+      "version": "1.0.7",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "cors",
+      "version": "2.8.6",
+      "licencia": "MIT",
+      "tipo": "directa"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "debug",
+      "version": "2.6.9",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "depd",
+      "version": "2.0.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "destroy",
+      "version": "1.2.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "dotenv",
+      "version": "16.6.1",
+      "licencia": "BSD-2-Clause",
+      "tipo": "directa"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "dunder-proto",
+      "version": "1.0.1",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "ecdsa-sig-formatter",
+      "version": "1.0.11",
+      "licencia": "Apache-2.0",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "ee-first",
+      "version": "1.1.1",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "encodeurl",
+      "version": "2.0.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "es-define-property",
+      "version": "1.0.1",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "es-errors",
+      "version": "1.3.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "es-object-atoms",
+      "version": "1.1.2",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "escape-html",
+      "version": "1.0.3",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "etag",
+      "version": "1.8.1",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "express",
+      "version": "4.22.3",
+      "licencia": "MIT",
+      "tipo": "directa"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "express-rate-limit",
+      "version": "7.5.1",
+      "licencia": "MIT",
+      "tipo": "directa"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "finalhandler",
+      "version": "1.3.2",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "forwarded",
+      "version": "0.2.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "fresh",
+      "version": "0.5.2",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "function-bind",
+      "version": "1.1.2",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "get-intrinsic",
+      "version": "1.3.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "get-proto",
+      "version": "1.0.1",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "gopd",
+      "version": "1.2.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "has-symbols",
+      "version": "1.1.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "hasown",
+      "version": "2.0.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "helmet",
+      "version": "8.3.0",
+      "licencia": "MIT",
+      "tipo": "directa"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "http-errors",
+      "version": "2.0.1",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "iconv-lite",
+      "version": "0.4.24",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "inherits",
+      "version": "2.0.4",
+      "licencia": "ISC",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "ipaddr.js",
+      "version": "1.9.1",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "jsonwebtoken",
+      "version": "9.0.3",
+      "licencia": "MIT",
+      "tipo": "directa"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "jwa",
+      "version": "2.0.1",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "jws",
+      "version": "4.0.1",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "lodash.includes",
+      "version": "4.3.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "lodash.isboolean",
+      "version": "3.0.3",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "lodash.isinteger",
+      "version": "4.0.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "lodash.isnumber",
+      "version": "3.0.3",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "lodash.isplainobject",
+      "version": "4.0.6",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "lodash.isstring",
+      "version": "4.0.1",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "lodash.once",
+      "version": "4.1.1",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "math-intrinsics",
+      "version": "1.1.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "media-typer",
+      "version": "0.3.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "merge-descriptors",
+      "version": "1.0.3",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "methods",
+      "version": "1.1.2",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "mime",
+      "version": "1.6.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "mime-db",
+      "version": "1.52.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "mime-types",
+      "version": "2.1.35",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "ms",
+      "version": "2.0.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "negotiator",
+      "version": "0.6.3",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "object-assign",
+      "version": "4.1.1",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "object-inspect",
+      "version": "1.13.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "on-finished",
+      "version": "2.4.1",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "parseurl",
+      "version": "1.3.3",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "path-to-regexp",
+      "version": "0.1.13",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "pg",
+      "version": "8.23.0",
+      "licencia": "MIT",
+      "tipo": "directa"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "pg-cloudflare",
+      "version": "1.4.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "pg-connection-string",
+      "version": "2.14.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "pg-int8",
+      "version": "1.0.1",
+      "licencia": "ISC",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "pg-pool",
+      "version": "3.14.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "pg-protocol",
+      "version": "1.16.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "pg-types",
+      "version": "2.2.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "pgpass",
+      "version": "1.0.5",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "postgres-array",
+      "version": "2.0.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "postgres-bytea",
+      "version": "1.0.1",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "postgres-date",
+      "version": "1.0.7",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "postgres-interval",
+      "version": "1.2.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "proxy-addr",
+      "version": "2.0.8",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "qs",
+      "version": "6.16.0",
+      "licencia": "BSD-3-Clause",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "range-parser",
+      "version": "1.2.1",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "raw-body",
+      "version": "2.5.3",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "safe-buffer",
+      "version": "5.2.1",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "safer-buffer",
+      "version": "2.1.2",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "semver",
+      "version": "7.8.5",
+      "licencia": "ISC",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "send",
+      "version": "0.19.2",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "serve-static",
+      "version": "1.16.3",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "setprototypeof",
+      "version": "1.2.0",
+      "licencia": "ISC",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "side-channel",
+      "version": "1.1.1",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "side-channel-list",
+      "version": "1.0.1",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "side-channel-map",
+      "version": "1.0.1",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "side-channel-weakmap",
+      "version": "1.0.2",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "split2",
+      "version": "4.2.0",
+      "licencia": "ISC",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "statuses",
+      "version": "2.0.2",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "toidentifier",
+      "version": "1.0.1",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "type-is",
+      "version": "1.6.18",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "unpipe",
+      "version": "1.0.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "utils-merge",
+      "version": "1.0.1",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "vary",
+      "version": "1.1.2",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "backend",
+      "nombre": "xtend",
+      "version": "4.0.2",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@babel/code-frame",
+      "version": "7.29.7",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@babel/compat-data",
+      "version": "7.29.7",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@babel/core",
+      "version": "7.29.7",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@babel/generator",
+      "version": "7.29.8",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@babel/helper-compilation-targets",
+      "version": "7.29.7",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@babel/helper-globals",
+      "version": "7.29.7",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@babel/helper-module-imports",
+      "version": "7.29.7",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@babel/helper-module-transforms",
+      "version": "7.29.7",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@babel/helper-plugin-utils",
+      "version": "7.29.7",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@babel/helper-string-parser",
+      "version": "7.29.7",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@babel/helper-validator-identifier",
+      "version": "7.29.7",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@babel/helper-validator-option",
+      "version": "7.29.7",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@babel/helpers",
+      "version": "7.29.7",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@babel/parser",
+      "version": "7.29.9",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@babel/plugin-transform-react-jsx-self",
+      "version": "7.29.7",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@babel/plugin-transform-react-jsx-source",
+      "version": "7.29.7",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@babel/template",
+      "version": "7.29.7",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@babel/traverse",
+      "version": "7.29.8",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@babel/types",
+      "version": "7.29.8",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@esbuild/aix-ppc64",
+      "version": "0.21.5",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@esbuild/android-arm",
+      "version": "0.21.5",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@esbuild/android-arm64",
+      "version": "0.21.5",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@esbuild/android-x64",
+      "version": "0.21.5",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@esbuild/darwin-arm64",
+      "version": "0.21.5",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@esbuild/darwin-x64",
+      "version": "0.21.5",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@esbuild/freebsd-arm64",
+      "version": "0.21.5",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@esbuild/freebsd-x64",
+      "version": "0.21.5",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@esbuild/linux-arm",
+      "version": "0.21.5",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@esbuild/linux-arm64",
+      "version": "0.21.5",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@esbuild/linux-ia32",
+      "version": "0.21.5",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@esbuild/linux-loong64",
+      "version": "0.21.5",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@esbuild/linux-mips64el",
+      "version": "0.21.5",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@esbuild/linux-ppc64",
+      "version": "0.21.5",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@esbuild/linux-riscv64",
+      "version": "0.21.5",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@esbuild/linux-s390x",
+      "version": "0.21.5",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@esbuild/linux-x64",
+      "version": "0.21.5",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@esbuild/netbsd-x64",
+      "version": "0.21.5",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@esbuild/openbsd-x64",
+      "version": "0.21.5",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@esbuild/sunos-x64",
+      "version": "0.21.5",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@esbuild/win32-arm64",
+      "version": "0.21.5",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@esbuild/win32-ia32",
+      "version": "0.21.5",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@esbuild/win32-x64",
+      "version": "0.21.5",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@jridgewell/gen-mapping",
+      "version": "0.3.13",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@jridgewell/remapping",
+      "version": "2.3.5",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@jridgewell/resolve-uri",
+      "version": "3.1.2",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@jridgewell/sourcemap-codec",
+      "version": "1.6.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@jridgewell/trace-mapping",
+      "version": "0.3.31",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@napi-rs/lzma-linux-x64-gnu",
+      "version": "1.5.1",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@remix-run/router",
+      "version": "1.23.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@rolldown/pluginutils",
+      "version": "1.0.0-beta.27",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@rollup/rollup-android-arm-eabi",
+      "version": "4.63.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@rollup/rollup-android-arm64",
+      "version": "4.63.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@rollup/rollup-darwin-arm64",
+      "version": "4.63.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@rollup/rollup-darwin-x64",
+      "version": "4.63.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@rollup/rollup-freebsd-arm64",
+      "version": "4.63.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@rollup/rollup-freebsd-x64",
+      "version": "4.63.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@rollup/rollup-linux-arm-gnueabihf",
+      "version": "4.63.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@rollup/rollup-linux-arm-musleabihf",
+      "version": "4.63.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@rollup/rollup-linux-arm64-gnu",
+      "version": "4.63.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@rollup/rollup-linux-arm64-musl",
+      "version": "4.63.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@rollup/rollup-linux-loong64-gnu",
+      "version": "4.63.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@rollup/rollup-linux-loong64-musl",
+      "version": "4.63.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@rollup/rollup-linux-ppc64-gnu",
+      "version": "4.63.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@rollup/rollup-linux-ppc64-musl",
+      "version": "4.63.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@rollup/rollup-linux-riscv64-gnu",
+      "version": "4.63.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@rollup/rollup-linux-riscv64-musl",
+      "version": "4.63.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@rollup/rollup-linux-s390x-gnu",
+      "version": "4.63.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@rollup/rollup-linux-x64-gnu",
+      "version": "4.63.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@rollup/rollup-linux-x64-musl",
+      "version": "4.63.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@rollup/rollup-openbsd-x64",
+      "version": "4.63.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@rollup/rollup-openharmony-arm64",
+      "version": "4.63.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@rollup/rollup-win32-arm64-msvc",
+      "version": "4.63.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@rollup/rollup-win32-ia32-msvc",
+      "version": "4.63.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@rollup/rollup-win32-x64-gnu",
+      "version": "4.63.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@rollup/rollup-win32-x64-msvc",
+      "version": "4.63.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@types/babel__core",
+      "version": "7.20.5",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@types/babel__generator",
+      "version": "7.27.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@types/babel__template",
+      "version": "7.4.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@types/babel__traverse",
+      "version": "7.28.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@types/estree",
+      "version": "1.0.9",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "@vitejs/plugin-react",
+      "version": "4.7.0",
+      "licencia": "MIT",
+      "tipo": "desarrollo"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "agent-base",
+      "version": "6.0.2",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "asynckit",
+      "version": "0.4.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "axios",
+      "version": "1.20.0",
+      "licencia": "MIT",
+      "tipo": "directa"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "baseline-browser-mapping",
+      "version": "2.11.25",
+      "licencia": "Apache-2.0",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "browserslist",
+      "version": "4.29.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "call-bind-apply-helpers",
+      "version": "1.0.2",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "caniuse-lite",
+      "version": "1.0.30001810",
+      "licencia": "CC-BY-4.0",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "combined-stream",
+      "version": "1.0.8",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "convert-source-map",
+      "version": "2.0.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "debug",
+      "version": "4.4.3",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "delayed-stream",
+      "version": "1.0.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "dunder-proto",
+      "version": "1.0.1",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "electron-to-chromium",
+      "version": "1.5.433",
+      "licencia": "ISC",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "es-define-property",
+      "version": "1.0.1",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "es-errors",
+      "version": "1.3.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "es-object-atoms",
+      "version": "1.1.2",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "es-set-tostringtag",
+      "version": "2.1.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "esbuild",
+      "version": "0.21.5",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "escalade",
+      "version": "3.2.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "follow-redirects",
+      "version": "1.16.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "form-data",
+      "version": "4.0.6",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "fsevents",
+      "version": "2.3.3",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "function-bind",
+      "version": "1.1.2",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "gensync",
+      "version": "1.0.0-beta.2",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "get-intrinsic",
+      "version": "1.3.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "get-proto",
+      "version": "1.0.1",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "gopd",
+      "version": "1.2.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "has-symbols",
+      "version": "1.1.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "has-tostringtag",
+      "version": "1.0.2",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "hasown",
+      "version": "2.0.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "https-proxy-agent",
+      "version": "5.0.1",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "js-tokens",
+      "version": "4.0.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "jsesc",
+      "version": "3.1.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "json5",
+      "version": "2.2.3",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "loose-envify",
+      "version": "1.4.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "lru-cache",
+      "version": "5.1.1",
+      "licencia": "ISC",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "math-intrinsics",
+      "version": "1.1.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "mime-db",
+      "version": "1.52.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "mime-types",
+      "version": "2.1.35",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "ms",
+      "version": "2.1.3",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "nanoid",
+      "version": "3.3.19",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "node-releases",
+      "version": "2.0.56",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "picocolors",
+      "version": "1.1.1",
+      "licencia": "ISC",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "postcss",
+      "version": "8.5.28",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "proxy-from-env",
+      "version": "2.1.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "react",
+      "version": "18.3.1",
+      "licencia": "MIT",
+      "tipo": "directa"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "react-dom",
+      "version": "18.3.1",
+      "licencia": "MIT",
+      "tipo": "directa"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "react-refresh",
+      "version": "0.17.0",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "react-router",
+      "version": "6.30.6",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "react-router-dom",
+      "version": "6.30.6",
+      "licencia": "MIT",
+      "tipo": "directa"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "rollup",
+      "version": "4.63.4",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "scheduler",
+      "version": "0.23.2",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "semver",
+      "version": "6.3.1",
+      "licencia": "ISC",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "source-map-js",
+      "version": "1.2.1",
+      "licencia": "BSD-3-Clause",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "update-browserslist-db",
+      "version": "1.3.3",
+      "licencia": "MIT",
+      "tipo": "transitiva"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "vite",
+      "version": "5.4.21",
+      "licencia": "MIT",
+      "tipo": "desarrollo"
+    },
+    {
+      "ambito": "frontend",
+      "nombre": "yallist",
+      "version": "3.1.1",
+      "licencia": "ISC",
+      "tipo": "transitiva"
+    }
+  ]
+}
