@@ -92,12 +92,9 @@ const ALTO = Math.ceil(Math.max(...altoColumnas)) + 120;
 
 // Diagnostico: si alguna entidad no quedo situada, el diagrama saldria roto.
 {
-  const situadas = Object.keys(geo);
   const faltan = tablas.filter((t) => !geo[t]);
-  console.log(`  entidades situadas: ${situadas.length}/${tablas.length}  alto=${ALTO}`);
   if (faltan.length) throw new Error(`Sin geometria: ${faltan.join(', ')}`);
-  if (!geo.roles) console.log('  DEBUG geo.roles =', JSON.stringify(geo.roles));
-  else console.log(`  DEBUG geo.roles x=${geo.roles.x} y=${geo.roles.y} w=${geo.roles.w} h=${geo.roles.h}`);
+  console.log(`  diagrama: ${Object.keys(geo).length} entidades situadas, alto ${ALTO}`);
 }
 
 function esc(s) {
@@ -462,24 +459,6 @@ ${tabla(
   esquema.uniques.map((u) => [{ t: `<code>${u.table_name}</code>` }, { t: `<code>${u.column_name}</code>` }, { t: `<code>${u.constraint_name}</code>` }]),
   { compacta: true },
 )}
-
-<h1>6. Coherencia con los demás documentos</h1>
-<p>El modelo es la base de la cadena documental del proyecto. Los nombres de las entidades se mantienen idénticos en:</p>
-<ul>
-  <li><strong>Evidencia 2 · Diccionario de datos</strong>: cada columna de cada entidad, con su tipo y descripción.</li>
-  <li><strong>Evidencia 3 · ERS (IEEE 830)</strong>: los requisitos se refieren a estas entidades.</li>
-  <li><strong>Evidencia 6 · Matriz de trazabilidad</strong>: relaciona cada requisito con la entidad y la prueba que lo verifica.</li>
-  <li><strong>Evidencia 7 · Pruebas de integración</strong>: las pruebas verifican estas reglas contra el sistema real.</li>
-</ul>
-
-<div class="caja">
-  <span class="titulo">Cómo regenerar este documento</span>
-  <p>El diagrama y las tablas se generan a partir del esquema real. Si la base cambia, se vuelve a ejecutar:</p>
-  <pre><code># 1. Extraer el esquema de la base de datos en ejecución
-cd backend &amp;&amp; node scripts/generar-esquema.mjs
-# 2. Regenerar el documento
-cd .. &amp;&amp; node documentacion/_generador/01-mer.mjs</code></pre>
-</div>
 
 <footer class="pie-doc">FINAN-X · Evidencia 1 de 7 · Modelo Entidad-Relación · Generado a partir del esquema real de PostgreSQL 16 (${tablas.length} tablas, ${esquema.columnas.length} columnas).</footer>
 `;
