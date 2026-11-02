@@ -15,6 +15,8 @@ remediación, el panel de control interactivo y el flujo de primer ingreso.
 - **Eliminar cliente** desde la pantalla de Clientes (solo ADMIN). Se permite únicamente
   si el cliente no tiene pedidos, facturas, pagos ni notas de crédito; si tiene historial,
   la API responde 409 y se sugiere inactivarlo. La operación queda en auditoría.
+- **Catálogo tecnológico de ejemplo**: 20 productos de informática con precios de
+  referencia en COP, IVA del 19 % y características (`base/productos-tecnologicos.sql`).
 - **Panel de control interactivo** con indicadores, gráficas (Recharts) y tabla con
   búsqueda, orden, paginación y exportación a CSV. Contenido distinto según el rol:
   el CAJERO ve solo su caja.

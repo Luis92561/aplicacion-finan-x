@@ -23,6 +23,12 @@ docker compose exec -T db psql -U postgres -d finanx -f /tmp/finanx-demo.sql || 
   exit 1
 }
 
+docker compose cp base/productos-tecnologicos.sql db:/tmp/productos-tec.sql
+docker compose exec -T db psql -U postgres -d finanx -f /tmp/productos-tec.sql || {
+  echo "[X] No se pudo cargar el catálogo tecnológico."
+  exit 1
+}
+
 open "http://localhost:8080"
 echo "[OK] Datos de demostración cargados."
 sleep 2

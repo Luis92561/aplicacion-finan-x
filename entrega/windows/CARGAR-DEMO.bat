@@ -24,6 +24,10 @@ docker compose cp base/finanx-demo.sql db:/tmp/finanx-demo.sql
 docker compose exec -T db psql -U postgres -d finanx -f /tmp/finanx-demo.sql
 if errorlevel 1 ( echo [X] No se pudieron cargar los datos. & pause & exit /b 1 )
 
+docker compose cp base/productos-tecnologicos.sql db:/tmp/productos-tec.sql
+docker compose exec -T db psql -U postgres -d finanx -f /tmp/productos-tec.sql
+if errorlevel 1 ( echo [X] No se pudo cargar el catalogo tecnologico. & pause & exit /b 1 )
+
 start "" http://localhost:8080
 echo [OK] Datos de demostracion cargados.
 timeout /t 6 >nul
