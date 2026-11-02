@@ -54,6 +54,7 @@
 | `04-seguridad/02-Hallazgos.csv` | Hallazgos en formato de tabla. |
 | `04-seguridad/03-Metodologia-y-Evidencias.md` | Método, comandos y hashes de la auditoría. |
 | `04-seguridad/04-Estado-de-Remediacion.md` | Qué se corrigió y cómo se verificó. |
+| `04-seguridad/05-Revision-Lanzamiento-GO-NO-GO.md` | Revisión del comité de lanzamiento (QA, DevOps, Tech Lead y Producto) con veredicto GO/NO-GO. |
 
 ## 05 · Usuarios
 
