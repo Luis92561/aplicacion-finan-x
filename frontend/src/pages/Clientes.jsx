@@ -14,8 +14,9 @@ export default function Clientes() {
   const [showForm, setShowForm] = useState(false);
   const [edit, setEdit] = useState(null);
   const [form, setForm] = useState(EMPTY);
-  const [cuenta, setCuenta] = useState({ username: '', password: '' });
+  const [cuenta, setCuenta] = useState({ username: '' });
   const [cuentaPara, setCuentaPara] = useState(null);
+  const [temporal, setTemporal] = useState(null);
   const [msg, setMsg] = useState('');
 
   const load = async () => {
@@ -63,11 +64,12 @@ export default function Clientes() {
 
   const crearCuenta = async (e) => {
     e.preventDefault();
-    setError(''); setMsg('');
+    setError(''); setMsg(''); setTemporal(null);
     try {
-      await api.post(`/clientes/${cuentaPara}/cuenta`, cuenta);
-      setCuentaPara(null); setCuenta({ username: '', password: '' });
-      setMsg('Cuenta de acceso creada');
+      const res = await api.post(`/clientes/${cuentaPara}/cuenta`, cuenta);
+      setCuentaPara(null); setCuenta({ username: '' });
+      setMsg('Cuenta de acceso creada. El cliente debe cambiar la contraseña al entrar.');
+      if (res.clave_temporal) setTemporal({ usuario: res.username, clave: res.clave_temporal });
       await load();
     } catch (err) { setError(errMsg(err)); }
   };
@@ -77,7 +79,7 @@ export default function Clientes() {
     try {
       const res = await api.get(`/clientes/${r.cliente_id}/resumen-correo`);
       if (!res.destinatario) { setError(`${r.nombre_razon_social} no tiene correo registrado`); return; }
-      window.location.href = `mailto:${res.destinatario}?subject=${encodeURIComponent(res.asunto)}&body=${encodeURIComponent(res.cuerpo)}`;
+      window.location.href = `mailto:${encodeURIComponent(res.destinatario)}?subject=${encodeURIComponent(res.asunto)}&body=${encodeURIComponent(res.cuerpo)}`;
       setMsg(`Se abrió su programa de correo con el estado financiero de ${r.nombre_razon_social} (${res.destinatario})`);
     } catch (err) { setError(errMsg(err)); }
   };
@@ -156,7 +158,9 @@ export default function Clientes() {
                       <td>{r.correo || '—'}</td>
                       <td>{r.ciudad || '—'}</td>
                       <td><Estado value={r.estado} /></td>
-                      <td>{r.tiene_cuenta ? <Badge tone="green">Cuenta</Badge> : <button className="btn btn-ghost btn-sm" onClick={() => { setCuentaPara(r.cliente_id); setCuenta({ username: '', password: '' }); }}>Crear cuenta</button>}</td>
+                      <td>{r.tiene_cuenta ? <Badge tone="green">Cuenta</Badge> : (user?.rol === 'ADMIN'
+                        ? <button className="btn btn-ghost btn-sm" onClick={() => { setCuentaPara(r.cliente_id); setCuenta({ username: '' }); }}>Crear cuenta</button>
+                        : <span className="muted">—</span>)}</td>
                       <td className="num"><Money value={r.saldo_pendiente} /></td>
                       <td>
                         <div className="row-actions">
@@ -177,14 +181,26 @@ export default function Clientes() {
           )}
         </div>
 
+        {temporal && (
+          <div className="alert alert-info">
+            <div><b>Contraseña temporal de {temporal.usuario}:</b> <code>{temporal.clave}</code></div>
+            <div style={{ fontSize: 12.5, marginTop: 4 }}>
+              Se muestra una sola vez. El cliente deberá cambiarla en su primer ingreso.
+            </div>
+          </div>
+        )}
+
         {cuentaPara != null && (
           <div className="card">
             <h3>Crear cuenta de acceso del cliente</h3>
+            <p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 0 }}>
+              Se generará una contraseña temporal que se muestra una sola vez. El cliente
+              deberá cambiarla al entrar al portal.
+            </p>
             <form onSubmit={crearCuenta} className="form-grid">
               <div className="field"><label>Usuario *</label>
-                <input value={cuenta.username} onChange={(e) => setCuenta({ ...cuenta, username: e.target.value })} required /></div>
-              <div className="field"><label>Contraseña *</label>
-                <input value={cuenta.password} onChange={(e) => setCuenta({ ...cuenta, password: e.target.value })} required minLength={6} /></div>
+                <input value={cuenta.username} onChange={(e) => setCuenta({ ...cuenta, username: e.target.value })}
+                  pattern="[a-zA-Z0-9._-]{3,32}" placeholder="nombre.apellido" required /></div>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 <button className="btn btn-primary" type="submit">Crear</button>
                 <button className="btn btn-ghost" type="button" onClick={() => setCuentaPara(null)}>Cancelar</button>

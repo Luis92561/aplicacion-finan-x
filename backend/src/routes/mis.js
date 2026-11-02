@@ -8,7 +8,14 @@ const router = Router();
 
 // Todas las rutas del portal requieren sesión de cliente.
 // El clienteId SIEMPRE se toma del token autenticado (aislamiento por cliente).
-router.use(requireAuth, requireCliente);
+//
+// El middleware se aplica solo a las rutas /mis-* y /mi-*: este router se monta en /api,
+// así que si se aplicara a todo, cualquier ruta interna inexistente caería aquí y
+// respondería "reservada para clientes" en lugar de 404 (y podría tapar rutas futuras).
+router.use((req, res, next) => {
+  if (!/^\/(mis-|mi-)/.test(req.path)) return next();
+  return requireAuth(req, res, () => requireCliente(req, res, next));
+});
 
 // GET /api/mis-datos
 router.get('/mis-datos', async (req, res, next) => {
@@ -102,7 +109,9 @@ router.get('/mis-pagos', async (req, res, next) => {
   try {
     const rows = await pool.query(
       `SELECT pg.pago_id, pg.numero_pago, pg.fecha, pg.valor::float8, pg.metodo_pago, pg.referencia, pg.observaciones,
-              pg.banco, pg.titular, pg.tipo_tarjeta, pg.ultimos_digitos_tarjeta, pg.vencimiento_tarjeta, pg.numero_cuenta,
+              pg.banco, pg.titular, pg.tipo_tarjeta, pg.ultimos_digitos_tarjeta,
+              CASE WHEN pg.numero_cuenta IS NULL THEN NULL
+                   ELSE '····' || RIGHT(pg.numero_cuenta, 4) END AS numero_cuenta,
               COALESCE(ui.nombre, uc.username) AS registrado_por,
               CASE WHEN pg.usuario_cliente_id IS NOT NULL THEN 'CLIENTE' ELSE 'INTERNO' END AS registrado_por_tipo,
               f.numero_factura, f.estado
@@ -155,7 +164,7 @@ router.get('/mis-pagos/efecty-codigo', async (req, res, next) => {
 
     const codigo = codigoEfecty(facturaId, valor);
     await audit({
-      usuario: req.user.username, usuarioTipo: 'CLIENTE', modulo: 'Pagos', operacion: 'CODIGO_EFECTY',
+      req, usuario: req.user.username, usuarioTipo: 'CLIENTE', modulo: 'Pagos', operacion: 'CODIGO_EFECTY',
       registro: f.rows[0].numero_factura,
       descripcion: `Código Efecty ${codigo} generado por $${valor} (saldo $${saldo})`,
     });
@@ -219,7 +228,9 @@ router.get('/mi-historial', async (req, res, next) => {
     );
     const pagos = await pool.query(
       `SELECT pg.numero_pago, pg.fecha, pg.valor::float8, pg.metodo_pago, pg.banco, pg.tipo_tarjeta,
-              pg.ultimos_digitos_tarjeta, pg.numero_cuenta,
+              pg.ultimos_digitos_tarjeta,
+              CASE WHEN pg.numero_cuenta IS NULL THEN NULL
+                   ELSE '····' || RIGHT(pg.numero_cuenta, 4) END AS numero_cuenta,
               COALESCE(ui.nombre, uc.username) AS registrado_por,
               CASE WHEN pg.usuario_cliente_id IS NOT NULL THEN 'CLIENTE' ELSE 'INTERNO' END AS registrado_por_tipo,
               f.numero_factura
@@ -310,7 +321,7 @@ router.post('/mis-pagos', async (req, res, next) => {
     // La auditoría entra en la MISMA transacción: antes iba después del COMMIT y al pool,
     // así que un fallo al auditar dejaba el pago registrado sin traza.
     await audit({
-      client,
+      req, client,
       usuario: req.user.username, usuarioTipo: 'CLIENTE', modulo: 'Pagos', operacion: 'PAGO_PORTAL',
       registro: numero, descripcion: `Pago desde el portal de $${valorNum} en ${f.rows[0].numero_factura} (${metodo}) · saldo $${nuevoSaldo}`,
     });

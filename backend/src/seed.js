@@ -19,6 +19,20 @@ async function waitForDb() {
 async function seed() {
   await waitForDb();
 
+  // El seed es SOLO para desarrollo y demostración. En producción las cuentas se crean
+  // con `npm run init:usuarios` (claves temporales + cambio obligatorio). Si se ejecutara
+  // aquí, volverían a existir usuarios con contraseñas conocidas.
+  if (process.env.NODE_ENV === 'production') {
+    console.error('FINAN-X: el seed de demostración no se ejecuta en producción. Use: npm run init:usuarios');
+    await pool.end();
+    process.exit(1);
+  }
+  if (process.env.SEED_DEMO !== 'true') {
+    console.log('FINAN-X: seed omitido. Para datos de demostración: SEED_DEMO=true npm run seed:demo');
+    await pool.end();
+    return;
+  }
+
   const roles = [
     ['ADMIN', 'Administración del sistema y gestión de usuarios'],
     ['FACTURADOR', 'Gestión de clientes, pedidos y facturas'],
@@ -35,19 +49,19 @@ async function seed() {
   console.log('✔ Roles listos');
 
   const usuarios = [
-    { nombre: 'Administrador', correo: 'admin@finanx.test', rol: 'ADMIN', password: 'admin123' },
-    { nombre: 'Facturador', correo: 'facturador@finanx.test', rol: 'FACTURADOR', password: 'facturador123' },
-    { nombre: 'Cajero', correo: 'cajero@finanx.test', rol: 'CAJERO', password: 'cajero123' },
-    { nombre: 'Supervisor', correo: 'supervisor@finanx.test', rol: 'SUPERVISOR', password: 'supervisor123' },
+    { nombre: 'Administrador', correo: 'admin@finanx.test', username: 'demo.admin', rol: 'ADMIN', password: 'admin123' },
+    { nombre: 'Facturador', correo: 'facturador@finanx.test', username: 'demo.facturador', rol: 'FACTURADOR', password: 'facturador123' },
+    { nombre: 'Cajero', correo: 'cajero@finanx.test', username: 'demo.cajero', rol: 'CAJERO', password: 'cajero123' },
+    { nombre: 'Supervisor', correo: 'supervisor@finanx.test', username: 'demo.supervisor', rol: 'SUPERVISOR', password: 'supervisor123' },
   ];
   for (const u of usuarios) {
-    const exists = await pool.query('SELECT 1 FROM usuarios WHERE correo = $1', [u.correo]);
+    const exists = await pool.query('SELECT 1 FROM usuarios WHERE correo = $1 OR LOWER(COALESCE(username,\'\')) = $2', [u.correo, u.username]);
     if (exists.rowCount) continue;
-    const hash = await bcrypt.hash(u.password, 10);
+    const hash = await bcrypt.hash(u.password, 12);
     await pool.query(
-      `INSERT INTO usuarios (nombre, correo, password_hash, rol_id)
-       SELECT $1, $2, $3, rol_id FROM roles WHERE nombre = $4`,
-      [u.nombre, u.correo, hash, u.rol]
+      `INSERT INTO usuarios (nombre, correo, username, password_hash, rol_id)
+       SELECT $1, $2, $3, $4, rol_id FROM roles WHERE nombre = $5`,
+      [u.nombre, u.correo, u.username, hash, u.rol]
     );
   }
   console.log('✔ Usuarios internos listos');
@@ -86,7 +100,7 @@ async function seed() {
     const cid = cli.rows[0].cliente_id;
     const exists = await pool.query('SELECT 1 FROM usuario_cliente WHERE cliente_id = $1', [cid]);
     if (!exists.rowCount) {
-      const hash = await bcrypt.hash('cliente123', 10);
+      const hash = await bcrypt.hash('cliente123', 12);
       await pool.query(
         `INSERT INTO usuario_cliente (cliente_id, username, password_hash) VALUES ($1, $2, $3)`,
         [cid, 'cliente@finanx.test', hash]

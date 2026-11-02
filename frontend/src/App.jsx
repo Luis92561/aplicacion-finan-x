@@ -1,8 +1,9 @@
-import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from './auth.jsx';
 import { Shell } from './components/Layout.jsx';
 
 import Login from './pages/Login.jsx';
+import CambiarClave from './pages/CambiarClave.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import Clientes from './pages/Clientes.jsx';
 import Productos from './pages/Productos.jsx';
@@ -26,9 +27,18 @@ import MiSaldo from './pages/portal/MiSaldo.jsx';
 import MiHistorial from './pages/portal/MiHistorial.jsx';
 import MisNotasCredito from './pages/portal/MisNotasCredito.jsx';
 
+/**
+ * La sesión se resuelve contra el servidor (cookie HttpOnly). Si la cuenta debe cambiar
+ * la contraseña, no se puede navegar a ninguna otra pantalla: se redirige al cambio.
+ */
 function RequireAuth() {
   const { user } = useAuth();
-  return user ? <Outlet /> : <Navigate to="/login" replace />;
+  const { pathname } = useLocation();
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.debeCambiarClave && pathname !== '/cambiar-clave') {
+    return <Navigate to="/cambiar-clave" replace />;
+  }
+  return <Outlet />;
 }
 
 function RequireInternal() {
@@ -62,6 +72,8 @@ export default function App() {
       <Route path="/login" element={<Login />} />
 
       <Route element={<RequireAuth />}>
+        <Route path="/cambiar-clave" element={<CambiarClave />} />
+
         <Route element={<Shell />}>
           {/* Portal del cliente */}
           <Route element={<RequireCliente />}>
@@ -85,10 +97,17 @@ export default function App() {
             <Route path="/facturas" element={<Facturas />} />
             <Route path="/facturas/:id" element={<FacturaDetalle />} />
             <Route path="/pagos" element={<Pagos />} />
-            <Route path="/notas-credito" element={<NotasCredito />} />
-            <Route path="/balance-clientes" element={<BalanceClientes />} />
-            <Route path="/reportes" element={<Reportes />} />
-            <Route path="/auditoria" element={<Auditoria />} />
+
+            <Route element={<RequireRol roles={['ADMIN', 'SUPERVISOR']} />}>
+              <Route path="/notas-credito" element={<NotasCredito />} />
+              <Route path="/auditoria" element={<Auditoria />} />
+            </Route>
+
+            <Route element={<RequireRol roles={['ADMIN', 'SUPERVISOR', 'FACTURADOR']} />}>
+              <Route path="/reportes" element={<Reportes />} />
+              <Route path="/balance-clientes" element={<BalanceClientes />} />
+            </Route>
+
             <Route element={<RequireRol roles={['ADMIN']} />}>
               <Route path="/usuarios" element={<Usuarios />} />
             </Route>

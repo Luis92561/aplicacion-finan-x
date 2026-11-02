@@ -41,7 +41,7 @@ export default function BalanceClientes() {
     try {
       const r = await api.get(`/clientes/${c.cliente_id}/resumen-correo`);
       if (!r.destinatario) { setError('El cliente no tiene correo registrado'); return; }
-      const url = `mailto:${r.destinatario}?subject=${encodeURIComponent(r.asunto)}&body=${encodeURIComponent(r.cuerpo)}`;
+      const url = `mailto:${encodeURIComponent(r.destinatario)}?subject=${encodeURIComponent(r.asunto)}&body=${encodeURIComponent(r.cuerpo)}`;
       window.location.href = url;
       setMsg(`Se abrió su programa de correo para enviar el estado financiero de ${c.nombre_razon_social} a ${r.destinatario}`);
     } catch (e) { setError(errMsg(e)); } finally { setEnviando(null); }

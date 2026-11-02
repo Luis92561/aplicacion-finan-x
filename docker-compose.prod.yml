@@ -1,0 +1,26 @@
+# =====================================================================
+# FINAN-X · Superposición de producción (TLS en 80/443)
+#
+# Uso:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# Requiere:
+#   - .env con DOMAIN, JWT_SECRET, POSTGRES_PASSWORD, APP_DB_PASSWORD
+#   - certs/fullchain.pem y certs/privkey.pem (Let's Encrypt o el generador local)
+# =====================================================================
+services:
+  backend:
+    environment:
+      NODE_ENV: production
+      COOKIE_SECURE: "on"
+      REGISTRO_ABIERTO: "off"
+      OTP_RETORNO_DEMO: "off"
+      CORS_ORIGINS: ${CORS_ORIGINS:?Defina CORS_ORIGINS con https://su-dominio}
+
+  frontend:
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/nginx-tls.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./certs:/etc/nginx/certs:ro

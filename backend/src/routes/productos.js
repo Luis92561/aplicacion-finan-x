@@ -39,6 +39,8 @@ router.post('/', async (req, res, next) => {
     const { codigo, nombre, descripcion, categoria, precio, impuesto = 0, unidadMedida = 'UND' } = b;
     if (!codigo || !nombre) throw new HttpError(400, 'Código y nombre son obligatorios');
     if (!(Number(precio) >= 0)) throw new HttpError(400, 'El precio no puede ser negativo');
+    const impuestoNum = Number(impuesto);
+    if (!(impuestoNum >= 0 && impuestoNum <= 100)) throw new HttpError(400, 'El impuesto debe estar entre 0 y 100');
 
     const dup = await pool.query('SELECT 1 FROM productos WHERE codigo = $1', [codigo]);
     if (dup.rowCount) throw new HttpError(409, 'Ya existe un producto con ese código');
@@ -46,9 +48,9 @@ router.post('/', async (req, res, next) => {
     const r = await pool.query(
       `INSERT INTO productos (codigo, nombre, descripcion, categoria, precio, impuesto, unidad_medida)
        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING producto_id`,
-      [codigo, nombre, descripcion || null, categoria || null, precio, impuesto, unidadMedida]
+      [codigo, nombre, descripcion || null, categoria || null, precio, impuestoNum, unidadMedida]
     );
-    await audit({ usuario: req.user.correo, modulo: MODULO, operacion: 'CREAR', registro: r.rows[0].producto_id, descripcion: `Producto ${nombre} (${codigo}) a $${precio}` });
+    await audit({ req, usuario: req.user.correo, modulo: MODULO, operacion: 'CREAR', registro: r.rows[0].producto_id, descripcion: `Producto ${nombre} (${codigo}) a $${precio}` });
     res.status(201).json({ producto_id: r.rows[0].producto_id });
   } catch (e) { next(e); }
 });
@@ -74,7 +76,7 @@ router.put('/:id', async (req, res, next) => {
        WHERE producto_id = $7`,
       [b.nombre, b.descripcion || null, b.categoria || null, b.precio, impuesto, b.unidadMedida, id]
     );
-    await audit({ usuario: req.user.correo, modulo: MODULO, operacion: 'ACTUALIZAR', registro: id, descripcion: `Actualización del producto ${b.nombre}` });
+    await audit({ req, usuario: req.user.correo, modulo: MODULO, operacion: 'ACTUALIZAR', registro: id, descripcion: `Actualización del producto ${b.nombre}` });
     res.json({ ok: true });
   } catch (e) { next(e); }
 });
@@ -87,7 +89,7 @@ router.patch('/:id/estado', async (req, res, next) => {
     if (!['ACTIVO', 'INACTIVO'].includes(estado)) throw new HttpError(400, 'Estado inválido');
     const r = await pool.query('UPDATE productos SET estado = $1, fecha_actualizacion = NOW() WHERE producto_id = $2 RETURNING nombre', [estado, id]);
     if (!r.rowCount) throw new HttpError(404, 'Producto no encontrado');
-    await audit({ usuario: req.user.correo, modulo: MODULO, operacion: 'ESTADO', registro: id, descripcion: `Producto ${r.rows[0].nombre} → ${estado}` });
+    await audit({ req, usuario: req.user.correo, modulo: MODULO, operacion: 'ESTADO', registro: id, descripcion: `Producto ${r.rows[0].nombre} → ${estado}` });
     res.json({ ok: true });
   } catch (e) { next(e); }
 });

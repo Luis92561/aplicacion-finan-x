@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>FINAN-X · Modelo Entidad-Relación</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 20mm; }
+  :root{
+    --primary:#1e3a8a; --primary-dark:#172554; --accent:#2563eb;
+    --success:#15803d; --success-light:#dcfce7; --warning:#b45309; --warning-light:#fef3c7;
+    --danger:#b91c1c; --danger-light:#fee2e2; --purple:#6d28d9; --purple-light:#ede9fe;
+    --gray:#64748b; --gray-light:#e2e8f0; --bg:#f8fafc; --border:#e2e8f0; --muted:#64748b;
+  }
+  *{box-sizing:border-box}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+    color:#0f172a; margin:0; font-size:10.5pt; line-height:1.55; background:#fff;
+  }
+  .doc{max-width:100%;}
+
+  /* ---------- Portada ---------- */
+  .portada{
+    min-height:245mm; display:flex; flex-direction:column; justify-content:center;
+    text-align:center; page-break-after:always; padding:0 10mm;
+  }
+  .portada .marca{font-size:34pt; font-weight:800; color:var(--primary); letter-spacing:-1px; margin:0}
+  .portada .marca span{color:var(--accent)}
+  .portada .sub{font-size:13pt; color:var(--muted); margin:6px 0 30px}
+  .portada h1{font-size:21pt; color:var(--primary-dark); margin:0 0 8px; line-height:1.25}
+  .portada .evidencia{
+    display:inline-block; background:var(--primary); color:#fff; font-weight:700;
+    padding:5px 16px; border-radius:999px; font-size:10pt; margin-bottom:22px;
+  }
+  .portada .desc{font-size:11pt; color:#334155; max-width:140mm; margin:0 auto 32px}
+  .portada table.meta{margin:0 auto; border-collapse:collapse; font-size:9.5pt; text-align:left}
+  .portada table.meta td{padding:4px 10px; border-bottom:1px solid var(--border)}
+  .portada table.meta td:first-child{color:var(--muted); font-weight:600; white-space:nowrap}
+  .portada .pie{margin-top:38px; font-size:9pt; color:var(--muted)}
+
+  /* ---------- Encabezados ---------- */
+  h1{font-size:16pt; color:var(--primary-dark); margin:0 0 4px; padding-bottom:6px; border-bottom:2.5px solid var(--primary)}
+  h2{font-size:13pt; color:var(--primary); margin:20px 0 8px; padding-bottom:4px; border-bottom:1px solid var(--border); page-break-after:avoid}
+  h3{font-size:11.5pt; color:var(--primary-dark); margin:14px 0 6px; page-break-after:avoid}
+  h4{font-size:10.5pt; color:#334155; margin:11px 0 4px; page-break-after:avoid}
+  p{margin:6px 0}
+  ul,ol{margin:6px 0 6px 18px; padding:0}
+  li{margin:2.5px 0}
+  a{color:var(--accent); text-decoration:none}
+  code{font-family:'Cascadia Mono',Consolas,'Courier New',monospace; font-size:9pt; background:#f1f5f9; padding:1px 4px; border-radius:4px; color:#0f172a}
+  pre{
+    background:#0f172a; color:#e2e8f0; padding:9px 12px; border-radius:7px; font-size:8.5pt;
+    overflow-wrap:anywhere; white-space:pre-wrap; font-family:'Cascadia Mono',Consolas,monospace;
+    page-break-inside:avoid; margin:8px 0; line-height:1.45;
+  }
+  pre code{background:none; color:inherit; padding:0}
+
+  /* ---------- Tablas ---------- */
+  table{width:100%; border-collapse:collapse; margin:9px 0; font-size:9pt; page-break-inside:auto}
+  thead{display:table-header-group}
+  tr{page-break-inside:avoid}
+  th{
+    background:var(--primary); color:#fff; text-align:left; padding:5px 7px;
+    font-size:8.5pt; font-weight:700; text-transform:uppercase; letter-spacing:.3px;
+  }
+  td{padding:4.5px 7px; border-bottom:1px solid var(--border); vertical-align:top}
+  tbody tr:nth-child(even){background:#f8fafc}
+  td.num,th.num{text-align:right; white-space:nowrap}
+  td.c,th.c{text-align:center}
+  table.compacta td,table.compacta th{padding:3.5px 6px; font-size:8.5pt}
+
+  /* ---------- Cajas ---------- */
+  .caja{border-left:4px solid var(--accent); background:#eff6ff; padding:8px 12px; border-radius:0 7px 7px 0; margin:9px 0; page-break-inside:avoid}
+  .caja.ok{border-color:var(--success); background:var(--success-light)}
+  .caja.warn{border-color:var(--warning); background:var(--warning-light)}
+  .caja.err{border-color:var(--danger); background:var(--danger-light)}
+  .caja.purple{border-color:var(--purple); background:var(--purple-light)}
+  .caja p:first-child{margin-top:0}
+  .caja p:last-child{margin-bottom:0}
+  .caja .titulo{font-weight:700; display:block; margin-bottom:2px}
+
+  .badge{display:inline-block; padding:1px 8px; border-radius:999px; font-size:7.5pt; font-weight:700; white-space:nowrap}
+  .b-ok{background:var(--success-light); color:var(--success)}
+  .b-no{background:var(--danger-light); color:var(--danger)}
+  .b-warn{background:var(--warning-light); color:var(--warning)}
+  .b-info{background:#dbeafe; color:var(--primary)}
+  .b-gray{background:var(--gray-light); color:var(--gray)}
+  .b-purple{background:var(--purple-light); color:var(--purple)}
+
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  .grid3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:9px}
+  .kpi{border:1px solid var(--border); border-radius:8px; padding:8px 10px; text-align:center; background:var(--bg)}
+  .kpi .n{font-size:17pt; font-weight:800; color:var(--primary); line-height:1.1}
+  .kpi .t{font-size:8pt; color:var(--muted); text-transform:uppercase; letter-spacing:.4px}
+
+  .captura{border:1px solid var(--border); border-radius:8px; overflow:hidden; margin:9px 0; page-break-inside:avoid; break-inside:avoid}
+  .captura img{width:100%; display:block}
+  /* Capturas muy altas: sin limite ocuparian varias paginas y el navegador partiria el
+     marco, dejando un recuadro vacio en una pagina y la imagen suelta en la siguiente.
+     Se limitan a un alto que quepa de una vez y se centran. */
+  .captura img.alta{width:auto; max-width:100%; max-height:200mm; margin:0 auto}
+  .captura .pie{background:var(--bg); padding:5px 9px; font-size:8pt; color:var(--muted); border-top:1px solid var(--border)}
+  .captura .aviso{font-size:7.6pt; color:var(--muted); font-style:italic}
+
+  .salto{page-break-before:always}
+  .evitar-corte{page-break-inside:avoid}
+  .indice{font-size:10pt}
+  .indice li{margin:3px 0}
+  .firma{margin-top:38px; display:grid; grid-template-columns:1fr 1fr; gap:28px}
+  .firma .l{padding-top:5px; font-size:9pt; color:#334155}
+  .firma .l strong{display:block; color:#172554; font-size:9.5pt; margin-bottom:2px}
+  /* Cada dato bajo la firma va en su propio renglon, con el hueco para escribirlo. */
+  .firma .firma-datos{display:block; margin-bottom:1px}
+  /* Hueco en blanco para completar a mano (los datos de las partes en el contrato).
+     No lleva raya: la franja y el borde de la tabla ya indican donde va cada dato.
+     Es inline-block con ancho completo para que ocupe el ancho de su celda Y pueda
+     usarse dentro de una frase (la linea de la fecha de firma). */
+  .hueco{display:inline-block; width:100%; height:1.3em; vertical-align:bottom}
+  /* Linea sobre la que se firma. Aqui si hay raya: es la referencia de la firma. */
+  .linea-firma{display:block; border-bottom:1px solid #334155}
+  /* Columna de etiquetas de las tablas de formulario. */
+  table.formulario .c-etiqueta{width:32%; font-weight:600}
+  /* En las tablas de formulario la etiqueta va arriba, a la altura de la primera
+     linea de escritura. */
+  table.formulario td{vertical-align:top}
+  /* La ultima fila no necesita el borde inferior: la tabla ya cierra ahi. */
+  table.formulario tbody tr:last-child td{border-bottom:none}
+  footer.pie-doc{margin-top:26px; border-top:1px solid var(--border); padding-top:7px; font-size:8pt; color:var(--muted)}
+</style>
+</head>
+<body><div class="doc">
+
+<section class="portada">
+  <p class="marca">FINAN<span>·X</span></p>
+  <p class="sub">Sistema de facturación y pagos</p>
+  <div class="evidencia">Evidencia 1 de 7</div>
+  <h1>Modelo Entidad-Relación (MER)</h1>
+  <p class="desc">Estructura de datos del sistema FINAN-X: entidades, atributos, claves primarias y foráneas, relaciones y cardinalidades. El modelo se ha extraído de la base de datos PostgreSQL realmente implementada, no de un diseño teórico.</p>
+  <table class="meta"><tr><td>Sistema</td><td>FINAN-X · Facturación y pagos</td></tr>
+<tr><td>Motor de base de datos</td><td>PostgreSQL 16</td></tr>
+<tr><td>Entidades (tablas)</td><td>12</td></tr>
+<tr><td>Columnas documentadas</td><td>117</td></tr>
+<tr><td>Claves foráneas</td><td>16</td></tr>
+<tr><td>Vistas</td><td>1 (factura_saldo)</td></tr></table>
+  <p class="pie">Proyecto académico · Integración de Aplicaciones · Sexto semestre</p>
+</section>
+
+<h1>1. Introducción</h1>
+<p>Este documento describe <strong>cómo se organiza y almacena la información</strong> que necesita FINAN-X. Responde a la pregunta guía de la evidencia: <em>¿cómo vamos a organizar y almacenar la información que necesita nuestra aplicación?</em></p>
+<p>El modelo no es teórico: se ha <strong>extraído de la base de datos en funcionamiento</strong>. Las entidades, las columnas, las claves y las restricciones son exactamente las que existen en PostgreSQL 16, de modo que este MER, el diccionario de datos (Evidencia 2) y la implementación no pueden contradecirse.</p>
+
+<div class="caja">
+  <span class="titulo">Criterio de diseño aplicado</span>
+  <p>No se ha creado ninguna entidad «para llenar el diagrama». Cada tabla responde a una necesidad concreta del negocio y se puede rastrear hasta un requisito funcional (ver la matriz de trazabilidad, Evidencia 6).</p>
+</div>
+
+<h1>2. Entidades</h1>
+<p>El sistema tiene <strong>12 tablas</strong> y <strong>1 vista</strong>. Se distinguen dos grupos:</p>
+<ul>
+  <li><strong>Núcleo del negocio</strong> (azul oscuro): el ciclo de venta y cobro — <code>clientes</code>, <code>productos</code>, <code>pedidos</code>, <code>detalle_pedido</code>, <code>facturas</code> y <code>pagos</code>.</li>
+  <li><strong>Soporte</strong> (gris): lo que hace funcionar ese ciclo con seguridad y trazabilidad — <code>roles</code>, <code>usuarios</code>, <code>usuario_cliente</code>, <code>notas_credito</code>, <code>auditoria</code> y <code>recuperaciones_clave</code>.</li>
+</ul>
+
+<table class=""><thead><tr><th>Entidad</th><th>Qué representa</th><th class="c">Cols.</th><th>Grupo</th><th>Claves foráneas</th><th>Justificación en el sistema</th></tr></thead><tbody>
+<tr><td><code>auditoria</code></td><td>Auditoría</td><td class="c">8</td><td><span class="badge b-gray">soporte</span></td><td>—</td><td>Bitácora de operaciones sensibles.</td></tr>
+<tr><td><code>clientes</code></td><td>Clientes</td><td class="c">11</td><td><span class="badge b-info">núcleo</span></td><td>—</td><td>Personas o empresas a las que se factura. Entidad central del negocio.</td></tr>
+<tr><td><code>detalle_pedido</code></td><td>Líneas del pedido</td><td class="c">6</td><td><span class="badge b-info">núcleo</span></td><td><code>pedido_id</code>, <code>producto_id</code></td><td>Líneas del pedido: resuelve el N:M entre pedidos y productos y congela el precio aplicado.</td></tr>
+<tr><td><code>facturas</code></td><td>Facturas</td><td class="c">14</td><td><span class="badge b-info">núcleo</span></td><td><code>pedido_id</code>, <code>cliente_id</code>, <code>usuario_anulacion</code></td><td>Documento de cobro generado desde un pedido confirmado.</td></tr>
+<tr><td><code>notas_credito</code></td><td>Notas de crédito</td><td class="c">13</td><td><span class="badge b-gray">soporte</span></td><td><code>factura_id</code>, <code>cliente_id</code>, <code>usuario_id</code>, <code>usuario_anulacion</code></td><td>Devoluciones; una nota activa aumenta el saldo de la factura.</td></tr>
+<tr><td><code>pagos</code></td><td>Pagos</td><td class="c">17</td><td><span class="badge b-info">núcleo</span></td><td><code>factura_id</code>, <code>usuario_id</code>, <code>usuario_cliente_id</code></td><td>Abonos contra una factura; nunca se borran ni se editan.</td></tr>
+<tr><td><code>pedidos</code></td><td>Pedidos</td><td class="c">10</td><td><span class="badge b-info">núcleo</span></td><td><code>cliente_id</code></td><td>Documento interno con lo que pidió un cliente, antes de facturarse.</td></tr>
+<tr><td><code>productos</code></td><td>Catálogo de productos</td><td class="c">11</td><td><span class="badge b-info">núcleo</span></td><td>—</td><td>Catálogo de artículos y servicios que se pueden vender.</td></tr>
+<tr><td><code>recuperaciones_clave</code></td><td>Solicitudes OTP</td><td class="c">8</td><td><span class="badge b-gray">soporte</span></td><td><code>usuario_cliente_id</code></td><td>Solicitudes de código de un solo uso (OTP) para recuperar la contraseña.</td></tr>
+<tr><td><code>roles</code></td><td>Catálogo de roles</td><td class="c">3</td><td><span class="badge b-gray">soporte</span></td><td>—</td><td>Catálogo de roles del personal interno; define los permisos (RBAC).</td></tr>
+<tr><td><code>usuario_cliente</code></td><td>Acceso del cliente al portal</td><td class="c">8</td><td><span class="badge b-gray">soporte</span></td><td><code>cliente_id</code></td><td>Credenciales de acceso del cliente al portal de autoservicio.</td></tr>
+<tr><td><code>usuarios</code></td><td>Personal interno</td><td class="c">8</td><td><span class="badge b-gray">soporte</span></td><td><code>rol_id</code></td><td>Personal interno (administrador, facturador, cajero, supervisor).</td></tr>
+</tbody></table>
+
+<div class="caja purple">
+  <span class="titulo">La vista <code>factura_saldo</code>: por qué el saldo no es una columna</span>
+  <p>El estado de cobro de una factura <strong>no se almacena</strong>, se calcula. La vista lo deriva de los pagos y de las notas de crédito activas: <code>saldo = total − Σ pagos + Σ notas de crédito ACTIVAS</code>. Si el saldo fuera una columna habría que mantenerlo sincronizado con cada pago, cada devolución y cada anulación; derivarlo hace que <strong>no pueda desincronizarse</strong>. Es una decisión de diseño deliberada, no una omisión.</p>
+</div>
+
+<h1>3. Diagrama entidad-relación</h1>
+<p>Notación <strong>pata de gallo</strong> (crow's foot). Las claves primarias aparecen resaltadas y marcadas con <span class="badge b-info">PK</span>; las foráneas, con <span class="badge b-purple">FK</span>.</p>
+
+<div class="evitar-corte" style="border:1px solid #e2e8f0; border-radius:8px; padding:6px; margin:8px 0; background:#fff">
+<svg viewBox="0 0 1100 850" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial">
+  <rect width="1100" height="850" fill="#ffffff"/>
+  <text x="30" y="14" font-size="12" font-weight="700" fill="#172554">Modelo Entidad-Relación · FINAN-X</text>
+  <path d="M30 65.5 C138 65.5 162 218 270 218" fill="none" stroke="#94a3b8" stroke-width="1.4"/>
+<line x1="30" y1="69.9" x2="30" y2="61.1" stroke="#334155" stroke-width="1.6"/>
+<line x1="270" y1="218" x2="282.9505310751927" y2="216.86697534428043" stroke="#334155" stroke-width="1.3"/><line x1="270" y1="218" x2="283" y2="218" stroke="#334155" stroke-width="1.3"/><line x1="270" y1="218" x2="282.9505310751927" y2="219.13302465571957" stroke="#334155" stroke-width="1.3"/>
+<rect x="132" y="130.75" width="36" height="12" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="150" y="139.75" font-size="7.6" font-weight="700" fill="#1e3a8a" text-anchor="middle" dominant-baseline="middle">1:N</text>
+<path d="M30 620.5 C138 620.5 162 339 270 339" fill="none" stroke="#94a3b8" stroke-width="1.4"/>
+<line x1="30" y1="624.9" x2="30" y2="616.1" stroke="#334155" stroke-width="1.6"/>
+<line x1="270" y1="339" x2="282.9505310751927" y2="337.86697534428043" stroke="#334155" stroke-width="1.3"/><line x1="270" y1="339" x2="283" y2="339" stroke="#334155" stroke-width="1.3"/><line x1="270" y1="339" x2="282.9505310751927" y2="340.13302465571957" stroke="#334155" stroke-width="1.3"/>
+<circle cx="253" cy="339" r="3.6" fill="#ffffff" stroke="#334155" stroke-width="1.3"/>
+<rect x="132" y="468.75" width="36" height="12" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="150" y="477.75" font-size="7.6" font-weight="700" fill="#1e3a8a" text-anchor="middle" dominant-baseline="middle">1:0..1</text>
+<path d="M270 529 C294 529 276 429 300 429" fill="none" stroke="#94a3b8" stroke-width="1.4"/>
+<line x1="270" y1="524.6" x2="270" y2="533.4" stroke="#334155" stroke-width="1.6"/>
+<line x1="300" y1="429" x2="287.0494689248073" y2="430.13302465571957" stroke="#334155" stroke-width="1.3"/><line x1="300" y1="429" x2="287" y2="429" stroke="#334155" stroke-width="1.3"/><line x1="300" y1="429" x2="287.0494689248073" y2="427.86697534428043" stroke="#334155" stroke-width="1.3"/>
+<rect x="267" y="468" width="36" height="12" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="285" y="477" font-size="7.6" font-weight="700" fill="#1e3a8a" text-anchor="middle" dominant-baseline="middle">1:N</text>
+<path d="M300 597 C408 597 432 269 540 269" fill="none" stroke="#94a3b8" stroke-width="1.4"/>
+<line x1="300" y1="601.4" x2="300" y2="592.6" stroke="#334155" stroke-width="1.6"/>
+<line x1="540" y1="269" x2="552.9505310751927" y2="267.86697534428043" stroke="#334155" stroke-width="1.3"/><line x1="540" y1="269" x2="553" y2="269" stroke="#334155" stroke-width="1.3"/><line x1="540" y1="269" x2="552.9505310751927" y2="270.13302465571957" stroke="#334155" stroke-width="1.3"/>
+<rect x="402" y="422" width="36" height="12" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="420" y="431" font-size="7.6" font-weight="700" fill="#1e3a8a" text-anchor="middle" dominant-baseline="middle">1:1..N</text>
+<path d="M300 125.5 C408 125.5 432 377 540 377" fill="none" stroke="#94a3b8" stroke-width="1.4"/>
+<line x1="300" y1="129.9" x2="300" y2="121.1" stroke="#334155" stroke-width="1.6"/>
+<line x1="540" y1="377" x2="552.9505310751927" y2="375.86697534428043" stroke="#334155" stroke-width="1.3"/><line x1="540" y1="377" x2="553" y2="377" stroke="#334155" stroke-width="1.3"/><line x1="540" y1="377" x2="552.9505310751927" y2="378.13302465571957" stroke="#334155" stroke-width="1.3"/>
+<rect x="402" y="240.25" width="36" height="12" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="420" y="249.25" font-size="7.6" font-weight="700" fill="#1e3a8a" text-anchor="middle" dominant-baseline="middle">1:N</text>
+<path d="M540 513 C564 513 546 34 570 34" fill="none" stroke="#94a3b8" stroke-width="1.4"/>
+<line x1="540" y1="508.6" x2="540" y2="517.4" stroke="#334155" stroke-width="1.6"/>
+<line x1="570" y1="34" x2="557.0494689248073" y2="35.13302465571956" stroke="#334155" stroke-width="1.3"/><line x1="570" y1="34" x2="557" y2="34" stroke="#334155" stroke-width="1.3"/><line x1="570" y1="34" x2="557.0494689248073" y2="32.86697534428045" stroke="#334155" stroke-width="1.3"/>
+<circle cx="587" cy="34" r="3.6" fill="#ffffff" stroke="#334155" stroke-width="1.3"/>
+<rect x="537" y="262.5" width="36" height="12" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="555" y="271.5" font-size="7.6" font-weight="700" fill="#1e3a8a" text-anchor="middle" dominant-baseline="middle">1:0..N</text>
+<path d="M270 620.5 C405 620.5 435 148 570 148" fill="none" stroke="#94a3b8" stroke-width="1.4"/>
+<line x1="270" y1="616.1" x2="270" y2="624.9" stroke="#334155" stroke-width="1.6"/>
+<line x1="570" y1="148" x2="557.0494689248073" y2="149.13302465571957" stroke="#334155" stroke-width="1.3"/><line x1="570" y1="148" x2="557" y2="148" stroke="#334155" stroke-width="1.3"/><line x1="570" y1="148" x2="557.0494689248073" y2="146.86697534428043" stroke="#334155" stroke-width="1.3"/>
+<rect x="402" y="373.25" width="36" height="12" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="420" y="382.25" font-size="7.6" font-weight="700" fill="#1e3a8a" text-anchor="middle" dominant-baseline="middle">1:N</text>
+<path d="M810 148 C834 148 816 34 840 34" fill="none" stroke="#94a3b8" stroke-width="1.4"/>
+<line x1="810" y1="143.6" x2="810" y2="152.4" stroke="#334155" stroke-width="1.6"/>
+<line x1="840" y1="34" x2="827.0494689248073" y2="35.13302465571956" stroke="#334155" stroke-width="1.3"/><line x1="840" y1="34" x2="827" y2="34" stroke="#334155" stroke-width="1.3"/><line x1="840" y1="34" x2="827.0494689248073" y2="32.86697534428045" stroke="#334155" stroke-width="1.3"/>
+<rect x="807" y="80" width="36" height="12" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="825" y="89" font-size="7.6" font-weight="700" fill="#1e3a8a" text-anchor="middle" dominant-baseline="middle">1:N</text>
+<path d="M570 262 C678 262 702 420.5 810 420.5" fill="none" stroke="#94a3b8" stroke-width="1.4"/>
+<line x1="570" y1="266.4" x2="570" y2="257.6" stroke="#334155" stroke-width="1.6"/>
+<line x1="810" y1="420.5" x2="822.9505310751927" y2="419.36697534428043" stroke="#334155" stroke-width="1.3"/><line x1="810" y1="420.5" x2="823" y2="420.5" stroke="#334155" stroke-width="1.3"/><line x1="810" y1="420.5" x2="822.9505310751927" y2="421.63302465571957" stroke="#334155" stroke-width="1.3"/>
+<rect x="672" y="330.25" width="36" height="12" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="690" y="339.25" font-size="7.6" font-weight="700" fill="#1e3a8a" text-anchor="middle" dominant-baseline="middle">1:N</text>
+<path d="M270 712 C405 712 435 420.5 570 420.5" fill="none" stroke="#94a3b8" stroke-width="1.4"/>
+<line x1="270" y1="707.6" x2="270" y2="716.4" stroke="#334155" stroke-width="1.6"/>
+<line x1="570" y1="420.5" x2="557.0494689248073" y2="421.63302465571957" stroke="#334155" stroke-width="1.3"/><line x1="570" y1="420.5" x2="557" y2="420.5" stroke="#334155" stroke-width="1.3"/><line x1="570" y1="420.5" x2="557.0494689248073" y2="419.36697534428043" stroke="#334155" stroke-width="1.3"/>
+<rect x="402" y="555.25" width="36" height="12" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="420" y="564.25" font-size="7.6" font-weight="700" fill="#1e3a8a" text-anchor="middle" dominant-baseline="middle">1:N</text>
+<path d="M270 408 C526.5 408 583.5 618 840 618" fill="none" stroke="#94a3b8" stroke-width="1.4"/>
+<line x1="270" y1="403.6" x2="270" y2="412.4" stroke="#334155" stroke-width="1.6"/>
+<line x1="840" y1="618" x2="827.0494689248073" y2="619.1330246557195" stroke="#334155" stroke-width="1.3"/><line x1="840" y1="618" x2="827" y2="618" stroke="#334155" stroke-width="1.3"/><line x1="840" y1="618" x2="827.0494689248073" y2="616.8669753442805" stroke="#334155" stroke-width="1.3"/>
+<rect x="537" y="502" width="36" height="12" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="555" y="511" font-size="7.6" font-weight="700" fill="#1e3a8a" text-anchor="middle" dominant-baseline="middle">1:N</text>
+<path d="M270 477 C526.5 477 583.5 307 840 307" fill="none" stroke="#94a3b8" stroke-width="1.4"/>
+<line x1="270" y1="472.6" x2="270" y2="481.4" stroke="#334155" stroke-width="1.6"/>
+<line x1="840" y1="307" x2="827.0494689248073" y2="308.13302465571957" stroke="#334155" stroke-width="1.3"/><line x1="840" y1="307" x2="827" y2="307" stroke="#334155" stroke-width="1.3"/><line x1="840" y1="307" x2="827.0494689248073" y2="305.86697534428043" stroke="#334155" stroke-width="1.3"/>
+<circle cx="857" cy="307" r="3.6" fill="#ffffff" stroke="#334155" stroke-width="1.3"/>
+<rect x="537" y="381" width="36" height="12" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="555" y="390" font-size="7.6" font-weight="700" fill="#1e3a8a" text-anchor="middle" dominant-baseline="middle">1:0..N</text>
+  <g>
+<rect x="840" y="345" width="240" height="166" rx="7" fill="#ffffff" stroke="#64748b" stroke-width="1.2"/>
+<rect x="841" y="346" width="238" height="29" rx="6" fill="#64748b"/>
+<rect x="841" y="367" width="238" height="7" fill="#64748b"/>
+<text x="850" y="365" font-size="11.5" font-weight="700" fill="#ffffff" dominant-baseline="middle">auditoria</text>
+<text x="1071" y="365" font-size="7.6" fill="#e2e8f0" text-anchor="end" dominant-baseline="middle">Auditoría</text>
+<rect x="841.5" y="376.5" width="237" height="15" fill="#dbeafe" opacity="0.8"/>
+<text x="848" y="385" font-size="7.2" font-weight="700" fill="#1e3a8a" dominant-baseline="middle">PK</text>
+<text x="866" y="385" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" font-weight="700">auditoria_id</text>
+<text x="1072" y="385" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+<text x="866" y="400" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >usuario</text>
+<text x="1072" y="400" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(200)</text>
+<text x="866" y="415" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >usuario_tipo</text>
+<text x="1072" y="415" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(20)</text>
+<text x="866" y="430" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >fecha_hora</text>
+<text x="1072" y="430" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">timestamptz</text>
+<text x="866" y="445" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >modulo</text>
+<text x="1072" y="445" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(50)</text>
+<text x="866" y="460" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >operacion</text>
+<text x="1072" y="460" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(30)</text>
+<text x="866" y="475" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >registro_afectado</text>
+<text x="1072" y="475" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(50)</text>
+<text x="866" y="490" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >descripcion</text>
+<text x="1072" y="490" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">text</text>
+</g>
+<g>
+<rect x="30" y="515" width="240" height="211" rx="7" fill="#ffffff" stroke="#1e3a8a" stroke-width="2"/>
+<rect x="31" y="516" width="238" height="29" rx="6" fill="#1e3a8a"/>
+<rect x="31" y="537" width="238" height="7" fill="#1e3a8a"/>
+<text x="40" y="535" font-size="11.5" font-weight="700" fill="#ffffff" dominant-baseline="middle">clientes</text>
+<text x="261" y="535" font-size="7.6" fill="#e2e8f0" text-anchor="end" dominant-baseline="middle">Clientes</text>
+<rect x="31.5" y="546.5" width="237" height="15" fill="#dbeafe" opacity="0.8"/>
+<text x="38" y="555" font-size="7.2" font-weight="700" fill="#1e3a8a" dominant-baseline="middle">PK</text>
+<text x="56" y="555" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" font-weight="700">cliente_id</text>
+<text x="262" y="555" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+<text x="56" y="570" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >tipo_cliente</text>
+<text x="262" y="570" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(20)</text>
+<text x="56" y="585" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >tipo_identificacion</text>
+<text x="262" y="585" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(20)</text>
+<text x="56" y="600" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >numero_identificacion</text>
+<text x="262" y="600" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(30)</text>
+<text x="56" y="615" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >nombre_razon_social</text>
+<text x="262" y="615" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(200)</text>
+<text x="56" y="630" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >telefono</text>
+<text x="262" y="630" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(30)</text>
+<text x="56" y="645" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >correo</text>
+<text x="262" y="645" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(150)</text>
+<text x="56" y="660" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >direccion</text>
+<text x="262" y="660" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(200)</text>
+<text x="56" y="675" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >ciudad</text>
+<text x="262" y="675" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(100)</text>
+<text x="56" y="690" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >estado</text>
+<text x="262" y="690" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(20)</text>
+<text x="56" y="705" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >fecha_creacion</text>
+<text x="262" y="705" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">timestamptz</text>
+</g>
+<g>
+<rect x="300" y="255" width="240" height="136" rx="7" fill="#ffffff" stroke="#1e3a8a" stroke-width="2"/>
+<rect x="301" y="256" width="238" height="29" rx="6" fill="#1e3a8a"/>
+<rect x="301" y="277" width="238" height="7" fill="#1e3a8a"/>
+<text x="310" y="275" font-size="11.5" font-weight="700" fill="#ffffff" dominant-baseline="middle">detalle_pedido</text>
+<text x="531" y="275" font-size="7.6" fill="#e2e8f0" text-anchor="end" dominant-baseline="middle">Líneas del pedido</text>
+<rect x="301.5" y="286.5" width="237" height="15" fill="#dbeafe" opacity="0.8"/>
+<text x="308" y="295" font-size="7.2" font-weight="700" fill="#1e3a8a" dominant-baseline="middle">PK</text>
+<text x="326" y="295" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" font-weight="700">detalle_id</text>
+<text x="532" y="295" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+<text x="308" y="310" font-size="7.2" font-weight="700" fill="#6d28d9" dominant-baseline="middle">FK</text>
+<text x="326" y="310" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >pedido_id</text>
+<text x="532" y="310" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+<text x="308" y="325" font-size="7.2" font-weight="700" fill="#6d28d9" dominant-baseline="middle">FK</text>
+<text x="326" y="325" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >producto_id</text>
+<text x="532" y="325" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+<text x="326" y="340" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >cantidad</text>
+<text x="532" y="340" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">num(12,2)</text>
+<text x="326" y="355" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >precio_unitario</text>
+<text x="532" y="355" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">num(14,2)</text>
+<text x="326" y="370" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >subtotal</text>
+<text x="532" y="370" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">num(14,2)</text>
+</g>
+<g>
+<rect x="570" y="20" width="240" height="256" rx="7" fill="#ffffff" stroke="#1e3a8a" stroke-width="2"/>
+<rect x="571" y="21" width="238" height="29" rx="6" fill="#1e3a8a"/>
+<rect x="571" y="42" width="238" height="7" fill="#1e3a8a"/>
+<text x="580" y="40" font-size="11.5" font-weight="700" fill="#ffffff" dominant-baseline="middle">facturas</text>
+<text x="801" y="40" font-size="7.6" fill="#e2e8f0" text-anchor="end" dominant-baseline="middle">Facturas</text>
+<rect x="571.5" y="51.5" width="237" height="15" fill="#dbeafe" opacity="0.8"/>
+<text x="578" y="60" font-size="7.2" font-weight="700" fill="#1e3a8a" dominant-baseline="middle">PK</text>
+<text x="596" y="60" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" font-weight="700">factura_id</text>
+<text x="802" y="60" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+<text x="596" y="75" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >numero_factura</text>
+<text x="802" y="75" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(20)</text>
+<text x="578" y="90" font-size="7.2" font-weight="700" fill="#6d28d9" dominant-baseline="middle">FK</text>
+<text x="596" y="90" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >pedido_id</text>
+<text x="802" y="90" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+<text x="578" y="105" font-size="7.2" font-weight="700" fill="#6d28d9" dominant-baseline="middle">FK</text>
+<text x="596" y="105" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >cliente_id</text>
+<text x="802" y="105" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+<text x="596" y="120" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >fecha_emision</text>
+<text x="802" y="120" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">timestamptz</text>
+<text x="596" y="135" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >fecha_vencimiento</text>
+<text x="802" y="135" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">date</text>
+<text x="596" y="150" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >subtotal</text>
+<text x="802" y="150" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">num(14,2)</text>
+<text x="596" y="165" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >impuestos</text>
+<text x="802" y="165" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">num(14,2)</text>
+<text x="596" y="180" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >total</text>
+<text x="802" y="180" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">num(14,2)</text>
+<text x="596" y="195" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >estado</text>
+<text x="802" y="195" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(20)</text>
+<text x="596" y="210" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >motivo_anulacion</text>
+<text x="802" y="210" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">text</text>
+<text x="596" y="225" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >fecha_anulacion</text>
+<text x="802" y="225" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">timestamptz</text>
+<text x="578" y="240" font-size="7.2" font-weight="700" fill="#6d28d9" dominant-baseline="middle">FK</text>
+<text x="596" y="240" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >usuario_anulacion</text>
+<text x="802" y="240" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+<text x="596" y="255" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >fecha_creacion</text>
+<text x="802" y="255" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">timestamptz</text>
+</g>
+<g>
+<rect x="570" y="300" width="240" height="241" rx="7" fill="#ffffff" stroke="#64748b" stroke-width="1.2"/>
+<rect x="571" y="301" width="238" height="29" rx="6" fill="#64748b"/>
+<rect x="571" y="322" width="238" height="7" fill="#64748b"/>
+<text x="580" y="320" font-size="11.5" font-weight="700" fill="#ffffff" dominant-baseline="middle">notas_credito</text>
+<text x="801" y="320" font-size="7.6" fill="#e2e8f0" text-anchor="end" dominant-baseline="middle">Notas de crédito</text>
+<rect x="571.5" y="331.5" width="237" height="15" fill="#dbeafe" opacity="0.8"/>
+<text x="578" y="340" font-size="7.2" font-weight="700" fill="#1e3a8a" dominant-baseline="middle">PK</text>
+<text x="596" y="340" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" font-weight="700">nota_credito_id</text>
+<text x="802" y="340" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+<text x="596" y="355" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >numero_nota</text>
+<text x="802" y="355" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(20)</text>
+<text x="578" y="370" font-size="7.2" font-weight="700" fill="#6d28d9" dominant-baseline="middle">FK</text>
+<text x="596" y="370" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >factura_id</text>
+<text x="802" y="370" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+<text x="578" y="385" font-size="7.2" font-weight="700" fill="#6d28d9" dominant-baseline="middle">FK</text>
+<text x="596" y="385" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >cliente_id</text>
+<text x="802" y="385" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+<text x="596" y="400" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >fecha</text>
+<text x="802" y="400" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">timestamptz</text>
+<text x="596" y="415" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >valor</text>
+<text x="802" y="415" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">num(14,2)</text>
+<text x="596" y="430" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >motivo</text>
+<text x="802" y="430" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">text</text>
+<text x="596" y="445" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >estado</text>
+<text x="802" y="445" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(20)</text>
+<text x="596" y="460" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >fecha_creacion</text>
+<text x="802" y="460" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">timestamptz</text>
+<text x="578" y="475" font-size="7.2" font-weight="700" fill="#6d28d9" dominant-baseline="middle">FK</text>
+<text x="596" y="475" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >usuario_id</text>
+<text x="802" y="475" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+<text x="596" y="490" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >fecha_anulacion</text>
+<text x="802" y="490" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">timestamptz</text>
+<text x="578" y="505" font-size="7.2" font-weight="700" fill="#6d28d9" dominant-baseline="middle">FK</text>
+<text x="596" y="505" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >usuario_anulacion</text>
+<text x="802" y="505" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+<text x="596" y="520" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >motivo_anulacion</text>
+<text x="802" y="520" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">text</text>
+</g>
+<g>
+<rect x="840" y="20" width="240" height="301" rx="7" fill="#ffffff" stroke="#1e3a8a" stroke-width="2"/>
+<rect x="841" y="21" width="238" height="29" rx="6" fill="#1e3a8a"/>
+<rect x="841" y="42" width="238" height="7" fill="#1e3a8a"/>
+<text x="850" y="40" font-size="11.5" font-weight="700" fill="#ffffff" dominant-baseline="middle">pagos</text>
+<text x="1071" y="40" font-size="7.6" fill="#e2e8f0" text-anchor="end" dominant-baseline="middle">Pagos</text>
+<rect x="841.5" y="51.5" width="237" height="15" fill="#dbeafe" opacity="0.8"/>
+<text x="848" y="60" font-size="7.2" font-weight="700" fill="#1e3a8a" dominant-baseline="middle">PK</text>
+<text x="866" y="60" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" font-weight="700">pago_id</text>
+<text x="1072" y="60" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+<text x="866" y="75" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >numero_pago</text>
+<text x="1072" y="75" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(20)</text>
+<text x="848" y="90" font-size="7.2" font-weight="700" fill="#6d28d9" dominant-baseline="middle">FK</text>
+<text x="866" y="90" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >factura_id</text>
+<text x="1072" y="90" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+<text x="866" y="105" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >fecha</text>
+<text x="1072" y="105" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">timestamptz</text>
+<text x="866" y="120" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >valor</text>
+<text x="1072" y="120" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">num(14,2)</text>
+<text x="866" y="135" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >metodo_pago</text>
+<text x="1072" y="135" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(30)</text>
+<text x="866" y="150" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >referencia</text>
+<text x="1072" y="150" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(60)</text>
+<text x="866" y="165" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >observaciones</text>
+<text x="1072" y="165" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">text</text>
+<text x="848" y="180" font-size="7.2" font-weight="700" fill="#6d28d9" dominant-baseline="middle">FK</text>
+<text x="866" y="180" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >usuario_id</text>
+<text x="1072" y="180" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+<text x="848" y="195" font-size="7.2" font-weight="700" fill="#6d28d9" dominant-baseline="middle">FK</text>
+<text x="866" y="195" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >usuario_cliente_id</text>
+<text x="1072" y="195" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+<text x="866" y="210" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >fecha_registro</text>
+<text x="1072" y="210" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">timestamptz</text>
+<text x="866" y="225" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >banco</text>
+<text x="1072" y="225" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">text</text>
+<text x="866" y="240" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >titular</text>
+<text x="1072" y="240" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">text</text>
+<text x="866" y="255" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >tipo_tarjeta</text>
+<text x="1072" y="255" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">text</text>
+<text x="866" y="270" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >ultimos_digitos_tarjeta</text>
+<text x="1072" y="270" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">text</text>
+<text x="866" y="285" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >vencimiento_tarjeta</text>
+<text x="1072" y="285" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">text</text>
+<text x="866" y="300" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >numero_cuenta</text>
+<text x="1072" y="300" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">text</text>
+</g>
+<g>
+<rect x="300" y="415" width="240" height="196" rx="7" fill="#ffffff" stroke="#1e3a8a" stroke-width="2"/>
+<rect x="301" y="416" width="238" height="29" rx="6" fill="#1e3a8a"/>
+<rect x="301" y="437" width="238" height="7" fill="#1e3a8a"/>
+<text x="310" y="435" font-size="11.5" font-weight="700" fill="#ffffff" dominant-baseline="middle">pedidos</text>
+<text x="531" y="435" font-size="7.6" fill="#e2e8f0" text-anchor="end" dominant-baseline="middle">Pedidos</text>
+<rect x="301.5" y="446.5" width="237" height="15" fill="#dbeafe" opacity="0.8"/>
+<text x="308" y="455" font-size="7.2" font-weight="700" fill="#1e3a8a" dominant-baseline="middle">PK</text>
+<text x="326" y="455" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" font-weight="700">pedido_id</text>
+<text x="532" y="455" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+<text x="326" y="470" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >numero_pedido</text>
+<text x="532" y="470" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(20)</text>
+<text x="308" y="485" font-size="7.2" font-weight="700" fill="#6d28d9" dominant-baseline="middle">FK</text>
+<text x="326" y="485" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >cliente_id</text>
+<text x="532" y="485" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+<text x="326" y="500" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >fecha</text>
+<text x="532" y="500" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">timestamptz</text>
+<text x="326" y="515" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >subtotal</text>
+<text x="532" y="515" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">num(14,2)</text>
+<text x="326" y="530" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >impuestos</text>
+<text x="532" y="530" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">num(14,2)</text>
+<text x="326" y="545" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >total</text>
+<text x="532" y="545" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">num(14,2)</text>
+<text x="326" y="560" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >estado</text>
+<text x="532" y="560" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(20)</text>
+<text x="326" y="575" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >observaciones</text>
+<text x="532" y="575" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">text</text>
+<text x="326" y="590" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >fecha_creacion</text>
+<text x="532" y="590" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">timestamptz</text>
+</g>
+<g>
+<rect x="300" y="20" width="240" height="211" rx="7" fill="#ffffff" stroke="#1e3a8a" stroke-width="2"/>
+<rect x="301" y="21" width="238" height="29" rx="6" fill="#1e3a8a"/>
+<rect x="301" y="42" width="238" height="7" fill="#1e3a8a"/>
+<text x="310" y="40" font-size="11.5" font-weight="700" fill="#ffffff" dominant-baseline="middle">productos</text>
+<text x="531" y="40" font-size="7.6" fill="#e2e8f0" text-anchor="end" dominant-baseline="middle">Catálogo de productos</text>
+<rect x="301.5" y="51.5" width="237" height="15" fill="#dbeafe" opacity="0.8"/>
+<text x="308" y="60" font-size="7.2" font-weight="700" fill="#1e3a8a" dominant-baseline="middle">PK</text>
+<text x="326" y="60" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" font-weight="700">producto_id</text>
+<text x="532" y="60" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+<text x="326" y="75" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >codigo</text>
+<text x="532" y="75" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(30)</text>
+<text x="326" y="90" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >nombre</text>
+<text x="532" y="90" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(150)</text>
+<text x="326" y="105" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >descripcion</text>
+<text x="532" y="105" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">text</text>
+<text x="326" y="120" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >categoria</text>
+<text x="532" y="120" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(60)</text>
+<text x="326" y="135" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >precio</text>
+<text x="532" y="135" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">num(14,2)</text>
+<text x="326" y="150" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >impuesto</text>
+<text x="532" y="150" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">num(5,2)</text>
+<text x="326" y="165" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >unidad_medida</text>
+<text x="532" y="165" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(20)</text>
+<text x="326" y="180" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >estado</text>
+<text x="532" y="180" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(20)</text>
+<text x="326" y="195" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >fecha_creacion</text>
+<text x="532" y="195" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">timestamptz</text>
+<text x="326" y="210" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >fecha_actualizacion</text>
+<text x="532" y="210" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">timestamptz</text>
+</g>
+<g>
+<rect x="840" y="535" width="240" height="166" rx="7" fill="#ffffff" stroke="#64748b" stroke-width="1.2"/>
+<rect x="841" y="536" width="238" height="29" rx="6" fill="#64748b"/>
+<rect x="841" y="557" width="238" height="7" fill="#64748b"/>
+<text x="850" y="555" font-size="11.5" font-weight="700" fill="#ffffff" dominant-baseline="middle">recuperaciones_clave</text>
+<text x="1071" y="555" font-size="7.6" fill="#e2e8f0" text-anchor="end" dominant-baseline="middle">Solicitudes OTP</text>
+<rect x="841.5" y="566.5" width="237" height="15" fill="#dbeafe" opacity="0.8"/>
+<text x="848" y="575" font-size="7.2" font-weight="700" fill="#1e3a8a" dominant-baseline="middle">PK</text>
+<text x="866" y="575" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" font-weight="700">recuperacion_id</text>
+<text x="1072" y="575" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+<text x="848" y="590" font-size="7.2" font-weight="700" fill="#6d28d9" dominant-baseline="middle">FK</text>
+<text x="866" y="590" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >usuario_cliente_id</text>
+<text x="1072" y="590" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+<text x="866" y="605" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >canal</text>
+<text x="1072" y="605" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(10)</text>
+<text x="866" y="620" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >codigo_hash</text>
+<text x="1072" y="620" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">text</text>
+<text x="866" y="635" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >intentos</text>
+<text x="1072" y="635" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+<text x="866" y="650" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >usado</text>
+<text x="1072" y="650" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">bool</text>
+<text x="866" y="665" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >expira_en</text>
+<text x="1072" y="665" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">timestamptz</text>
+<text x="866" y="680" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >creado_en</text>
+<text x="1072" y="680" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">timestamptz</text>
+</g>
+<g>
+<rect x="30" y="20" width="240" height="91" rx="7" fill="#ffffff" stroke="#64748b" stroke-width="1.2"/>
+<rect x="31" y="21" width="238" height="29" rx="6" fill="#64748b"/>
+<rect x="31" y="42" width="238" height="7" fill="#64748b"/>
+<text x="40" y="40" font-size="11.5" font-weight="700" fill="#ffffff" dominant-baseline="middle">roles</text>
+<text x="261" y="40" font-size="7.6" fill="#e2e8f0" text-anchor="end" dominant-baseline="middle">Catálogo de roles</text>
+<rect x="31.5" y="51.5" width="237" height="15" fill="#dbeafe" opacity="0.8"/>
+<text x="38" y="60" font-size="7.2" font-weight="700" fill="#1e3a8a" dominant-baseline="middle">PK</text>
+<text x="56" y="60" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" font-weight="700">rol_id</text>
+<text x="262" y="60" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+<text x="56" y="75" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >nombre</text>
+<text x="262" y="75" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(50)</text>
+<text x="56" y="90" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >descripcion</text>
+<text x="262" y="90" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">text</text>
+</g>
+<g>
+<rect x="30" y="325" width="240" height="166" rx="7" fill="#ffffff" stroke="#64748b" stroke-width="1.2"/>
+<rect x="31" y="326" width="238" height="29" rx="6" fill="#64748b"/>
+<rect x="31" y="347" width="238" height="7" fill="#64748b"/>
+<text x="40" y="345" font-size="11.5" font-weight="700" fill="#ffffff" dominant-baseline="middle">usuario_cliente</text>
+<text x="261" y="345" font-size="7.6" fill="#e2e8f0" text-anchor="end" dominant-baseline="middle">Acceso del cliente al portal</text>
+<rect x="31.5" y="356.5" width="237" height="15" fill="#dbeafe" opacity="0.8"/>
+<text x="38" y="365" font-size="7.2" font-weight="700" fill="#1e3a8a" dominant-baseline="middle">PK</text>
+<text x="56" y="365" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" font-weight="700">usuario_cliente_id</text>
+<text x="262" y="365" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+<text x="38" y="380" font-size="7.2" font-weight="700" fill="#6d28d9" dominant-baseline="middle">FK</text>
+<text x="56" y="380" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >cliente_id</text>
+<text x="262" y="380" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+<text x="56" y="395" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >username</text>
+<text x="262" y="395" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(150)</text>
+<text x="56" y="410" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >password_hash</text>
+<text x="262" y="410" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">text</text>
+<text x="56" y="425" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >estado</text>
+<text x="262" y="425" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(20)</text>
+<text x="56" y="440" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >fecha_creacion</text>
+<text x="262" y="440" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">timestamptz</text>
+<text x="56" y="455" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >ultimo_acceso</text>
+<text x="262" y="455" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">timestamptz</text>
+<text x="56" y="470" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >token_version</text>
+<text x="262" y="470" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+</g>
+<g>
+<rect x="30" y="135" width="240" height="166" rx="7" fill="#ffffff" stroke="#64748b" stroke-width="1.2"/>
+<rect x="31" y="136" width="238" height="29" rx="6" fill="#64748b"/>
+<rect x="31" y="157" width="238" height="7" fill="#64748b"/>
+<text x="40" y="155" font-size="11.5" font-weight="700" fill="#ffffff" dominant-baseline="middle">usuarios</text>
+<text x="261" y="155" font-size="7.6" fill="#e2e8f0" text-anchor="end" dominant-baseline="middle">Personal interno</text>
+<rect x="31.5" y="166.5" width="237" height="15" fill="#dbeafe" opacity="0.8"/>
+<text x="38" y="175" font-size="7.2" font-weight="700" fill="#1e3a8a" dominant-baseline="middle">PK</text>
+<text x="56" y="175" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" font-weight="700">usuario_id</text>
+<text x="262" y="175" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+<text x="56" y="190" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >nombre</text>
+<text x="262" y="190" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(120)</text>
+<text x="56" y="205" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >correo</text>
+<text x="262" y="205" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(150)</text>
+<text x="56" y="220" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >password_hash</text>
+<text x="262" y="220" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">text</text>
+<text x="38" y="235" font-size="7.2" font-weight="700" fill="#6d28d9" dominant-baseline="middle">FK</text>
+<text x="56" y="235" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >rol_id</text>
+<text x="262" y="235" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+<text x="56" y="250" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >estado</text>
+<text x="262" y="250" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">varchar(20)</text>
+<text x="56" y="265" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >fecha_creacion</text>
+<text x="262" y="265" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">timestamptz</text>
+<text x="56" y="280" font-size="8.6" fill="#0f172a" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle" >token_version</text>
+<text x="262" y="280" font-size="7.2" fill="#94a3b8" text-anchor="end" font-family="Cascadia Mono,Consolas,monospace" dominant-baseline="middle">int</text>
+</g>
+  
+<g>
+  <rect x="30" y="754" width="1040" height="86" rx="7" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="45" y="774" font-size="10" font-weight="700" fill="#1e3a8a" font-family="Segoe UI,Arial">Notación</text>
+  <text x="45" y="792" font-size="8.6" fill="#334155" font-family="Segoe UI,Arial">
+    <tspan font-weight="700" fill="#1e3a8a">PK</tspan> clave primaria · <tspan font-weight="700" fill="#6d28d9">FK</tspan> clave foránea · las entidades en azul oscuro son el núcleo del negocio y las grises dan soporte
+  </text>
+  <text x="45" y="809" font-size="8.6" fill="#334155" font-family="Segoe UI,Arial">
+    <tspan font-weight="700">1</tspan> = exactamente uno (barra) · <tspan font-weight="700">N</tspan> = muchos (pata de gallo) · <tspan font-weight="700">0..1</tspan> = opcional · <tspan font-weight="700">0..N</tspan> = puede no existir ninguno
+  </text>
+  <text x="45" y="826" font-size="8.6" fill="#334155" font-family="Segoe UI,Arial">
+    <tspan font-weight="700">1:0..1</tspan> clientes → usuario_cliente: el cliente puede tener cuenta de portal o no · <tspan font-weight="700">1:0..N</tspan> pedidos → facturas: varias facturas históricas, pero una sola ACTIVA
+  </text>
+</g>
+</svg>
+</div>
+
+<div class="salto"></div>
+<h1>4. Relaciones y cardinalidades</h1>
+<p>Se han documentado <strong>16 relaciones</strong> mediante claves foráneas. La columna «Cardinalidad» indica el sentido de la relación leído desde la entidad padre hacia la hija.</p>
+
+<table class=""><thead><tr><th>Entidad hija</th><th>Columna FK</th><th class="c">Card.</th><th>Referencia a</th><th>Al borrar el padre</th><th>Qué significa</th></tr></thead><tbody>
+<tr><td><code>usuarios</code></td><td><code>rol_id</code></td><td>N:1</td><td><code>roles</code>.<code>rol_id</code></td><td><span class="badge b-gray">restrictiva</span></td><td>un rol agrupa a varios usuarios</td></tr>
+<tr><td><code>usuario_cliente</code></td><td><code>cliente_id</code></td><td>1:0..1</td><td><code>clientes</code>.<code>cliente_id</code></td><td><span class="badge b-gray">restrictiva</span></td><td>el cliente puede tener una cuenta de portal</td></tr>
+<tr><td><code>pedidos</code></td><td><code>cliente_id</code></td><td>1:N</td><td><code>clientes</code>.<code>cliente_id</code></td><td><span class="badge b-gray">restrictiva</span></td><td>un cliente hace varios pedidos</td></tr>
+<tr><td><code>detalle_pedido</code></td><td><code>pedido_id</code></td><td>1:1..N</td><td><code>pedidos</code>.<code>pedido_id</code></td><td><span class="badge b-warn">ON DELETE CASCADE</span></td><td>un pedido tiene una o más líneas</td></tr>
+<tr><td><code>detalle_pedido</code></td><td><code>producto_id</code></td><td>N:1</td><td><code>productos</code>.<code>producto_id</code></td><td><span class="badge b-gray">restrictiva</span></td><td>un producto aparece en varias líneas</td></tr>
+<tr><td><code>facturas</code></td><td><code>pedido_id</code></td><td>1:0..N</td><td><code>pedidos</code>.<code>pedido_id</code></td><td><span class="badge b-gray">restrictiva</span></td><td>solo una factura ACTIVA a la vez</td></tr>
+<tr><td><code>facturas</code></td><td><code>cliente_id</code></td><td>1:N</td><td><code>clientes</code>.<code>cliente_id</code></td><td><span class="badge b-gray">restrictiva</span></td><td>un cliente acumula facturas</td></tr>
+<tr><td><code>facturas</code></td><td><code>usuario_anulacion</code></td><td>N:0..1</td><td><code>usuarios</code>.<code>usuario_id</code></td><td><span class="badge b-gray">restrictiva</span></td><td>—</td></tr>
+<tr><td><code>pagos</code></td><td><code>factura_id</code></td><td>1:N</td><td><code>facturas</code>.<code>factura_id</code></td><td><span class="badge b-gray">restrictiva</span></td><td>una factura recibe varios pagos</td></tr>
+<tr><td><code>pagos</code></td><td><code>usuario_id</code></td><td>N:0..1</td><td><code>usuarios</code>.<code>usuario_id</code></td><td><span class="badge b-gray">restrictiva</span></td><td>—</td></tr>
+<tr><td><code>pagos</code></td><td><code>usuario_cliente_id</code></td><td>N:0..1</td><td><code>usuario_cliente</code>.<code>usuario_cliente_id</code></td><td><span class="badge b-gray">restrictiva</span></td><td>pagos hechos desde el portal (puede no haber ninguno)</td></tr>
+<tr><td><code>notas_credito</code></td><td><code>factura_id</code></td><td>1:N</td><td><code>facturas</code>.<code>factura_id</code></td><td><span class="badge b-gray">restrictiva</span></td><td>una factura puede tener devoluciones</td></tr>
+<tr><td><code>notas_credito</code></td><td><code>cliente_id</code></td><td>1:N</td><td><code>clientes</code>.<code>cliente_id</code></td><td><span class="badge b-gray">restrictiva</span></td><td>la devolución también apunta al cliente</td></tr>
+<tr><td><code>notas_credito</code></td><td><code>usuario_id</code></td><td>N:0..1</td><td><code>usuarios</code>.<code>usuario_id</code></td><td><span class="badge b-gray">restrictiva</span></td><td>—</td></tr>
+<tr><td><code>notas_credito</code></td><td><code>usuario_anulacion</code></td><td>N:0..1</td><td><code>usuarios</code>.<code>usuario_id</code></td><td><span class="badge b-gray">restrictiva</span></td><td>—</td></tr>
+<tr><td><code>recuperaciones_clave</code></td><td><code>usuario_cliente_id</code></td><td>1:N</td><td><code>usuario_cliente</code>.<code>usuario_cliente_id</code></td><td><span class="badge b-warn">ON DELETE CASCADE</span></td><td>solicitudes de OTP de esa cuenta</td></tr>
+</tbody></table>
+
+<h2>4.1 Relaciones que no se deducen solo de la clave foránea</h2>
+<p>Una clave foránea indica «muchos hijos», pero no si el hijo es obligatorio ni si el padre admite varios. Estas dos reglas se aplican en el código y merecen explicitarse:</p>
+
+<div class="grid2">
+  <div class="caja ok">
+    <span class="titulo">clientes 1 : 0..1 usuario_cliente</span>
+    <p>Un cliente <strong>puede</strong> tener cuenta en el portal o no (por eso «0..1»). Lo garantiza la restricción <code>UNIQUE</code> sobre <code>usuario_cliente.cliente_id</code>: la base de datos impide por sí sola que un cliente tenga dos cuentas.</p>
+  </div>
+  <div class="caja ok">
+    <span class="titulo">pedidos 1 : 0..N facturas</span>
+    <p>Un pedido puede tener varias facturas a lo largo del tiempo (si una se anula y se vuelve a emitir), pero <strong>solo una ACTIVA</strong>. Lo impone el índice único parcial <code>uq_factura_activa_por_pedido</code>, no solo el código de la aplicación.</p>
+  </div>
+</div>
+
+<h1>5. Claves y restricciones</h1>
+<p>Las claves no son solo identificadores: son <strong>reglas de negocio aplicadas por la base de datos</strong>. Si el código de la aplicación fallara, la base sigue impidiendo los datos incoherentes.</p>
+
+<div class="grid3">
+  <div class="kpi"><div class="n">12</div><div class="t">Claves primarias</div></div>
+  <div class="kpi"><div class="n">16</div><div class="t">Claves foráneas</div></div>
+  <div class="kpi"><div class="n">11</div><div class="t">Restricciones UNIQUE</div></div>
+  <div class="kpi"><div class="n">15</div><div class="t">Restricciones CHECK</div></div>
+  <div class="kpi"><div class="n">37</div><div class="t">Índices</div></div>
+  <div class="kpi"><div class="n">1</div><div class="t">Vistas</div></div>
+</div>
+
+<h2>5.1 Restricciones CHECK: los valores válidos viven en la base</h2>
+<p>Cada columna de estado tiene una lista cerrada de valores permitidos. Así es imposible guardar, por ejemplo, un pedido en un estado que el sistema no sepa interpretar (lo que rompería los filtros y los informes).</p>
+
+<table class="compacta "><thead><tr><th>Tabla</th><th>Restricción</th><th>Valores permitidos</th></tr></thead><tbody>
+<tr><td><code>auditoria</code></td><td><code>ck_auditoria_usuario_tipo</code></td><td>CHECK (((usuario_tipo)::text = ANY ((ARRAY['INTERNO'::character varying, 'CLIENTE'::character varying])::text[])))</td></tr>
+<tr><td><code>clientes</code></td><td><code>ck_clientes_estado</code></td><td>CHECK (((estado)::text = ANY ((ARRAY['ACTIVO'::character varying, 'INACTIVO'::character varying])::text[])))</td></tr>
+<tr><td><code>detalle_pedido</code></td><td><code>detalle_pedido_cantidad_check</code></td><td>CHECK ((cantidad > (0)::numeric))</td></tr>
+<tr><td><code>facturas</code></td><td><code>ck_facturas_estado</code></td><td>CHECK (((estado)::text = ANY ((ARRAY['ACTIVA'::character varying, 'ANULADA'::character varying])::text[])))</td></tr>
+<tr><td><code>notas_credito</code></td><td><code>ck_notas_credito_estado</code></td><td>CHECK (((estado)::text = ANY ((ARRAY['ACTIVA'::character varying, 'ANULADA'::character varying])::text[])))</td></tr>
+<tr><td><code>notas_credito</code></td><td><code>notas_credito_valor_check</code></td><td>CHECK ((valor > (0)::numeric))</td></tr>
+<tr><td><code>pagos</code></td><td><code>ck_pagos_metodo</code></td><td>CHECK (((metodo_pago)::text = ANY ((ARRAY['EFECTIVO'::character varying, 'TARJETA'::character varying, 'TRANSFERENCIA'::character varying, 'CHEQUE'::character varying])::text[])))</td></tr>
+<tr><td><code>pagos</code></td><td><code>pagos_valor_check</code></td><td>CHECK ((valor > (0)::numeric))</td></tr>
+<tr><td><code>pedidos</code></td><td><code>ck_pedidos_estado</code></td><td>CHECK (((estado)::text = ANY ((ARRAY['BORRADOR'::character varying, 'CONFIRMADO'::character varying, 'CANCELADO'::character varying, 'FACTURADO'::character varying])::text[])))</td></tr>
+<tr><td><code>productos</code></td><td><code>ck_productos_estado</code></td><td>CHECK (((estado)::text = ANY ((ARRAY['ACTIVO'::character varying, 'INACTIVO'::character varying])::text[])))</td></tr>
+<tr><td><code>productos</code></td><td><code>productos_impuesto_check</code></td><td>CHECK (((impuesto >= (0)::numeric) AND (impuesto <= (100)::numeric)))</td></tr>
+<tr><td><code>productos</code></td><td><code>productos_precio_check</code></td><td>CHECK ((precio >= (0)::numeric))</td></tr>
+<tr><td><code>recuperaciones_clave</code></td><td><code>recuperaciones_clave_canal_check</code></td><td>CHECK (((canal)::text = ANY ((ARRAY['EMAIL'::character varying, 'SMS'::character varying])::text[])))</td></tr>
+<tr><td><code>usuario_cliente</code></td><td><code>ck_usuario_cliente_estado</code></td><td>CHECK (((estado)::text = ANY ((ARRAY['ACTIVO'::character varying, 'INACTIVO'::character varying])::text[])))</td></tr>
+<tr><td><code>usuarios</code></td><td><code>ck_usuarios_estado</code></td><td>CHECK (((estado)::text = ANY ((ARRAY['ACTIVO'::character varying, 'INACTIVO'::character varying])::text[])))</td></tr>
+</tbody></table>
+
+<h2>5.2 Restricciones UNIQUE: qué no puede repetirse</h2>
+<table class="compacta "><thead><tr><th>Tabla</th><th>Columna</th><th>Restricción</th></tr></thead><tbody>
+<tr><td><code>clientes</code></td><td><code>numero_identificacion</code></td><td><code>uq_cliente_identificacion</code></td></tr>
+<tr><td><code>clientes</code></td><td><code>tipo_identificacion</code></td><td><code>uq_cliente_identificacion</code></td></tr>
+<tr><td><code>facturas</code></td><td><code>numero_factura</code></td><td><code>facturas_numero_factura_key</code></td></tr>
+<tr><td><code>notas_credito</code></td><td><code>numero_nota</code></td><td><code>notas_credito_numero_nota_key</code></td></tr>
+<tr><td><code>pagos</code></td><td><code>numero_pago</code></td><td><code>pagos_numero_pago_key</code></td></tr>
+<tr><td><code>pedidos</code></td><td><code>numero_pedido</code></td><td><code>pedidos_numero_pedido_key</code></td></tr>
+<tr><td><code>productos</code></td><td><code>codigo</code></td><td><code>productos_codigo_key</code></td></tr>
+<tr><td><code>roles</code></td><td><code>nombre</code></td><td><code>roles_nombre_key</code></td></tr>
+<tr><td><code>usuario_cliente</code></td><td><code>cliente_id</code></td><td><code>usuario_cliente_cliente_id_key</code></td></tr>
+<tr><td><code>usuario_cliente</code></td><td><code>username</code></td><td><code>usuario_cliente_username_key</code></td></tr>
+<tr><td><code>usuarios</code></td><td><code>correo</code></td><td><code>usuarios_correo_key</code></td></tr>
+</tbody></table>
+
+<footer class="pie-doc">FINAN-X · Evidencia 1 de 7 · Modelo Entidad-Relación · Generado a partir del esquema real de PostgreSQL 16 (12 tablas, 117 columnas).</footer>
+
+</div></body>
+</html>

@@ -9,14 +9,14 @@ import pool from '../db.js';
  *
  *     await client.query('BEGIN');
  *     ... la operación ...
- *     await audit({ client, usuario, modulo, operacion, ... });   // participa de la transacción
+ *     await audit({ req, client, usuario, modulo, operacion, ... });   // participa de la transacción
  *     await client.query('COMMIT');
  *
- * Antes se llamaba siempre al pool y siempre DESPUÉS del COMMIT, así que si la inserción de
- * auditoría fallaba la operación quedaba guardada sin dejar rastro (la función nunca lanza,
- * solo escribe en consola). Con `client` ambos cambios se confirman o se deshacen juntos.
+ * Si se pasa `req`, se guardan también la IP y el user-agent: sin ellos, ante un incidente
+ * no se puede saber desde dónde se hizo la operación.
  */
 export async function audit({
+  req = null,
   usuario,
   usuarioTipo = 'INTERNO',
   modulo,
@@ -26,11 +26,14 @@ export async function audit({
   client = null,
 }) {
   const ejecutor = client || pool;
+  const ip = req?.ip || null;
+  const userAgent = req?.get?.('user-agent')?.slice(0, 300) || null;
+
   try {
     await ejecutor.query(
-      `INSERT INTO auditoria (usuario, usuario_tipo, modulo, operacion, registro_afectado, descripcion)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [usuario || null, usuarioTipo, modulo, operacion, String(registro || ''), descripcion || '']
+      `INSERT INTO auditoria (usuario, usuario_tipo, modulo, operacion, registro_afectado, descripcion, ip, user_agent)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+      [usuario || null, usuarioTipo, modulo, operacion, String(registro || ''), descripcion || '', ip, userAgent]
     );
   } catch (err) {
     // Si la auditoría va dentro de una transacción, el error debe propagarse para que la

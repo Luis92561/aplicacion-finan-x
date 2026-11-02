@@ -14,6 +14,52 @@ export function Estado({ value }) {
   return <Badge tone={TONES[value] || 'gray'}>{label}</Badge>;
 }
 
+/**
+ * Rol del usuario. Antes la pantalla de Usuarios pintaba el rol con el componente de
+ * estado y aparecían cosas como "ADMIN → CONFIRMADO" o "CAJERO → PAGO PARCIAL".
+ */
+const ROLES = {
+  ADMIN: { tone: 'purple', label: 'ADMIN' },
+  SUPERVISOR: { tone: 'blue', label: 'SUPERVISOR' },
+  FACTURADOR: { tone: 'green', label: 'FACTURADOR' },
+  CAJERO: { tone: 'orange', label: 'CAJERO' },
+  CLIENTE: { tone: 'gray', label: 'CLIENTE' },
+};
+
+export function Rol({ value }) {
+  const cfg = ROLES[value] || { tone: 'gray', label: String(value || '—') };
+  return <Badge tone={cfg.tone}>{cfg.label}</Badge>;
+}
+
+/** Operación de auditoría, con su propio color (no es un estado del negocio). */
+const OPERACIONES = {
+  LOGIN: 'green',
+  LOGOUT: 'gray',
+  LOGIN_FALLIDO: 'red',
+  LOGIN_BLOQUEADO: 'red',
+  CAMBIO_CLAVE: 'orange',
+  CAMBIO_CLAVE_FALLIDO: 'red',
+  CLAVE: 'orange',
+  CLAVE_RECUPERADA: 'orange',
+  CREAR: 'blue',
+  ACTUALIZAR: 'blue',
+  ESTADO: 'blue',
+  GENERAR: 'purple',
+  REGISTRAR: 'green',
+  PAGO: 'green',
+  PAGO_PORTAL: 'green',
+  CODIGO_EFECTY: 'gray',
+  ANULAR: 'red',
+  RECUPERAR_SOLICITAR: 'gray',
+  AUTORREGISTRO: 'gray',
+};
+
+export function Operacion({ value }) {
+  const v = String(value || '—');
+  const tone = OPERACIONES[v] || (/(ANULAR|FALLID)/.test(v) ? 'red' : 'gray');
+  return <Badge tone={tone}>{v.replaceAll('_', ' ')}</Badge>;
+}
+
 export function Money({ value, decimals = false }) {
   const fmt = new Intl.NumberFormat('es-CO', {
     style: 'currency',

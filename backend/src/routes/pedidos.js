@@ -85,7 +85,9 @@ router.post('/', async (req, res, next) => {
 
     for (const item of items) {
       const cantidad = Number(item.cantidad);
-      if (!item.productoId || !(cantidad > 0)) throw new HttpError(400, 'Cada línea requiere producto y cantidad mayor que cero');
+      if (!item.productoId || !Number.isFinite(cantidad) || cantidad <= 0 || cantidad > 1_000_000) {
+        throw new HttpError(400, 'Cada línea requiere producto y una cantidad válida (mayor que cero)');
+      }
 
       const prod = await client.query('SELECT * FROM productos WHERE producto_id = $1 AND estado = $2', [item.productoId, 'ACTIVO']);
       if (!prod.rowCount) throw new HttpError(400, `Producto ${item.productoId} no existe o está inactivo`);
@@ -111,8 +113,7 @@ router.post('/', async (req, res, next) => {
 
     // Dentro de la transacción: el pedido no debe existir sin su registro de auditoría.
     await audit({
-      client,
-      usuario: req.user.correo, modulo: MODULO, operacion: 'CREAR', registro: numero,
+      req, client, usuario: req.user.correo, modulo: MODULO, operacion: 'CREAR', registro: numero,
       descripcion: `Pedido ${numero} por $${total}`,
     });
 
@@ -145,7 +146,9 @@ router.put('/:id', async (req, res, next) => {
     let impuestos = 0;
     for (const item of items) {
       const cantidad = Number(item.cantidad);
-      if (!item.productoId || !(cantidad > 0)) throw new HttpError(400, 'Cada línea requiere producto y cantidad mayor que cero');
+      if (!item.productoId || !Number.isFinite(cantidad) || cantidad <= 0 || cantidad > 1_000_000) {
+        throw new HttpError(400, 'Cada línea requiere producto y una cantidad válida (mayor que cero)');
+      }
       const prod = await client.query('SELECT * FROM productos WHERE producto_id = $1 AND estado = $2', [item.productoId, 'ACTIVO']);
       if (!prod.rowCount) throw new HttpError(400, `Producto ${item.productoId} no existe o está inactivo`);
       const precioUnitario = Number(prod.rows[0].precio);
@@ -165,8 +168,7 @@ router.put('/:id', async (req, res, next) => {
       [observaciones || null, subtotal, impuestos, total, id]
     );
     await audit({
-      client,
-      usuario: req.user.correo, modulo: MODULO, operacion: 'ACTUALIZAR', registro: ped.rows[0].numero_pedido,
+      req, client, usuario: req.user.correo, modulo: MODULO, operacion: 'ACTUALIZAR', registro: ped.rows[0].numero_pedido,
       descripcion: `Modificación del pedido por $${total}`,
     });
 
@@ -182,10 +184,18 @@ router.put('/:id', async (req, res, next) => {
 
 // PATCH /api/pedidos/:id/estado  — { estado: 'CONFIRMADO' | 'CANCELADO' }
 router.patch('/:id/estado', async (req, res, next) => {
+  const client = await pool.connect();
   try {
     const id = idNumerico(req.params.id, 'id');
     const { estado } = req.body || {};
-    const ped = await pool.query('SELECT estado, numero_pedido FROM pedidos WHERE pedido_id = $1', [id]);
+
+    await client.query('BEGIN');
+    // FOR UPDATE: sin bloqueo, un pedido podía confirmarse y facturarse mientras otro
+    // usuario lo cancelaba al mismo tiempo, dejando una factura sobre un pedido cancelado.
+    const ped = await client.query(
+      'SELECT estado, numero_pedido FROM pedidos WHERE pedido_id = $1 FOR UPDATE',
+      [id]
+    );
     if (!ped.rowCount) throw new HttpError(404, 'Pedido no encontrado');
     const actual = ped.rows[0].estado;
     const permitido =
@@ -193,10 +203,19 @@ router.patch('/:id/estado', async (req, res, next) => {
       (estado === 'CANCELADO' && ['BORRADOR', 'CONFIRMADO'].includes(actual));
     if (!permitido) throw new HttpError(409, `Transición ${actual} → ${estado} no permitida`);
 
-    await pool.query('UPDATE pedidos SET estado = $1 WHERE pedido_id = $2', [estado, id]);
-    await audit({ usuario: req.user.correo, modulo: MODULO, operacion: 'ESTADO', registro: ped.rows[0].numero_pedido, descripcion: `Pedido → ${estado}` });
+    await client.query('UPDATE pedidos SET estado = $1 WHERE pedido_id = $2', [estado, id]);
+    await audit({
+      req, client, usuario: req.user.correo, modulo: MODULO, operacion: 'ESTADO',
+      registro: ped.rows[0].numero_pedido, descripcion: `Pedido → ${estado}`,
+    });
+    await client.query('COMMIT');
     res.json({ ok: true, estado });
-  } catch (e) { next(e); }
+  } catch (e) {
+    await client.query('ROLLBACK').catch(() => {});
+    next(e);
+  } finally {
+    client.release();
+  }
 });
 
 export default router;

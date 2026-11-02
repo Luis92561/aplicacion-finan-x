@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth.jsx';
+import { Rol } from '../ui.jsx';
 
 const ICONS = {
   inicio: '📊', clientes: '👥', productos: '📦', pedidos: '🧾', facturas: '📄',
@@ -15,12 +16,11 @@ const NAVS = {
     { label: 'Pedidos', icon: 'pedidos', to: '/pedidos' },
     { label: 'Facturas', icon: 'facturas', to: '/facturas' },
     { label: 'Pagos', icon: 'pagos', to: '/pagos' },
-    { label: 'Notas crédito', icon: 'notas', to: '/notas-credito' },
-    { label: 'Balances por cliente', icon: 'balance', to: '/balance-clientes' },
-    { label: 'Reportes', icon: 'reportes', to: '/reportes' },
-    { label: 'Auditoría', icon: 'auditoria', to: '/auditoria' },
+    { label: 'Notas crédito', icon: 'notas', to: '/notas-credito', roles: ['ADMIN', 'SUPERVISOR'] },
+    { label: 'Balances por cliente', icon: 'balance', to: '/balance-clientes', roles: ['ADMIN', 'SUPERVISOR', 'FACTURADOR'] },
+    { label: 'Reportes', icon: 'reportes', to: '/reportes', roles: ['ADMIN', 'SUPERVISOR', 'FACTURADOR'] },
+    { label: 'Auditoría', icon: 'auditoria', to: '/auditoria', roles: ['ADMIN', 'SUPERVISOR'] },
   ],
-  adminExtra: [{ label: 'Usuarios', icon: 'usuarios', to: '/usuarios' }],
   cliente: [
     { label: 'Mi saldo', icon: 'saldo', to: '/portal' },
     { label: 'Mis datos', icon: 'datos', to: '/portal/datos' },
@@ -33,23 +33,24 @@ const NAVS = {
 };
 
 export function Shell() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const { logout } = useAuth();
 
   if (!user) return null;
 
-  const isCliente = user.tipo === 'cliente';
-  const navs = isCliente
-    ? NAVS.cliente
-    : [...NAVS.interno, ...(user.rol === 'ADMIN' ? NAVS.adminExtra : [])];
+  const esCliente = user.tipo === 'cliente';
+  const base = esCliente ? NAVS.cliente : NAVS.interno;
+  // El menú oculta lo que el rol no puede usar. Es solo presentación: el backend
+  // vuelve a comprobar el rol en cada endpoint.
+  const navs = base.filter((n) => !n.roles || n.roles.includes(user.rol));
+  if (!esCliente && user.rol === 'ADMIN') {
+    navs.push({ label: 'Usuarios', icon: 'usuarios', to: '/usuarios' });
+  }
 
-  const exit = () => {
-    logout();
+  const exit = async () => {
+    await logout();
     navigate('/login');
   };
-
-  const rolLabel = isCliente ? 'Cliente' : user.rol;
 
   return (
     <div className="layout">
@@ -59,8 +60,7 @@ export function Shell() {
           <small>Facturación y pagos</small>
         </div>
         <nav>
-          {!isCliente && <div className="nav-label">Operación</div>}
-          {isCliente && <div className="nav-label">Mi cuenta</div>}
+          <div className="nav-label">{esCliente ? 'Mi cuenta' : 'Operación'}</div>
           {navs.map((n) => (
             <NavLink key={n.to} to={n.to} end={n.to === '/' || n.to === '/portal'} className={({ isActive }) => (isActive ? 'active' : '')}>
               <span className="icon">{ICONS[n.icon]}</span>
@@ -70,7 +70,10 @@ export function Shell() {
         </nav>
         <div className="user-box">
           <strong>{user.nombre}</strong>
-          <span>{rolLabel}{isCliente ? ` · ${user.username}` : ` · ${user.correo}`}</span>
+          <span className="user-rol">
+            {esCliente ? <Rol value="CLIENTE" /> : <Rol value={user.rol} />}
+            <span>{esCliente ? user.username : user.correo}</span>
+          </span>
           <button className="logout" onClick={exit}>Cerrar sesión</button>
         </div>
       </aside>

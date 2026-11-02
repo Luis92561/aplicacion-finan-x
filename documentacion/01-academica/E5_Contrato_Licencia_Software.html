@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>FINAN-X · Contrato de licencia de software</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 20mm; }
+  :root{
+    --primary:#1e3a8a; --primary-dark:#172554; --accent:#2563eb;
+    --success:#15803d; --success-light:#dcfce7; --warning:#b45309; --warning-light:#fef3c7;
+    --danger:#b91c1c; --danger-light:#fee2e2; --purple:#6d28d9; --purple-light:#ede9fe;
+    --gray:#64748b; --gray-light:#e2e8f0; --bg:#f8fafc; --border:#e2e8f0; --muted:#64748b;
+  }
+  *{box-sizing:border-box}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+    color:#0f172a; margin:0; font-size:10.5pt; line-height:1.55; background:#fff;
+  }
+  .doc{max-width:100%;}
+
+  /* ---------- Portada ---------- */
+  .portada{
+    min-height:245mm; display:flex; flex-direction:column; justify-content:center;
+    text-align:center; page-break-after:always; padding:0 10mm;
+  }
+  .portada .marca{font-size:34pt; font-weight:800; color:var(--primary); letter-spacing:-1px; margin:0}
+  .portada .marca span{color:var(--accent)}
+  .portada .sub{font-size:13pt; color:var(--muted); margin:6px 0 30px}
+  .portada h1{font-size:21pt; color:var(--primary-dark); margin:0 0 8px; line-height:1.25}
+  .portada .evidencia{
+    display:inline-block; background:var(--primary); color:#fff; font-weight:700;
+    padding:5px 16px; border-radius:999px; font-size:10pt; margin-bottom:22px;
+  }
+  .portada .desc{font-size:11pt; color:#334155; max-width:140mm; margin:0 auto 32px}
+  .portada table.meta{margin:0 auto; border-collapse:collapse; font-size:9.5pt; text-align:left}
+  .portada table.meta td{padding:4px 10px; border-bottom:1px solid var(--border)}
+  .portada table.meta td:first-child{color:var(--muted); font-weight:600; white-space:nowrap}
+  .portada .pie{margin-top:38px; font-size:9pt; color:var(--muted)}
+
+  /* ---------- Encabezados ---------- */
+  h1{font-size:16pt; color:var(--primary-dark); margin:0 0 4px; padding-bottom:6px; border-bottom:2.5px solid var(--primary)}
+  h2{font-size:13pt; color:var(--primary); margin:20px 0 8px; padding-bottom:4px; border-bottom:1px solid var(--border); page-break-after:avoid}
+  h3{font-size:11.5pt; color:var(--primary-dark); margin:14px 0 6px; page-break-after:avoid}
+  h4{font-size:10.5pt; color:#334155; margin:11px 0 4px; page-break-after:avoid}
+  p{margin:6px 0}
+  ul,ol{margin:6px 0 6px 18px; padding:0}
+  li{margin:2.5px 0}
+  a{color:var(--accent); text-decoration:none}
+  code{font-family:'Cascadia Mono',Consolas,'Courier New',monospace; font-size:9pt; background:#f1f5f9; padding:1px 4px; border-radius:4px; color:#0f172a}
+  pre{
+    background:#0f172a; color:#e2e8f0; padding:9px 12px; border-radius:7px; font-size:8.5pt;
+    overflow-wrap:anywhere; white-space:pre-wrap; font-family:'Cascadia Mono',Consolas,monospace;
+    page-break-inside:avoid; margin:8px 0; line-height:1.45;
+  }
+  pre code{background:none; color:inherit; padding:0}
+
+  /* ---------- Tablas ---------- */
+  table{width:100%; border-collapse:collapse; margin:9px 0; font-size:9pt; page-break-inside:auto}
+  thead{display:table-header-group}
+  tr{page-break-inside:avoid}
+  th{
+    background:var(--primary); color:#fff; text-align:left; padding:5px 7px;
+    font-size:8.5pt; font-weight:700; text-transform:uppercase; letter-spacing:.3px;
+  }
+  td{padding:4.5px 7px; border-bottom:1px solid var(--border); vertical-align:top}
+  tbody tr:nth-child(even){background:#f8fafc}
+  td.num,th.num{text-align:right; white-space:nowrap}
+  td.c,th.c{text-align:center}
+  table.compacta td,table.compacta th{padding:3.5px 6px; font-size:8.5pt}
+
+  /* ---------- Cajas ---------- */
+  .caja{border-left:4px solid var(--accent); background:#eff6ff; padding:8px 12px; border-radius:0 7px 7px 0; margin:9px 0; page-break-inside:avoid}
+  .caja.ok{border-color:var(--success); background:var(--success-light)}
+  .caja.warn{border-color:var(--warning); background:var(--warning-light)}
+  .caja.err{border-color:var(--danger); background:var(--danger-light)}
+  .caja.purple{border-color:var(--purple); background:var(--purple-light)}
+  .caja p:first-child{margin-top:0}
+  .caja p:last-child{margin-bottom:0}
+  .caja .titulo{font-weight:700; display:block; margin-bottom:2px}
+
+  .badge{display:inline-block; padding:1px 8px; border-radius:999px; font-size:7.5pt; font-weight:700; white-space:nowrap}
+  .b-ok{background:var(--success-light); color:var(--success)}
+  .b-no{background:var(--danger-light); color:var(--danger)}
+  .b-warn{background:var(--warning-light); color:var(--warning)}
+  .b-info{background:#dbeafe; color:var(--primary)}
+  .b-gray{background:var(--gray-light); color:var(--gray)}
+  .b-purple{background:var(--purple-light); color:var(--purple)}
+
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  .grid3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:9px}
+  .kpi{border:1px solid var(--border); border-radius:8px; padding:8px 10px; text-align:center; background:var(--bg)}
+  .kpi .n{font-size:17pt; font-weight:800; color:var(--primary); line-height:1.1}
+  .kpi .t{font-size:8pt; color:var(--muted); text-transform:uppercase; letter-spacing:.4px}
+
+  .captura{border:1px solid var(--border); border-radius:8px; overflow:hidden; margin:9px 0; page-break-inside:avoid}
+  .captura img{width:100%; display:block}
+  .captura .pie{background:var(--bg); padding:5px 9px; font-size:8pt; color:var(--muted); border-top:1px solid var(--border)}
+
+  .salto{page-break-before:always}
+  .evitar-corte{page-break-inside:avoid}
+  .indice{font-size:10pt}
+  .indice li{margin:3px 0}
+  .firma{margin-top:38px; display:grid; grid-template-columns:1fr 1fr; gap:28px}
+  .firma .l{padding-top:5px; font-size:9pt; color:#334155}
+  .firma .l strong{display:block; color:#172554; font-size:9.5pt; margin-bottom:2px}
+  /* Cada dato bajo la firma va en su propio renglon, con el hueco para escribirlo. */
+  .firma .firma-datos{display:block; margin-bottom:1px}
+  /* Hueco en blanco para completar a mano (los datos de las partes en el contrato).
+     No lleva raya: la franja y el borde de la tabla ya indican donde va cada dato.
+     Es inline-block con ancho completo para que ocupe el ancho de su celda Y pueda
+     usarse dentro de una frase (la linea de la fecha de firma). */
+  .hueco{display:inline-block; width:100%; height:1.3em; vertical-align:bottom}
+  /* Linea sobre la que se firma. Aqui si hay raya: es la referencia de la firma. */
+  .linea-firma{display:block; border-bottom:1px solid #334155}
+  /* Columna de etiquetas de las tablas de formulario. */
+  table.formulario .c-etiqueta{width:32%; font-weight:600}
+  /* En las tablas de formulario la etiqueta va arriba, a la altura de la primera
+     linea de escritura. */
+  table.formulario td{vertical-align:top}
+  /* La ultima fila no necesita el borde inferior: la tabla ya cierra ahi. */
+  table.formulario tbody tr:last-child td{border-bottom:none}
+  footer.pie-doc{margin-top:26px; border-top:1px solid var(--border); padding-top:7px; font-size:8pt; color:var(--muted)}
+</style>
+</head>
+<body><div class="doc">
+
+<section class="portada">
+  <p class="marca">FINAN<span>·X</span></p>
+  <p class="sub">Sistema de facturación y pagos</p>
+  <div class="evidencia">Evidencia 5 de 7</div>
+  <h1>Contrato de licencia de software</h1>
+  <p class="desc">Condiciones bajo las cuales la empresa contratante puede utilizar el sistema FINAN-X. El contrato distingue expresamente entre <strong>ser dueño del software</strong> y <strong>tener derecho a usarlo</strong>, que no son lo mismo.</p>
+  <table class="meta"><tr><td>Objeto</td><td>Licencia de uso del software FINAN-X</td></tr>
+<tr><td>Titularidad</td><td>Del equipo desarrollador (EL LICENCIANTE)</td></tr>
+<tr><td>Tipo de licencia</td><td>No exclusiva · uso interno · no transferible</td></tr>
+<tr><td>Duración</td><td>Indefinida, sujeta a las causales de terminación</td></tr>
+<tr><td>Territorio</td><td>República de Colombia</td></tr>
+<tr><td>Finalidad</td><td>Académica (asignatura Integración de Aplicaciones)</td></tr></table>
+  <p class="pie">Proyecto académico · Integración de Aplicaciones · Sexto semestre</p>
+</section>
+
+<div class="caja err">
+  <span class="titulo">Advertencia importante sobre el alcance de este documento</span>
+  <p>Este contrato se elabora como <strong>ejercicio académico</strong> para la asignatura Integración de Aplicaciones, a partir de un escenario supuesto: una empresa contrata al equipo para desarrollar el software.</p>
+  <p style="margin-bottom:0">El software está protegido por las <strong>normas de derecho de autor colombianas</strong> (Ley 23 de 1982 y Ley 44 de 1993, entre otras). Un contrato destinado a una relación comercial real debe ser <strong>revisado y ajustado por un profesional del derecho</strong>, y este documento no sustituye esa asesoría.</p>
+</div>
+
+<h1>Contrato de licencia de uso de software</h1>
+<p>Entre los suscritos, a saber:</p>
+
+
+<h3>EL LICENCIANTE (el equipo desarrollador)</h3>
+<table class="compacta formulario"><tbody>
+<tr><td class="c-etiqueta">Integrantes</td><td><span class="hueco"></span><br><span class="hueco"></span><br><span class="hueco"></span></td></tr>
+<tr><td class="c-etiqueta">Documento de identidad</td><td><span class="hueco"></span><br><span class="hueco"></span><br><span class="hueco"></span></td></tr>
+<tr><td class="c-etiqueta">Domicilio</td><td><span class="hueco"></span></td></tr>
+<tr><td class="c-etiqueta">Correo de contacto</td><td><span class="hueco"></span></td></tr>
+<tr><td class="c-etiqueta">En adelante</td><td><strong>«EL EQUIPO»</strong> o <strong>«EL LICENCIANTE»</strong></td></tr>
+</tbody></table>
+
+<h3>EL LICENCIATARIO (la empresa contratante)</h3>
+<table class="compacta formulario"><tbody>
+<tr><td class="c-etiqueta">Razón social</td><td><span class="hueco"></span></td></tr>
+<tr><td class="c-etiqueta">NIT</td><td><span class="hueco"></span></td></tr>
+<tr><td class="c-etiqueta">Representante legal</td><td><span class="hueco"></span></td></tr>
+<tr><td class="c-etiqueta">Documento del representante</td><td><span class="hueco"></span></td></tr>
+<tr><td class="c-etiqueta">Domicilio</td><td><span class="hueco"></span></td></tr>
+<tr><td class="c-etiqueta">En adelante</td><td><strong>«LA EMPRESA»</strong> o <strong>«EL LICENCIATARIO»</strong></td></tr>
+</tbody></table>
+
+<p>Se ha convenido celebrar el presente <strong>contrato de licencia de uso de software</strong>, que se regirá por las siguientes cláusulas:</p>
+
+<h2>PRIMERA. Identificación del software</h2>
+<p>EL LICENCIANTE desarrolló una aplicación informática denominada <strong>FINAN-X</strong> (en adelante, «EL SOFTWARE»), cuyas características son:</p>
+
+<table class=""><thead><tr><th>Aspecto</th><th>Descripción</th></tr></thead><tbody>
+<tr><td><strong>Nombre</strong></td><td>FINAN-X — Sistema de facturación y pagos</td></tr>
+<tr><td><strong>Finalidad</strong></td><td>Gestionar el ciclo de venta y cobro de una empresa: clientes, productos, pedidos, facturación, pagos, devoluciones, reportes y auditoría, con un portal de autoservicio para el cliente.</td></tr>
+<tr><td><strong>Componentes</strong></td><td>Aplicación web (frontend), interfaz de programación de servicios (API REST), esquema de base de datos y documentación técnica y de usuario.</td></tr>
+<tr><td><strong>Tecnologías</strong></td><td>React y Vite (interfaz); Node.js y Express (servicios); PostgreSQL 16 (datos); Docker para el despliegue.</td></tr>
+<tr><td><strong>Entrega</strong></td><td>Código fuente, esquema de base de datos, scripts de instalación, documentación y pruebas automatizadas.</td></tr>
+<tr><td><strong>Versión</strong></td><td>Versión 1.0 — la identificada en el repositorio al momento de la entrega.</td></tr>
+<tr><td><strong>Ubicación del código</strong></td><td><span class="hueco"></span><br><span style="font-size:8pt;color:#64748b">URL del repositorio o del medio de entrega</span></td></tr>
+</tbody></table>
+
+<h2>SEGUNDA. Titularidad del software</h2>
+<p><strong>EL SOFTWARE es de titularidad de EL LICENCIANTE</strong>, quien conserva la totalidad de los derechos patrimoniales de autor sobre el código fuente, la arquitectura, el modelo de datos, las reglas de negocio, la documentación y los elementos gráficos originales.</p>
+<p>Este contrato <strong>NO transfiere ni cede</strong> la titularidad del software, ni ninguno de los derechos patrimoniales derivados de él. LA EMPRESA recibe únicamente un <strong>derecho de uso</strong> en los términos de la cláusula TERCERA.</p>
+
+<div class="caja">
+  <span class="titulo">Diferencia entre ser dueño y tener derecho a usar</span>
+  <p>Esta distinción es el eje del contrato:</p>
+  <ul style="margin-bottom:0">
+    <li><strong>Titularidad (ceder el software):</strong> el dueño puede venderlo, licenciarlo a otros, modificarlo libremente y decidir su futuro. Es lo que conserva EL LICENCIANTE.</li>
+    <li><strong>Licencia de uso (recibir el software):</strong> el usuario puede utilizarlo en las condiciones pactadas, pero no es su dueño ni puede explotarlo como propio. Es lo que recibe LA EMPRESA.</li>
+  </ul>
+  <p style="margin-bottom:0">Si las partes quisieran transferir la propiedad, sería necesario un contrato de <strong>cesión de derechos patrimoniales</strong>, que no es el presente documento.</p>
+</div>
+
+<h2>TERCERA. Derechos de uso otorgados</h2>
+<p>EL LICENCIANTE otorga a LA EMPRESA una licencia de uso de EL SOFTWARE con las siguientes características:</p>
+
+<table class=""><thead><tr><th>Característica</th><th>Condición</th></tr></thead><tbody>
+<tr><td><strong>Alcance</strong></td><td>Uso del software para la <strong>operación interna</strong> de LA EMPRESA: facturación y cobro a sus propios clientes.</td></tr>
+<tr><td><strong>Usuarios</strong></td><td>El personal de LA EMPRESA y sus clientes, a través del portal de autoservicio, sin límite de número de usuarios.</td></tr>
+<tr><td><strong>Instalaciones</strong></td><td>Los servidores propios de LA EMPRESA o los que contrate para ello (servicios en la nube).</td></tr>
+<tr><td><strong>Copias</strong></td><td>Se permite realizar las copias necesarias para la instalación, el funcionamiento y el respaldo de la información.</td></tr>
+<tr><td><strong>Exclusividad</strong></td><td><strong>NO EXCLUSIVA.</strong> EL LICENCIANTE conserva el derecho de usar, licenciar y comercializar EL SOFTWARE con otros clientes, y de reutilizar sus componentes en otros desarrollos.</td></tr>
+<tr><td><strong>Territorio</strong></td><td>República de Colombia. Su uso fuera de este territorio requerirá autorización escrita de EL LICENCIANTE.</td></tr>
+<tr><td><strong>Duración</strong></td><td>Indefinida, salvo terminación anticipada conforme a la cláusula DÉCIMA.</td></tr>
+<tr><td><strong>Transferibilidad</strong></td><td><strong>NO TRANSFERIBLE.</strong> LA EMPRESA no puede ceder ni sublicenciar la licencia a terceros sin autorización escrita de EL LICENCIANTE.</td></tr>
+</tbody></table>
+
+<h2>CUARTA. Restricciones</h2>
+<p>LA EMPRESA se obliga a <strong>no</strong> realizar, directa ni indirectamente, las siguientes conductas:</p>
+<ol>
+  <li><strong>Comercializar</strong> EL SOFTWARE: venderlo, alquilarlo, licenciarlo, sublicenciarlo o cederlo a terceros, total o parcialmente.</li>
+  <li><strong>Ofrecerlo como servicio</strong> a terceros (por ejemplo, facturar a otras empresas usando EL SOFTWARE como producto propio).</li>
+  <li><strong>Retirar, ocultar o alterar</strong> los avisos de autoría, de titularidad o de licencia que acompañan al software.</li>
+  <li><strong>Usar el nombre o las marcas</strong> de EL LICENCIANTE para promocionar productos o servicios sin autorización escrita.</li>
+  <li><strong>Eludir las medidas de seguridad</strong> del software o utilizarlo para fines ilícitos, incluido el tratamiento de datos personales sin la autorización de sus titulares.</li>
+</ol>
+
+<h2>QUINTA. Distribución y modificación</h2>
+<ul>
+  <li><strong>Distribución:</strong> LA EMPRESA no puede distribuir EL SOFTWARE ni sus componentes a terceros. Se entiende por distribución la entrega a personas distintas de su personal y sus clientes autorizados.</li>
+  <li><strong>Modificación:</strong> LA EMPRESA <strong>puede modificar</strong> el software para adaptarlo a sus necesidades internas, así como desarrollar módulos complementarios, siempre que no los distribuya ni los comercialice como producto independiente.</li>
+  <li><strong>Mejoras:</strong> salvo pacto en contrario, las modificaciones realizadas por LA EMPRESA <strong>no transfieren titularidad</strong> a EL LICENCIANTE sobre el código original, ni de EL LICENCIANTE a LA EMPRESA sobre el software base.</li>
+  <li><strong>Nuevas versiones:</strong> esta licencia cubre la versión 1.0 identificada en la cláusula PRIMERA. Las mejoras y nuevas versiones que EL LICENCIANTE desarrolle podrán licenciarse en condiciones separadas.</li>
+</ul>
+
+<h2>SEXTA. Uso comercial y explotación</h2>
+<p>El uso que LA EMPRESA haga del software es <strong>para sí misma</strong>, en su condición de usuario, y ese uso puede tener finalidad lucrativa en el marco de su actividad (facturar a sus clientes es su negocio). Lo que <strong>no</strong> está permitido es explotar EL SOFTWARE como producto: venderlo, licenciarlo o cobrar a terceros por su uso.</p>
+
+<table class=""><thead><tr><th>Situación</th><th>¿Permitido?</th><th>Aclaración</th></tr></thead><tbody>
+<tr><td>LA EMPRESA usa el sistema para facturar a sus clientes</td><td><span class="badge b-ok">Sí</span></td><td>Es exactamente la finalidad del software y el objeto del contrato.</td></tr>
+<tr><td>LA EMPRESA cobra a un tercero por «instalarle» el sistema</td><td><span class="badge b-no">No</span></td><td>Sería distribución o sublicenciamiento, prohibido en la cláusula CUARTA.</td></tr>
+<tr><td>LA EMPRESA lo ofrece como servicio en línea a otras empresas</td><td><span class="badge b-no">No</span></td><td>Constituiría explotación comercial del software ajeno.</td></tr>
+<tr><td>LA EMPRESA modifica el sistema para su operación</td><td><span class="badge b-ok">Sí</span></td><td>Permitido por la cláusula QUINTA, mientras no lo distribuya.</td></tr>
+<tr><td>EL EQUIPO licencia el mismo software a otra empresa</td><td><span class="badge b-ok">Sí</span></td><td>La licencia es NO EXCLUSIVA: es un derecho que conserva EL LICENCIANTE.</td></tr>
+</tbody></table>
+
+<h2>SÉPTIMA. Propiedad intelectual</h2>
+<ul>
+  <li>EL SOFTWARE es una <strong>obra protegida por el derecho de autor</strong>. La titularidad de EL LICENCIANTE consta desde el momento de su creación, sin necesidad de registro; el registro solo sirve como medio de prueba.</li>
+  <li>Esta licencia <strong>no implica cesión</strong> de derechos morales (que son irrenunciables) ni patrimoniales.</li>
+  <li>Los <strong>datos que LA EMPRESA introduzca</strong> en el sistema (clientes, productos, facturas, pagos) son de su exclusiva propiedad y responsabilidad. EL LICENCIANTE no los utiliza ni los trata con otra finalidad.</li>
+  <li>La documentación, los diagramas, los prototipos y las pruebas son obra de EL LICENCIANTE y quedan cubiertos por esta misma licencia de uso.</li>
+</ul>
+
+<h2>OCTAVA. Componentes de terceros</h2>
+<p>EL SOFTWARE incorpora componentes de código abierto de terceros. La titularidad de esos componentes corresponde a sus respectivos autores y su uso se rige por <strong>sus propias licencias</strong>, no por este contrato. EL LICENCIANTE declara que:</p>
+<ul>
+  <li>Todos los componentes utilizados tienen licencias <strong>permisivas</strong> (MIT, ISC, BSD, Apache-2.0) compatibles con el uso comercial.</li>
+  <li><strong>Ningún componente</strong> que forme parte del software entregado está sujeto a licencias copyleft que obliguen a publicar el código fuente.</li>
+  <li>Se entrega el detalle completo en la <strong>Evidencia 4 · Matriz de propiedad intelectual</strong>, que forma parte de la documentación del proyecto.</li>
+</ul>
+
+<div class="caja">
+  <span class="titulo">Herramientas de documentación</span>
+  <p style="margin-bottom:0">La herramienta <strong>PlantUML</strong>, usada para generar los diagramas, tiene licencia GPL-3.0. Se usó como programa independiente y <strong>no se distribuye</strong> con EL SOFTWARE ni se enlaza con él, por lo que su licencia no alcanza al producto entregado.</p>
+</div>
+
+<h2>NOVENA. Soporte y mantenimiento</h2>
+<p>El presente contrato <strong>no incluye</strong> soporte técnico, mantenimiento, corrección de errores ni actualizaciones, salvo pacto escrito adicional. Si las partes lo desean, podrán suscribir un acuerdo de soporte separado con el alcance, los tiempos de respuesta y la contraprestación correspondiente.</p>
+<p>Se entrega, junto con el software, la documentación de instalación y uso, que permite a LA EMPRESA poner el sistema en funcionamiento por sus propios medios.</p>
+
+<h2>DÉCIMA. Terminación de la licencia</h2>
+<p>Esta licencia puede terminar por:</p>
+<ol>
+  <li><strong>Mutuo acuerdo</strong> de las partes, por escrito.</li>
+  <li><strong>Incumplimiento</strong> de cualquiera de las obligaciones de la cláusula CUARTA (restricciones). En ese caso, EL LICENCIANTE podrá exigir el cese inmediato del uso.</li>
+  <li><strong>Decisión unilateral</strong> de LA EMPRESA, comunicada por escrito, sin penalidad.</li>
+</ol>
+<p>Terminada la licencia, LA EMPRESA deberá <strong>cesar el uso</strong> de EL SOFTWARE y eliminar las copias que obren en su poder, salvo aquellas que deba conservar por obligaciones legales, contables o tributarias.</p>
+
+<div class="caja warn">
+  <span class="titulo">Cláusula importante: los datos no desaparecen por terminar el contrato</span>
+  <p style="margin-bottom:0">La terminación de la licencia <strong>no faculta a borrar la información de LA EMPRESA</strong>. Al finalizar, EL LICENCIANTE entregará una <strong>copia completa de los datos</strong> en un formato abierto y estándar (por ejemplo, un volcado de la base de datos y los documentos generados), para que LA EMPRESA pueda conservarlos y cumplir con sus obligaciones contables y tributarias.</p>
+</div>
+
+<h2>DÉCIMO PRIMERA. Protección de datos personales</h2>
+<p>EL SOFTWARE trata datos personales de clientes (nombre, identificación, contacto). LA EMPRESA actúa como <strong>responsable del tratamiento</strong> y se obliga a dar cumplimiento a la normativa colombiana de protección de datos personales (Ley 1581 de 2012 y sus decretos reglamentarios). EL LICENCIANTE, en su calidad de desarrollador, actúa como <strong>encargado del tratamiento</strong> únicamente en lo necesario para la puesta en funcionamiento y no utiliza los datos con fines distintos.</p>
+
+<h2>DÉCIMO SEGUNDA. Garantías y limitación de responsabilidad</h2>
+<p>EL LICENCIANTE entrega EL SOFTWARE en el estado en que se encuentra, con la documentación y las pruebas descritas en la documentación del proyecto. No garantiza que el software esté libre de errores ni que satisfaga necesidades distintas de las especificadas en la Evidencia 3 (Especificación de Requisitos).</p>
+<p>EL LICENCIANTE no será responsable de los perjuicios derivados del uso indebido del software, de la pérdida de datos por causas ajenas a su control (fallos de hardware, de red o de terceros) ni del incumplimiento por parte de LA EMPRESA de sus obligaciones legales, contables o tributarias.</p>
+<p><strong>Aclaración necesaria:</strong> EL SOFTWARE genera documentos de cobro con finalidad de gestión interna. <strong>No constituye un documento con validez fiscal</strong> mientras no se integre con los servicios de facturación electrónica exigidos por la DIAN.</p>
+
+<h2>DÉCIMO TERCERA. Modificaciones al contrato</h2>
+<p>Cualquier modificación de este contrato deberá constar por <strong>escrito</strong> y ser suscrita por ambas partes.</p>
+
+<h2>DÉCIMO CUARTA. Ley aplicable y solución de controversias</h2>
+<p>Este contrato se rige por las leyes de la <strong>República de Colombia</strong>. Las partes intentarán resolver de buena fe cualquier controversia derivada de su interpretación o cumplimiento, y de no lograrlo acudirán a los jueces competentes de <span class="hueco"></span>.</p>
+
+<h2>DÉCIMO QUINTA. Aceptación</h2>
+<p>Las partes manifiestan que han leído y comprendido el contenido de este contrato y lo aceptan en su integridad, y en constancia firman:</p>
+
+<div class="firma">
+  <div>
+    <div class="l">
+      <span class="linea-firma" style="height:3.4em"></span>
+      <strong>EL LICENCIANTE</strong>
+      <span class="firma-datos">Nombre: <span class="hueco" style="height:1.2em"></span></span>
+      <span class="firma-datos">CC: <span class="hueco" style="height:1.2em"></span></span>
+      En representación del equipo desarrollador
+    </div>
+  </div>
+  <div>
+    <div class="l">
+      <span class="linea-firma" style="height:3.4em"></span>
+      <strong>EL LICENCIATARIO</strong>
+      <span class="firma-datos">Nombre: <span class="hueco"></span></span>
+      <span class="firma-datos">CC: <span class="hueco"></span></span>
+      Representante legal de <span class="hueco"></span><br>
+      <span class="firma-datos">NIT: <span class="hueco"></span></span>
+    </div>
+  </div>
+</div>
+
+<p style="margin-top:22px">Firmado en:</p>
+<table class="compacta formulario"><tbody>
+<tr><td class="c-etiqueta">Ciudad</td><td><span class="hueco"></span></td></tr>
+<tr><td class="c-etiqueta">Día</td><td><span class="hueco"></span></td></tr>
+<tr><td class="c-etiqueta">Mes</td><td><span class="hueco"></span></td></tr>
+<tr><td class="c-etiqueta">Año</td><td><span class="hueco"></span></td></tr>
+</tbody></table>
+
+<h1>Anexo · Resumen de la licencia en una página</h1>
+<table class=""><thead><tr><th>Pregunta</th><th>Respuesta</th></tr></thead><tbody>
+<tr><td>¿Quién es el dueño del software?</td><td><strong>El equipo desarrollador (EL LICENCIANTE).</strong> Conserva todos los derechos patrimoniales.</td></tr>
+<tr><td>¿Qué recibe LA EMPRESA?</td><td>Una <strong>licencia de uso</strong>: puede usarlo para su operación interna, sin ser su dueña.</td></tr>
+<tr><td>¿Es exclusiva?</td><td><strong>No.</strong> El equipo puede licenciar el mismo software a otros clientes.</td></tr>
+<tr><td>¿Puede LA EMPRESA venderlo o revenderlo?</td><td><strong>No.</strong> Tampoco ofrecerlo como servicio a terceros.</td></tr>
+<tr><td>¿Puede modificarlo?</td><td><strong>Sí</strong>, para su uso interno, pero no distribuirlo.</td></tr>
+<tr><td>¿Por cuánto tiempo?</td><td>De forma <strong>indefinida</strong>, salvo incumplimiento o decisión de la empresa.</td></tr>
+<tr><td>¿Dónde puede usarlo?</td><td>En <strong>Colombia</strong>.</td></tr>
+<tr><td>¿Qué pasa con los datos de la empresa?</td><td>Son <strong>suyos</strong>. Al terminar el contrato se le entrega una copia completa.</td></tr>
+<tr><td>¿Los componentes de terceros cambian algo?</td><td>No. Todos son de licencia permisiva; el equipo puede licenciar su software como decida.</td></tr>
+<tr><td>¿Quién responde por las obligaciones fiscales?</td><td><strong>LA EMPRESA.</strong> El software no emite documentos con validez fiscal mientras no se integre con la DIAN.</td></tr>
+</tbody></table>
+
+<footer class="pie-doc">FINAN-X · Evidencia 5 de 7 · Contrato de licencia de software · Documento con finalidad académica.</footer>
+
+</div></body>
+</html>

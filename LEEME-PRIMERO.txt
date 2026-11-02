@@ -1,0 +1,52 @@
+FINAN-X · Facturación y pagos — versión final 1.0.0
+====================================================
+
+QUÉ ES ESTO
+-----------
+Proyecto de facturación y pagos (React + Node.js + PostgreSQL) con panel de control,
+portal de clientes, auditoría de seguridad y documentación académica.
+
+CÓMO ABRIRLO (LO MÁS RÁPIDO)
+----------------------------
+Windows:  entrega\windows\ABRIR-FINAN-X.bat        (doble clic)
+Mac:      entrega\mac\ABRIR-FINAN-X.command        (doble clic)
+
+El lanzador arranca Docker, levanta la base de datos, la API y la interfaz, crea las
+cuentas iniciales y abre el navegador en http://localhost:8080.
+
+Solo se necesita Docker Desktop instalado una vez. Si no hay internet, el lanzador usa
+las imágenes de entrega\*\paquete-offline\.
+
+CUENTAS
+-------
+Están en primer-ingreso\Acta-Usuarios-Primer-Ingreso.pdf
+Todas piden cambiar la contraseña en el primer ingreso.
+
+DÓNDE ESTÁ CADA COSA
+--------------------
+documentacion\00-indice.md          Índice de toda la documentación
+documentacion\01-academica\         Evidencias E1–E7 y guías del proyecto
+documentacion\02-tecnica\           Especificaciones, diagramas y dashboard
+documentacion\03-operacion\         Despliegue, checklist y abrir en otra PC
+documentacion\04-seguridad\         Auditoría y estado de remediación
+documentacion\05-usuarios\          Nota sobre las cuentas iniciales
+documentacion\06-anexos\            Mockups y capturas
+primer-ingreso\                     Acta y claves temporales (NO publicar)
+base\                               Datos de demostración opcionales
+
+COMANDOS ÚTILES
+---------------
+CERRAR-FINAN-X        Detiene la aplicación (conserva los datos)
+REINICIAR-DATOS       Borra los datos y deja la demo como nueva
+ABRIR-MODO-SEGURO     Abre con HTTPS en https://localhost:8443
+CARGAR-DEMO           Reemplaza la base por la demo (6 facturas de ejemplo)
+
+SEGURIDAD
+---------
+- No publique primer-ingreso\ ni el archivo .env.
+- El informe de auditoría y su remediación están en documentacion\04-seguridad\.
+- Antes de publicar en internet, siga documentacion\03-operacion\CHECKLIST-DESPLIEGUE.md.
+
+INTEGRIDAD
+----------
+SHA256SUMS.txt contiene el hash de cada archivo para verificar la entrega.

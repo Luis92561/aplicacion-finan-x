@@ -117,7 +117,7 @@ export default function FacturaDetalle() {
           <button className="btn btn-primary" onClick={() => setShowPreview(true)}>👁 Vista previa · Imprimir</button>
           {data.correo && (
             <a className="btn btn-ghost" style={{ textDecoration: 'none' }}
-              href={`mailto:${data.correo}?subject=${encodeURIComponent(`Factura ${data.numero_factura} · FINAN-X`)}&body=${encodeURIComponent(`Estimado(a) ${data.nombre_razon_social}:\n\nAdjuntamos su factura ${data.numero_factura} por ${cpu(data.total)}. Saldo pendiente: ${cpu(data.saldo)}.\n\nDescargue el detalle en el portal FINAN-X.\n\nAtentamente,\nFINAN-X`)}`}>
+              href={`mailto:${encodeURIComponent(data.correo)}?subject=${encodeURIComponent(`Factura ${data.numero_factura} · FINAN-X`)}&body=${encodeURIComponent(`Estimado(a) ${data.nombre_razon_social}:\n\nAdjuntamos su factura ${data.numero_factura} por ${cpu(data.total)}. Saldo pendiente: ${cpu(data.saldo)}.\n\nDescargue el detalle en el portal FINAN-X.\n\nAtentamente,\nFINAN-X`)}`}>
               ✉ Enviar por correo
             </a>
           )}

@@ -4,10 +4,15 @@
   "description": "API REST de FINAN-X (facturación y pagos)",
   "type": "module",
   "main": "src/index.js",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "node --watch src/index.js",
     "start": "node src/index.js",
-    "seed": "node src/seed.js",
+    "seed:demo": "node src/seed.js",
+    "init:usuarios": "node scripts/crear-usuarios-iniciales.mjs",
+    "verificar:esquema": "node scripts/verificar-esquema.mjs",
     "test": "node scripts/e2e.mjs"
   },
   "dependencies": {

@@ -12,4 +12,17 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    // Separa las librerías grandes en su propio archivo: el navegador puede cachearlas
+    // entre versiones y el trozo de la aplicación queda pequeño.
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom', 'react-router-dom'],
+          charts: ['recharts'],
+          http: ['axios'],
+        },
+      },
+    },
+  },
 });

@@ -107,24 +107,24 @@ async function main() {
       correo: `nuevo${regSuf}@mail.co`,
       ciudad: 'Pereira',
       username: `nuevo${regSuf}`,
-      password: 'secreto1',
+      password: 'SecretoSeguro#1',
     },
   });
   check('Registrar cliente → 201 con token', reg.status === 201 && !!reg.data?.token && reg.data?.user?.tipo === 'cliente', JSON.stringify(reg.data));
   let REGT = reg.data?.token;
   const dupIdent = await call('POST', '/auth/registro', {
-    body: { nombreRazonSocial: 'Duplicado', numeroIdentificacion: `1122${regSuf}`, username: `otro${regSuf}`, password: 'secreto1' },
+    body: { nombreRazonSocial: 'Duplicado', numeroIdentificacion: `1122${regSuf}`, username: `otro${regSuf}`, password: 'SecretoSeguro#1' },
   });
   check('Identificación duplicada → 409', dupIdent.status === 409, JSON.stringify(dupIdent.data));
   const dupUser = await call('POST', '/auth/registro', {
-    body: { nombreRazonSocial: 'Otro', numeroIdentificacion: `2211${regSuf}`, username: `nuevo${regSuf}`, password: 'secreto1' },
+    body: { nombreRazonSocial: 'Otro', numeroIdentificacion: `2211${regSuf}`, username: `nuevo${regSuf}`, password: 'SecretoSeguro#1' },
   });
   check('Usuario duplicado → 409', dupUser.status === 409, JSON.stringify(dupUser.data));
   const corta = await call('POST', '/auth/registro', {
     body: { nombreRazonSocial: 'Corta', numeroIdentificacion: `3311${regSuf}`, username: `ab${regSuf}`, password: '123' },
   });
   check('Contraseña corta → 400', corta.status === 400);
-  const sinNombre = await call('POST', '/auth/registro', { body: { numeroIdentificacion: `4411${regSuf}`, username: `sn${regSuf}`, password: 'secreto1' } });
+  const sinNombre = await call('POST', '/auth/registro', { body: { numeroIdentificacion: `4411${regSuf}`, username: `sn${regSuf}`, password: 'SecretoSeguro#1' } });
   check('Faltan datos obligatorios → 400', sinNombre.status === 400);
   const misNuevo = await call('GET', '/mis-facturas', { token: REGT });
   check('Cliente registrado entra al portal aislado', misNuevo.status === 200 && Array.isArray(misNuevo.data));
@@ -414,7 +414,7 @@ async function main() {
   check('Crear cuenta de portal con contraseña de 1 carácter → 400', cuentaClaveCorta.status === 400, JSON.stringify(cuentaClaveCorta.data));
 
   // M5 · `estado` de un usuario interno se guardaba sin validar (la columna no tiene CHECK).
-  const userNuevo = await call('POST', '/usuarios', { token: AT, body: { nombre: `Usuario ${suffix}`, correo: `u${suffix}@finanx.test`, rol: 'CAJERO', password: 'clave12345' } });
+  const userNuevo = await call('POST', '/usuarios', { token: AT, body: { nombre: `Usuario ${suffix}`, correo: `u${suffix}@finanx.test`, rol: 'CAJERO', password: 'ClaveAdminSegura#2' } });
   const estadoMalo = await call('PATCH', `/usuarios/${userNuevo.data?.usuario_id}`, { token: AT, body: { estado: 'CUALQUIERA' } });
   check('Estado de usuario inválido → 400 (antes se guardaba tal cual)', estadoMalo.status === 400, JSON.stringify(estadoMalo.data));
 
@@ -504,7 +504,7 @@ async function main() {
   // Con dos administradores activos, desactivar a uno sí debe permitirse… pero el
   // usuario con el que se prueba (admin@finanx.test) es el que se va a desactivar, así
   // que primero se crea un segundo administrador y se prueba con él.
-  const admin2 = await call('POST', '/usuarios', { token: AT, body: { nombre: `Admin Dos ${suffix}`, correo: `admin2-${suffix}@finanx.test`, rol: 'ADMIN', password: 'clave12345' } });
+  const admin2 = await call('POST', '/usuarios', { token: AT, body: { nombre: `Admin Dos ${suffix}`, correo: `admin2-${suffix}@finanx.test`, rol: 'ADMIN', password: 'ClaveAdminSegura#2' } });
   check('Crear un segundo administrador → 201', admin2.status === 201, JSON.stringify(admin2.data));
   const offAdmin2 = await call('PATCH', `/usuarios/${admin2.data?.usuario_id}`, { token: AT, body: { estado: 'INACTIVO' } });
   check('Con otro ADMIN activo, desactivar a uno se permite', offAdmin2.status === 200, JSON.stringify(offAdmin2.data));
@@ -543,19 +543,24 @@ async function main() {
   check('CORS: origen no permitido es bloqueado', corsEvil.headers.get('access-control-allow-origin') === null);
 
   let ultimoIntento = null;
+  // El bloqueo ahora es por CUENTA (además de por IP+usuario): se ataca siempre el mismo
+  // usuario para que el contador de la cuenta se dispare.
+  const usuarioBloqueo = `bloqueo-${suffix}@x.test`;
   for (let i = 0; i < 30; i++) {
-    ultimoIntento = await call('POST', '/auth/login', { body: { username: `e2e-${Date.now()}-${i}@x.test`, password: 'mala' } });
+    ultimoIntento = await call('POST', '/auth/login', { body: { username: usuarioBloqueo, password: 'mala' } });
     if (ultimoIntento.status === 429) break;
   }
-  check('Fuerza bruta: intentos fallidos consecutivos → 429', ultimoIntento.status === 429, JSON.stringify(ultimoIntento.data));
-  const okTrasBloqueo = await call('POST', '/auth/login', { body: { username: 'cliente@finanx.test', password: 'cliente123' } });
-  check('Login correcto tras bloqueo → 200 (el acierto resetea el contador)', okTrasBloqueo.status === 200, JSON.stringify(okTrasBloqueo.data));
-  const datosTrasTodo = await call('GET', '/mis-datos', { token: okTrasBloqueo.data?.token });
+  check('Fuerza bruta: 5 fallos de una cuenta → 429', ultimoIntento.status === 429, JSON.stringify(ultimoIntento.data));
+  const okOtraCuenta = await call('POST', '/auth/login', { body: { username: 'cliente@finanx.test', password: 'cliente123' } });
+  check('Un login correcto de OTRA cuenta no reinicia el bloqueo', okOtraCuenta.status === 200, JSON.stringify(okOtraCuenta.data));
+  const sigueBloqueada = await call('POST', '/auth/login', { body: { username: usuarioBloqueo, password: 'mala' } });
+  check('La cuenta atacada sigue bloqueada tras el login ajeno → 429', sigueBloqueada.status === 429, JSON.stringify(sigueBloqueada.data));
+  const datosTrasTodo = await call('GET', '/mis-datos', { token: okOtraCuenta.data?.token });
   check('Token renovado sigue aislado en el portal', datosTrasTodo.status === 200 && datosTrasTodo.data?.cliente_id === clienteLogin.data?.user?.clienteId);
 
   // ---------- Recuperación de contraseña (OTP) y datos de pago en línea ----------
   console.log('12) Recuperación de contraseña (OTP) y datos de pago en línea');
-  const reqUsr = `nuevo${regSuf}`; // cliente autoregistrado en 1b (contraseña original 'secreto1')
+  const reqUsr = `nuevo${regSuf}`; // cliente autoregistrado en 1b (contraseña original 'SecretoSeguro#1')
 
   // --- Flujo de recuperación con código de un solo uso ---
   const sol = await call('POST', '/auth/recuperar-solicitar', { body: { username: reqUsr, canal: 'EMAIL' } });
@@ -567,21 +572,21 @@ async function main() {
 
   let ultimoWrong = null;
   for (let i = 0; i < 5; i++) {
-    ultimoWrong = await call('POST', '/auth/recuperar-cambiar', { body: { username: reqUsr, codigo: '000000', nuevaClave: 'claveNueva1' } });
+    ultimoWrong = await call('POST', '/auth/recuperar-cambiar', { body: { username: reqUsr, codigo: '000000', nuevaClave: 'ClaveNuevaSegura#1' } });
   }
   check('Código incorrecto → 401 en cada intento y se bloquea a los 5', ultimoWrong.status === 401, JSON.stringify(ultimoWrong.data));
-  const trasBloqueo = await call('POST', '/auth/recuperar-cambiar', { body: { username: reqUsr, codigo: sol.data?.demo_otp, nuevaClave: 'claveNueva1' } });
+  const trasBloqueo = await call('POST', '/auth/recuperar-cambiar', { body: { username: reqUsr, codigo: sol.data?.demo_otp, nuevaClave: 'ClaveNuevaSegura#1' } });
   check('Con intentos agotados el código correcto ya no vale', trasBloqueo.status === 400 || trasBloqueo.status === 429, JSON.stringify(trasBloqueo.data));
 
   const sol2 = await call('POST', '/auth/recuperar-solicitar', { body: { username: reqUsr, canal: 'EMAIL' } });
   check('Nuevo código tras agotar el anterior', sol2.status === 200 && /^\d{6}$/.test(String(sol2.data?.demo_otp || '')), JSON.stringify(sol2.data));
-  const codMal = await call('POST', '/auth/recuperar-cambiar', { body: { username: reqUsr, codigo: '111111', nuevaClave: 'claveNueva1' } });
+  const codMal = await call('POST', '/auth/recuperar-cambiar', { body: { username: reqUsr, codigo: '111111', nuevaClave: 'ClaveNuevaSegura#1' } });
   check('Código incorrecto rechazado → 401', codMal.status === 401);
-  const cambio = await call('POST', '/auth/recuperar-cambiar', { body: { username: reqUsr, codigo: sol2.data?.demo_otp, nuevaClave: 'claveNueva1' } });
+  const cambio = await call('POST', '/auth/recuperar-cambiar', { body: { username: reqUsr, codigo: sol2.data?.demo_otp, nuevaClave: 'ClaveNuevaSegura#1' } });
   check('Cambiar contraseña con código válido → 200', cambio.status === 200, JSON.stringify(cambio.data));
-  const loginNueva = await call('POST', '/auth/login', { body: { username: reqUsr, password: 'claveNueva1' } });
+  const loginNueva = await call('POST', '/auth/login', { body: { username: reqUsr, password: 'ClaveNuevaSegura#1' } });
   check('Login con la nueva contraseña → 200', loginNueva.status === 200 && loginNueva.data?.user?.tipo === 'cliente', JSON.stringify(loginNueva.data));
-  const loginVieja = await call('POST', '/auth/login', { body: { username: reqUsr, password: 'secreto1' } });
+  const loginVieja = await call('POST', '/auth/login', { body: { username: reqUsr, password: 'SecretoSeguro#1' } });
   check('La contraseña anterior ya no sirve → 401', loginVieja.status === 401);
   const reuso = await call('POST', '/auth/recuperar-cambiar', { body: { username: reqUsr, codigo: sol2.data?.demo_otp, nuevaClave: 'otraClave123' } });
   check('El código usado no se puede reutilizar', reuso.status === 400, JSON.stringify(reuso.data));
@@ -597,13 +602,13 @@ async function main() {
   // iniciar sesión al final del bloque y se reasigna REGT: es exactamente lo que tendría
   // que hacer un usuario real tras cambiar su contraseña.
   console.log('12b) A7: el cambio de contraseña cierra las sesiones anteriores');
-  const loginAntes = await call('POST', '/auth/login', { body: { username: reqUsr, password: 'claveNueva1' } });
+  const loginAntes = await call('POST', '/auth/login', { body: { username: reqUsr, password: 'ClaveNuevaSegura#1' } });
   const tokenViejo = loginAntes.data?.token;
   const antesCambio = await call('GET', '/mis-datos', { token: tokenViejo });
   check('Token nuevo funciona antes de cambiar la contraseña', antesCambio.status === 200, `status=${antesCambio.status}`);
 
   const sol3 = await call('POST', '/auth/recuperar-solicitar', { body: { username: reqUsr, canal: 'EMAIL' } });
-  const cambio2 = await call('POST', '/auth/recuperar-cambiar', { body: { username: reqUsr, codigo: sol3.data?.demo_otp, nuevaClave: 'claveNueva2' } });
+  const cambio2 = await call('POST', '/auth/recuperar-cambiar', { body: { username: reqUsr, codigo: sol3.data?.demo_otp, nuevaClave: 'ClaveNuevaSegura#2' } });
   check('Segundo cambio de contraseña → 200', cambio2.status === 200, JSON.stringify(cambio2.data));
 
   const conTokenViejo = await call('GET', '/mis-datos', { token: tokenViejo });
@@ -613,7 +618,7 @@ async function main() {
   const conRegtViejo = await call('GET', '/mis-datos', { token: REGT });
   check('El token del registro también queda invalidado → 401', conRegtViejo.status === 401, `status=${conRegtViejo.status}`);
 
-  const loginTrasCambio = await call('POST', '/auth/login', { body: { username: reqUsr, password: 'claveNueva2' } });
+  const loginTrasCambio = await call('POST', '/auth/login', { body: { username: reqUsr, password: 'ClaveNuevaSegura#2' } });
   const tokenNuevo = loginTrasCambio.data?.token;
   const conTokenNuevo = await call('GET', '/mis-datos', { token: tokenNuevo });
   check('Token emitido DESPUÉS del cambio → 200', conTokenNuevo.status === 200, `status=${conTokenNuevo.status}`);

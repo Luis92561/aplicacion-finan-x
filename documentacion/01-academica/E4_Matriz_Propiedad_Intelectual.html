@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>FINAN-X · Matriz de propiedad intelectual</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 20mm; }
+  :root{
+    --primary:#1e3a8a; --primary-dark:#172554; --accent:#2563eb;
+    --success:#15803d; --success-light:#dcfce7; --warning:#b45309; --warning-light:#fef3c7;
+    --danger:#b91c1c; --danger-light:#fee2e2; --purple:#6d28d9; --purple-light:#ede9fe;
+    --gray:#64748b; --gray-light:#e2e8f0; --bg:#f8fafc; --border:#e2e8f0; --muted:#64748b;
+  }
+  *{box-sizing:border-box}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+    color:#0f172a; margin:0; font-size:10.5pt; line-height:1.55; background:#fff;
+  }
+  .doc{max-width:100%;}
+
+  /* ---------- Portada ---------- */
+  .portada{
+    min-height:245mm; display:flex; flex-direction:column; justify-content:center;
+    text-align:center; page-break-after:always; padding:0 10mm;
+  }
+  .portada .marca{font-size:34pt; font-weight:800; color:var(--primary); letter-spacing:-1px; margin:0}
+  .portada .marca span{color:var(--accent)}
+  .portada .sub{font-size:13pt; color:var(--muted); margin:6px 0 30px}
+  .portada h1{font-size:21pt; color:var(--primary-dark); margin:0 0 8px; line-height:1.25}
+  .portada .evidencia{
+    display:inline-block; background:var(--primary); color:#fff; font-weight:700;
+    padding:5px 16px; border-radius:999px; font-size:10pt; margin-bottom:22px;
+  }
+  .portada .desc{font-size:11pt; color:#334155; max-width:140mm; margin:0 auto 32px}
+  .portada table.meta{margin:0 auto; border-collapse:collapse; font-size:9.5pt; text-align:left}
+  .portada table.meta td{padding:4px 10px; border-bottom:1px solid var(--border)}
+  .portada table.meta td:first-child{color:var(--muted); font-weight:600; white-space:nowrap}
+  .portada .pie{margin-top:38px; font-size:9pt; color:var(--muted)}
+
+  /* ---------- Encabezados ---------- */
+  h1{font-size:16pt; color:var(--primary-dark); margin:0 0 4px; padding-bottom:6px; border-bottom:2.5px solid var(--primary)}
+  h2{font-size:13pt; color:var(--primary); margin:20px 0 8px; padding-bottom:4px; border-bottom:1px solid var(--border); page-break-after:avoid}
+  h3{font-size:11.5pt; color:var(--primary-dark); margin:14px 0 6px; page-break-after:avoid}
+  h4{font-size:10.5pt; color:#334155; margin:11px 0 4px; page-break-after:avoid}
+  p{margin:6px 0}
+  ul,ol{margin:6px 0 6px 18px; padding:0}
+  li{margin:2.5px 0}
+  a{color:var(--accent); text-decoration:none}
+  code{font-family:'Cascadia Mono',Consolas,'Courier New',monospace; font-size:9pt; background:#f1f5f9; padding:1px 4px; border-radius:4px; color:#0f172a}
+  pre{
+    background:#0f172a; color:#e2e8f0; padding:9px 12px; border-radius:7px; font-size:8.5pt;
+    overflow-wrap:anywhere; white-space:pre-wrap; font-family:'Cascadia Mono',Consolas,monospace;
+    page-break-inside:avoid; margin:8px 0; line-height:1.45;
+  }
+  pre code{background:none; color:inherit; padding:0}
+
+  /* ---------- Tablas ---------- */
+  table{width:100%; border-collapse:collapse; margin:9px 0; font-size:9pt; page-break-inside:auto}
+  thead{display:table-header-group}
+  tr{page-break-inside:avoid}
+  th{
+    background:var(--primary); color:#fff; text-align:left; padding:5px 7px;
+    font-size:8.5pt; font-weight:700; text-transform:uppercase; letter-spacing:.3px;
+  }
+  td{padding:4.5px 7px; border-bottom:1px solid var(--border); vertical-align:top}
+  tbody tr:nth-child(even){background:#f8fafc}
+  td.num,th.num{text-align:right; white-space:nowrap}
+  td.c,th.c{text-align:center}
+  table.compacta td,table.compacta th{padding:3.5px 6px; font-size:8.5pt}
+
+  /* ---------- Cajas ---------- */
+  .caja{border-left:4px solid var(--accent); background:#eff6ff; padding:8px 12px; border-radius:0 7px 7px 0; margin:9px 0; page-break-inside:avoid}
+  .caja.ok{border-color:var(--success); background:var(--success-light)}
+  .caja.warn{border-color:var(--warning); background:var(--warning-light)}
+  .caja.err{border-color:var(--danger); background:var(--danger-light)}
+  .caja.purple{border-color:var(--purple); background:var(--purple-light)}
+  .caja p:first-child{margin-top:0}
+  .caja p:last-child{margin-bottom:0}
+  .caja .titulo{font-weight:700; display:block; margin-bottom:2px}
+
+  .badge{display:inline-block; padding:1px 8px; border-radius:999px; font-size:7.5pt; font-weight:700; white-space:nowrap}
+  .b-ok{background:var(--success-light); color:var(--success)}
+  .b-no{background:var(--danger-light); color:var(--danger)}
+  .b-warn{background:var(--warning-light); color:var(--warning)}
+  .b-info{background:#dbeafe; color:var(--primary)}
+  .b-gray{background:var(--gray-light); color:var(--gray)}
+  .b-purple{background:var(--purple-light); color:var(--purple)}
+
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  .grid3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:9px}
+  .kpi{border:1px solid var(--border); border-radius:8px; padding:8px 10px; text-align:center; background:var(--bg)}
+  .kpi .n{font-size:17pt; font-weight:800; color:var(--primary); line-height:1.1}
+  .kpi .t{font-size:8pt; color:var(--muted); text-transform:uppercase; letter-spacing:.4px}
+
+  .captura{border:1px solid var(--border); border-radius:8px; overflow:hidden; margin:9px 0; page-break-inside:avoid}
+  .captura img{width:100%; display:block}
+  .captura .pie{background:var(--bg); padding:5px 9px; font-size:8pt; color:var(--muted); border-top:1px solid var(--border)}
+
+  .salto{page-break-before:always}
+  .evitar-corte{page-break-inside:avoid}
+  .indice{font-size:10pt}
+  .indice li{margin:3px 0}
+  .firma{margin-top:38px; display:grid; grid-template-columns:1fr 1fr; gap:28px}
+  .firma .l{border-top:1px solid #334155; padding-top:5px; font-size:9pt; color:#334155}
+  .placeholder{background:#fef3c7; border-bottom:1px dashed var(--warning); padding:0 3px; font-weight:600}
+  footer.pie-doc{margin-top:26px; border-top:1px solid var(--border); padding-top:7px; font-size:8pt; color:var(--muted)}
+</style>
+</head>
+<body><div class="doc">
+
+<section class="portada">
+  <p class="marca">FINAN<span>·X</span></p>
+  <p class="sub">Sistema de facturación y pagos</p>
+  <div class="evidencia">Evidencia 4 de 7</div>
+  <h1>Matriz de propiedad intelectual</h1>
+  <p class="desc">Inventario de todo lo que compone FINAN-X: qué es propio del equipo, qué es de terceros y bajo qué licencia se utiliza. Las licencias se han verificado en el árbol de dependencias real del proyecto, no supuesto.</p>
+  <table class="meta"><tr><td>Sistema</td><td>FINAN-X · Facturación y pagos</td></tr>
+<tr><td>Paquetes analizados</td><td>238</td></tr>
+<tr><td>Dependencias directas</td><td>12</td></tr>
+<tr><td>Componentes no npm</td><td>11</td></tr>
+<tr><td>Licencias distintas encontradas</td><td>6</td></tr>
+<tr><td>Licencias copyleft fuerte</td><td>1 (una herramienta, no se distribuye)</td></tr></table>
+  <p class="pie">Proyecto académico · Integración de Aplicaciones · Sexto semestre</p>
+</section>
+
+<h1>1. Para qué sirve esta matriz</h1>
+<p>Antes de definir las condiciones de uso del software (Evidencia 5) hay que saber <strong>qué hay dentro</strong> y <strong>de quién es cada parte</strong>. Esta matriz responde a tres preguntas:</p>
+<ul>
+  <li>¿Qué parte de FINAN-X es <strong>original del equipo</strong>?</li>
+  <li>¿Qué parte es de <strong>terceros</strong> y con qué licencia se usa?</li>
+  <li>¿Alguna de esas licencias <strong>condiciona</strong> lo que el equipo puede hacer con su propio software?</li>
+</ul>
+
+<div class="caja ok">
+  <span class="titulo">Conclusión principal</span>
+  <p style="margin-bottom:0">Todas las librerías que forman parte del software entregado usan licencias <strong>permisivas</strong> (MIT, ISC, BSD, Apache). <strong>Ninguna obliga a publicar el código propio</strong> ni impide su uso comercial, así que el equipo conserva la titularidad y puede licenciar el producto con las condiciones que decida (Evidencia 5). La única licencia copyleft del proyecto corresponde a <strong>PlantUML</strong>, que es una herramienta de documentación que <em>no se distribuye</em> con el software: se ejecutó para generar los diagramas.</p>
+</div>
+
+<h1>2. Lo que es propio del equipo</h1>
+<p>Es la parte sobre la que el equipo tiene derechos de autor:</p>
+<table class=""><thead><tr><th>Componente propio</th><th>Detalle</th></tr></thead><tbody>
+<tr><td><strong>Aplicación web (frontend)</strong></td><td>Interfaz completa: pantallas, componentes, navegación por roles, formularios, sistema visual (hoja de estilos propia) y la previsualización imprimible de facturas.</td></tr>
+<tr><td><strong>API REST (backend)</strong></td><td>Todos los servicios: autenticación, clientes, productos, pedidos, facturación, pagos, notas de crédito, reportes, auditoría y portal del cliente.</td></tr>
+<tr><td><strong>Modelo de datos</strong></td><td>Diseño del esquema de PostgreSQL, las restricciones de integridad, los índices y la vista de saldo.</td></tr>
+<tr><td><strong>Reglas de negocio</strong></td><td>Las decisiones de negocio del sistema: no permitir sobrepago, una factura activa por pedido, no devolver más de lo pagado, baja lógica, auditoría.</td></tr>
+<tr><td><strong>Documentación</strong></td><td>Requisitos, guías, especificaciones, diagramas, mockups y estas siete evidencias.</td></tr>
+<tr><td><strong>Pruebas automáticas</strong></td><td>La suite de integración de 154 comprobaciones y los scripts de captura de pantalla.</td></tr>
+<tr><td><strong>Prototipos (mockups)</strong></td><td>Las 14 pantallas de demostración en HTML y la galería.</td></tr>
+</tbody></table>
+
+<h1>3. Componentes de terceros que forman parte del software</h1>
+<p>Se listan las <strong>dependencias directas</strong> (14), es decir, las que el equipo eligió de forma explícita. Las transitivas se resumen en la sección 6.</p>
+
+<table class=""><thead><tr><th>Paquete</th><th>Versión</th><th>Ámbito</th><th>Licencia</th><th>Uso en el proyecto</th></tr></thead><tbody>
+<tr><td><code>bcryptjs</code></td><td>2.4.3</td><td>Backend</td><td>MIT</td><td>Cifrado de contraseñas y de los códigos OTP.</td></tr>
+<tr><td><code>cors</code></td><td>2.8.6</td><td>Backend</td><td>MIT</td><td>Control de acceso por origen (lista blanca).</td></tr>
+<tr><td><code>dotenv</code></td><td>16.6.1</td><td>Backend</td><td>BSD-2-Clause</td><td>Lectura de la configuración desde variables de entorno.</td></tr>
+<tr><td><code>express</code></td><td>4.22.3</td><td>Backend</td><td>MIT</td><td>Servidor HTTP y enrutado de la API REST.</td></tr>
+<tr><td><code>express-rate-limit</code></td><td>7.5.1</td><td>Backend</td><td>MIT</td><td>Límite de peticiones por dirección IP (anti-spam y fuerza bruta).</td></tr>
+<tr><td><code>helmet</code></td><td>8.3.0</td><td>Backend</td><td>MIT</td><td>Cabeceras de seguridad HTTP en las respuestas de la API.</td></tr>
+<tr><td><code>jsonwebtoken</code></td><td>9.0.3</td><td>Backend</td><td>MIT</td><td>Firma y verificación de los tokens de sesión (JWT).</td></tr>
+<tr><td><code>pg</code></td><td>8.23.0</td><td>Backend</td><td>MIT</td><td>Cliente de PostgreSQL con pool de conexiones y consultas parametrizadas.</td></tr>
+<tr><td><code>@vitejs/plugin-react</code></td><td>4.7.0</td><td>Frontend</td><td>MIT</td><td>Soporte de React para Vite (compilación de JSX).</td></tr>
+<tr><td><code>axios</code></td><td>1.20.0</td><td>Frontend</td><td>MIT</td><td>Cliente HTTP que consume la API desde el frontend.</td></tr>
+<tr><td><code>react</code></td><td>18.3.1</td><td>Frontend</td><td>MIT</td><td>Biblioteca de interfaz de usuario del frontend.</td></tr>
+<tr><td><code>react-dom</code></td><td>18.3.1</td><td>Frontend</td><td>MIT</td><td>Renderizado de React en el navegador.</td></tr>
+<tr><td><code>react-router-dom</code></td><td>6.30.6</td><td>Frontend</td><td>MIT</td><td>Enrutado de la aplicación de página única.</td></tr>
+<tr><td><code>vite</code></td><td>5.4.21</td><td>Frontend</td><td>MIT</td><td>Empaquetador y servidor de desarrollo del frontend.</td></tr>
+</tbody></table>
+
+<h1>4. Componentes de terceros que NO son paquetes</h1>
+<p>El software se apoya además en piezas de infraestructura y en una herramienta de documentación. La diferencia es importante: <strong>la infraestructura se ejecuta, pero no se distribuye con el código</strong>.</p>
+
+<table class=""><thead><tr><th>Elemento</th><th>Procedencia</th><th>Licencia</th><th>Uso en el proyecto</th><th class="c">Naturaleza</th></tr></thead><tbody>
+<tr><td><strong>Código propio</strong></td><td>Equipo de desarrollo</td><td>Titularidad del equipo</td><td>Frontend (React), API REST, esquema de base de datos, scripts de despliegue, pruebas automáticas y toda la documentación. Es la parte original del proyecto.</td><td class="c"><span class="badge b-ok">Propio</span></td></tr>
+<tr><td>PostgreSQL 16</td><td>PostgreSQL Global Development Group</td><td>PostgreSQL License</td><td>Motor de base de datos, usado como contenedor oficial <code>postgres:16-alpine</code>. Una licencia permisiva: no obliga a publicar el código propio.</td><td class="c"><span class="badge b-ok">Permisiva</span></td></tr>
+<tr><td>Node.js 22</td><td>OpenJS Foundation</td><td>MIT</td><td>Entorno de ejecución del backend, dentro de la imagen <code>node:22-alpine</code>.</td><td class="c"><span class="badge b-ok">Permisiva</span></td></tr>
+<tr><td>nginx 1.27</td><td>F5 / Nginx Inc.</td><td>BSD-2-Clause</td><td>Servidor web que sirve el frontend compilado y actúa de proxy hacia la API.</td><td class="c"><span class="badge b-ok">Permisiva</span></td></tr>
+<tr><td>Alpine Linux</td><td>Alpine Linux Development Team</td><td>MIT (y otras)</td><td>Sistema base de las imágenes de los contenedores. Se usa como imagen oficial, sin modificarla.</td><td class="c"><span class="badge b-ok">Permisiva</span></td></tr>
+<tr><td>Docker</td><td>Docker Inc.</td><td>Acuerdo de licencia propio (Docker Desktop)</td><td>Herramienta de despliegue. Solo se usa para construir y ejecutar; no forma parte del software entregado.</td><td class="c"><span class="badge b-info">Herramienta</span></td></tr>
+<tr><td>PlantUML 1.2024.8</td><td>Arnaud Roques</td><td><strong>GPL-3.0</strong></td><td>Utilidad que generó los diagramas (casos de uso, clases, arquitectura, Gantt) a partir de archivos <code>.puml</code>.</td><td class="c"><span class="badge b-warn">Revisar</span></td></tr>
+<tr><td>Smetana</td><td>Autor de PlantUML</td><td>MIT</td><td>Motor de disposición de grafos que PlantUML usa con la opción <code>-Playout=smetana</code> para dibujar los diagramas.</td><td class="c"><span class="badge b-ok">Permisiva</span></td></tr>
+<tr><td>Iconos del menú</td><td>Unicode Consortium / fabricante del sistema</td><td>Uso libre</td><td>Los iconos del menú del panel son <strong>caracteres emoji estándar</strong> (gráfico de barras, siluetas, caja…), incluidos en la fuente del sistema operativo y no en una fuente o paquete de iconos con licencia. No se distribuye ningún recurso gráfico de terceros: no hay archivos de imagen ni tipografías descargadas.</td><td class="c"><span class="badge b-ok">Sin dependencia</span></td></tr>
+<tr><td>Puente de pago Efecty</td><td>— (no integrado)</td><td>Simulado</td><td>El código de pago en efectivo se <strong>genera</strong> en el sistema con un dígito de control, pero no se conecta con ninguna pasarela real. No hay servicio de terceros contratado.</td><td class="c"><span class="badge b-gray">Simulado</span></td></tr>
+<tr><td>Proveedor de SMS/correo</td><td>— (no integrado)</td><td>—</td><td>El envío del código OTP está pendiente: el sistema lo imprime en consola. No hay contrato con ningún proveedor, por lo que no hay componente de terceros implicado.</td><td class="c"><span class="badge b-gray">Pendiente</span></td></tr>
+</tbody></table>
+
+<div class="caja warn">
+  <span class="titulo">Caso de PlantUML: por qué su GPL-3.0 no contagia el proyecto</span>
+  <p>PlantUML es la única pieza con licencia <strong>copyleft fuerte</strong> (GPL-3.0). Su obligación es que, si se distribuye el programa <em>o un producto derivado</em>, se libere el código en los mismos términos.</p>
+  <p style="margin-bottom:0">Aquí <strong>no se distribuye ni se enlaza</strong> con el software: es una aplicación independiente que se ejecuta desde la línea de comandos con <code>java -jar plantuml.jar</code> para transformar archivos de texto <code>.puml</code> en imágenes <code>.svg</code>. Lo que se distribuye son <strong>los SVG resultantes</strong>, que son obra del proyecto, no código de PlantUML. Es el mismo caso que usar un editor de texto con licencia GPL para escribir un documento: el documento no queda sujeto a esa licencia.</p>
+</div>
+
+<div class="caja">
+  <span class="titulo">Uso del servicio: sin datos de terceros</span>
+  <p style="margin-bottom:0">El proyecto <strong>no consume ninguna API externa</strong> ni descarga conjuntos de datos ajenos: no hay llamadas de red salidas del sistema (las únicas direcciones que aparecen en el código son de <code>localhost</code>). Tampoco usa fuentes tipográficas, iconos ni plantillas de terceros: la tipografía es la del sistema y los iconos son caracteres emoji estándar.</p>
+</div>
+
+<h1>5. Resumen de licencias encontradas</h1>
+<p>Resultado de analizar los <strong>238 paquetes</strong> que instala el proyecto (backend y frontend, incluidas las dependencias de desarrollo y las transitivas):</p>
+
+<table class=""><thead><tr><th>Licencia</th><th class="c">Paquetes</th><th>Qué permite</th><th class="c">Tipo</th></tr></thead><tbody>
+<tr><td><strong>MIT</strong></td><td class="c">221</td><td>Permisiva. Permite usar, copiar, modificar y distribuir, incluso comercialmente, conservando el aviso de copyright.</td><td class="c"><span class="badge b-ok">Permisiva</span></td></tr>
+<tr><td><strong>ISC</strong></td><td class="c">10</td><td>Equivalente funcional a MIT. Mismas libertades.</td><td class="c"><span class="badge b-ok">Permisiva</span></td></tr>
+<tr><td><strong>BSD-3-Clause</strong></td><td class="c">3</td><td>Permisiva, con una cláusula extra que prohíbe usar el nombre de los autores para promocionar el producto derivado.</td><td class="c"><span class="badge b-ok">Permisiva</span></td></tr>
+<tr><td><strong>Apache-2.0</strong></td><td class="c">2</td><td>Permisiva. Permite uso comercial y además concede licencia explícita de patentes.</td><td class="c"><span class="badge b-ok">Permisiva</span></td></tr>
+<tr><td><strong>BSD-2-Clause</strong></td><td class="c">1</td><td>Permisiva. Como MIT, con el aviso de copyright.</td><td class="c"><span class="badge b-ok">Permisiva</span></td></tr>
+<tr><td><strong>CC-BY-4.0</strong></td><td class="c">1</td><td>Creative Commons de atribución: permite el uso citando la autoría.</td><td class="c"><span class="badge b-ok">Permisiva</span></td></tr>
+</tbody></table>
+
+<div class="grid3">
+  <div class="kpi"><div class="n">238</div><div class="t">Paquetes analizados</div></div>
+  <div class="kpi"><div class="n">93%</div><div class="t">Bajo licencia MIT</div></div>
+  <div class="kpi"><div class="n">0</div><div class="t">Copyleft en las dependencias</div></div>
+</div>
+
+<h1>6. Dependencias transitivas</h1>
+<p>Son las 224 librerías que instalan las anteriores. No se eligieron directamente, pero también forman parte del software distribuido, por lo que se revisó su licencia. Todas son permisivas.</p>
+
+<table class="compacta "><thead><tr><th>Paquete</th><th>Versión</th><th>Ámbito</th><th>Licencia</th></tr></thead><tbody>
+<tr><td><code>@babel/code-frame</code></td><td>7.29.7</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@babel/compat-data</code></td><td>7.29.7</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@babel/core</code></td><td>7.29.7</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@babel/generator</code></td><td>7.29.8</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@babel/helper-compilation-targets</code></td><td>7.29.7</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@babel/helper-globals</code></td><td>7.29.7</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@babel/helper-module-imports</code></td><td>7.29.7</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@babel/helper-module-transforms</code></td><td>7.29.7</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@babel/helper-plugin-utils</code></td><td>7.29.7</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@babel/helper-string-parser</code></td><td>7.29.7</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@babel/helper-validator-identifier</code></td><td>7.29.7</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@babel/helper-validator-option</code></td><td>7.29.7</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@babel/helpers</code></td><td>7.29.7</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@babel/parser</code></td><td>7.29.9</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@babel/plugin-transform-react-jsx-self</code></td><td>7.29.7</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@babel/plugin-transform-react-jsx-source</code></td><td>7.29.7</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@babel/template</code></td><td>7.29.7</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@babel/traverse</code></td><td>7.29.8</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@babel/types</code></td><td>7.29.8</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@esbuild/aix-ppc64</code></td><td>0.21.5</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@esbuild/android-arm</code></td><td>0.21.5</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@esbuild/android-arm64</code></td><td>0.21.5</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@esbuild/android-x64</code></td><td>0.21.5</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@esbuild/darwin-arm64</code></td><td>0.21.5</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@esbuild/darwin-x64</code></td><td>0.21.5</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@esbuild/freebsd-arm64</code></td><td>0.21.5</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@esbuild/freebsd-x64</code></td><td>0.21.5</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@esbuild/linux-arm</code></td><td>0.21.5</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@esbuild/linux-arm64</code></td><td>0.21.5</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@esbuild/linux-ia32</code></td><td>0.21.5</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@esbuild/linux-loong64</code></td><td>0.21.5</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@esbuild/linux-mips64el</code></td><td>0.21.5</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@esbuild/linux-ppc64</code></td><td>0.21.5</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@esbuild/linux-riscv64</code></td><td>0.21.5</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@esbuild/linux-s390x</code></td><td>0.21.5</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@esbuild/linux-x64</code></td><td>0.21.5</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@esbuild/netbsd-x64</code></td><td>0.21.5</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@esbuild/openbsd-x64</code></td><td>0.21.5</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@esbuild/sunos-x64</code></td><td>0.21.5</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@esbuild/win32-arm64</code></td><td>0.21.5</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@esbuild/win32-ia32</code></td><td>0.21.5</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@esbuild/win32-x64</code></td><td>0.21.5</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@jridgewell/gen-mapping</code></td><td>0.3.13</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@jridgewell/remapping</code></td><td>2.3.5</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@jridgewell/resolve-uri</code></td><td>3.1.2</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@jridgewell/sourcemap-codec</code></td><td>1.6.0</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@jridgewell/trace-mapping</code></td><td>0.3.31</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@napi-rs/lzma-linux-x64-gnu</code></td><td>1.5.1</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@remix-run/router</code></td><td>1.23.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@rolldown/pluginutils</code></td><td>1.0.0-beta.27</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@rollup/rollup-android-arm-eabi</code></td><td>4.63.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@rollup/rollup-android-arm64</code></td><td>4.63.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@rollup/rollup-darwin-arm64</code></td><td>4.63.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@rollup/rollup-darwin-x64</code></td><td>4.63.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@rollup/rollup-freebsd-arm64</code></td><td>4.63.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@rollup/rollup-freebsd-x64</code></td><td>4.63.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@rollup/rollup-linux-arm-gnueabihf</code></td><td>4.63.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@rollup/rollup-linux-arm-musleabihf</code></td><td>4.63.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@rollup/rollup-linux-arm64-gnu</code></td><td>4.63.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@rollup/rollup-linux-arm64-musl</code></td><td>4.63.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@rollup/rollup-linux-loong64-gnu</code></td><td>4.63.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@rollup/rollup-linux-loong64-musl</code></td><td>4.63.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@rollup/rollup-linux-ppc64-gnu</code></td><td>4.63.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@rollup/rollup-linux-ppc64-musl</code></td><td>4.63.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@rollup/rollup-linux-riscv64-gnu</code></td><td>4.63.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@rollup/rollup-linux-riscv64-musl</code></td><td>4.63.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@rollup/rollup-linux-s390x-gnu</code></td><td>4.63.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@rollup/rollup-linux-x64-gnu</code></td><td>4.63.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@rollup/rollup-linux-x64-musl</code></td><td>4.63.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@rollup/rollup-openbsd-x64</code></td><td>4.63.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@rollup/rollup-openharmony-arm64</code></td><td>4.63.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@rollup/rollup-win32-arm64-msvc</code></td><td>4.63.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@rollup/rollup-win32-ia32-msvc</code></td><td>4.63.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@rollup/rollup-win32-x64-gnu</code></td><td>4.63.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@rollup/rollup-win32-x64-msvc</code></td><td>4.63.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@types/babel__core</code></td><td>7.20.5</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@types/babel__generator</code></td><td>7.27.0</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@types/babel__template</code></td><td>7.4.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@types/babel__traverse</code></td><td>7.28.0</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@types/estree</code></td><td>1.0.9</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>accepts</code></td><td>1.3.8</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>agent-base</code></td><td>6.0.2</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>array-flatten</code></td><td>1.1.1</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>asynckit</code></td><td>0.4.0</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>baseline-browser-mapping</code></td><td>2.11.25</td><td>Frontend</td><td>Apache-2.0</td></tr>
+<tr><td><code>body-parser</code></td><td>1.20.8</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>browserslist</code></td><td>4.29.0</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>buffer-equal-constant-time</code></td><td>1.0.1</td><td>Backend</td><td>BSD-3-Clause</td></tr>
+<tr><td><code>bytes</code></td><td>3.1.2</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>call-bind-apply-helpers</code></td><td>1.0.2</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>call-bind-apply-helpers</code></td><td>1.0.2</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>call-bound</code></td><td>1.0.4</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>caniuse-lite</code></td><td>1.0.30001810</td><td>Frontend</td><td>CC-BY-4.0</td></tr>
+<tr><td><code>combined-stream</code></td><td>1.0.8</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>content-disposition</code></td><td>0.5.4</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>content-type</code></td><td>1.0.5</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>convert-source-map</code></td><td>2.0.0</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>cookie</code></td><td>0.7.2</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>cookie-signature</code></td><td>1.0.7</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>debug</code></td><td>2.6.9</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>debug</code></td><td>4.4.3</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>delayed-stream</code></td><td>1.0.0</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>depd</code></td><td>2.0.0</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>destroy</code></td><td>1.2.0</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>dunder-proto</code></td><td>1.0.1</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>dunder-proto</code></td><td>1.0.1</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>ecdsa-sig-formatter</code></td><td>1.0.11</td><td>Backend</td><td>Apache-2.0</td></tr>
+<tr><td><code>ee-first</code></td><td>1.1.1</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>electron-to-chromium</code></td><td>1.5.433</td><td>Frontend</td><td>ISC</td></tr>
+<tr><td><code>encodeurl</code></td><td>2.0.0</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>es-define-property</code></td><td>1.0.1</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>es-define-property</code></td><td>1.0.1</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>es-errors</code></td><td>1.3.0</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>es-errors</code></td><td>1.3.0</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>es-object-atoms</code></td><td>1.1.2</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>es-object-atoms</code></td><td>1.1.2</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>es-set-tostringtag</code></td><td>2.1.0</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>esbuild</code></td><td>0.21.5</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>escalade</code></td><td>3.2.0</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>escape-html</code></td><td>1.0.3</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>etag</code></td><td>1.8.1</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>finalhandler</code></td><td>1.3.2</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>follow-redirects</code></td><td>1.16.0</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>form-data</code></td><td>4.0.6</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>forwarded</code></td><td>0.2.0</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>fresh</code></td><td>0.5.2</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>fsevents</code></td><td>2.3.3</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>function-bind</code></td><td>1.1.2</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>function-bind</code></td><td>1.1.2</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>gensync</code></td><td>1.0.0-beta.2</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>get-intrinsic</code></td><td>1.3.0</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>get-intrinsic</code></td><td>1.3.0</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>get-proto</code></td><td>1.0.1</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>get-proto</code></td><td>1.0.1</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>gopd</code></td><td>1.2.0</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>gopd</code></td><td>1.2.0</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>has-symbols</code></td><td>1.1.0</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>has-symbols</code></td><td>1.1.0</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>has-tostringtag</code></td><td>1.0.2</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>hasown</code></td><td>2.0.4</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>hasown</code></td><td>2.0.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>http-errors</code></td><td>2.0.1</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>https-proxy-agent</code></td><td>5.0.1</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>iconv-lite</code></td><td>0.4.24</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>inherits</code></td><td>2.0.4</td><td>Backend</td><td>ISC</td></tr>
+<tr><td><code>ipaddr.js</code></td><td>1.9.1</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>js-tokens</code></td><td>4.0.0</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>jsesc</code></td><td>3.1.0</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>json5</code></td><td>2.2.3</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>jwa</code></td><td>2.0.1</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>jws</code></td><td>4.0.1</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>lodash.includes</code></td><td>4.3.0</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>lodash.isboolean</code></td><td>3.0.3</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>lodash.isinteger</code></td><td>4.0.4</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>lodash.isnumber</code></td><td>3.0.3</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>lodash.isplainobject</code></td><td>4.0.6</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>lodash.isstring</code></td><td>4.0.1</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>lodash.once</code></td><td>4.1.1</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>loose-envify</code></td><td>1.4.0</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>lru-cache</code></td><td>5.1.1</td><td>Frontend</td><td>ISC</td></tr>
+<tr><td><code>math-intrinsics</code></td><td>1.1.0</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>math-intrinsics</code></td><td>1.1.0</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>media-typer</code></td><td>0.3.0</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>merge-descriptors</code></td><td>1.0.3</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>methods</code></td><td>1.1.2</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>mime</code></td><td>1.6.0</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>mime-db</code></td><td>1.52.0</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>mime-db</code></td><td>1.52.0</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>mime-types</code></td><td>2.1.35</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>mime-types</code></td><td>2.1.35</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>ms</code></td><td>2.0.0</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>ms</code></td><td>2.1.3</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>nanoid</code></td><td>3.3.19</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>negotiator</code></td><td>0.6.3</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>node-releases</code></td><td>2.0.56</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>object-assign</code></td><td>4.1.1</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>object-inspect</code></td><td>1.13.4</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>on-finished</code></td><td>2.4.1</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>parseurl</code></td><td>1.3.3</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>path-to-regexp</code></td><td>0.1.13</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>pg-cloudflare</code></td><td>1.4.0</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>pg-connection-string</code></td><td>2.14.0</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>pg-int8</code></td><td>1.0.1</td><td>Backend</td><td>ISC</td></tr>
+<tr><td><code>pg-pool</code></td><td>3.14.0</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>pg-protocol</code></td><td>1.16.0</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>pg-types</code></td><td>2.2.0</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>pgpass</code></td><td>1.0.5</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>picocolors</code></td><td>1.1.1</td><td>Frontend</td><td>ISC</td></tr>
+<tr><td><code>postcss</code></td><td>8.5.28</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>postgres-array</code></td><td>2.0.0</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>postgres-bytea</code></td><td>1.0.1</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>postgres-date</code></td><td>1.0.7</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>postgres-interval</code></td><td>1.2.0</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>proxy-addr</code></td><td>2.0.8</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>proxy-from-env</code></td><td>2.1.0</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>qs</code></td><td>6.16.0</td><td>Backend</td><td>BSD-3-Clause</td></tr>
+<tr><td><code>range-parser</code></td><td>1.2.1</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>raw-body</code></td><td>2.5.3</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>react-refresh</code></td><td>0.17.0</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>react-router</code></td><td>6.30.6</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>rollup</code></td><td>4.63.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>safe-buffer</code></td><td>5.2.1</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>safer-buffer</code></td><td>2.1.2</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>scheduler</code></td><td>0.23.2</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>semver</code></td><td>7.8.5</td><td>Backend</td><td>ISC</td></tr>
+<tr><td><code>semver</code></td><td>6.3.1</td><td>Frontend</td><td>ISC</td></tr>
+<tr><td><code>send</code></td><td>0.19.2</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>serve-static</code></td><td>1.16.3</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>setprototypeof</code></td><td>1.2.0</td><td>Backend</td><td>ISC</td></tr>
+<tr><td><code>side-channel</code></td><td>1.1.1</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>side-channel-list</code></td><td>1.0.1</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>side-channel-map</code></td><td>1.0.1</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>side-channel-weakmap</code></td><td>1.0.2</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>source-map-js</code></td><td>1.2.1</td><td>Frontend</td><td>BSD-3-Clause</td></tr>
+<tr><td><code>split2</code></td><td>4.2.0</td><td>Backend</td><td>ISC</td></tr>
+<tr><td><code>statuses</code></td><td>2.0.2</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>toidentifier</code></td><td>1.0.1</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>type-is</code></td><td>1.6.18</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>unpipe</code></td><td>1.0.0</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>update-browserslist-db</code></td><td>1.3.3</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>utils-merge</code></td><td>1.0.1</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>vary</code></td><td>1.1.2</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>xtend</code></td><td>4.0.2</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>yallist</code></td><td>3.1.1</td><td>Frontend</td><td>ISC</td></tr>
+</tbody></table>
+
+<h1>7. Obligaciones que asume el equipo</h1>
+<p>Usar software de terceros conlleva compromisos. Estos son los que aplican a FINAN-X:</p>
+
+<table class=""><thead><tr><th>Obligación</th><th>A quién afecta</th><th>Cómo se cumple en el proyecto</th></tr></thead><tbody>
+<tr><td><strong>Conservar los avisos de copyright y la licencia</strong></td><td>MIT, ISC, BSD, Apache-2.0, PostgreSQL</td><td>Los paquetes se instalan sin modificar y cada uno conserva su archivo de licencia dentro de <code>node_modules</code>. Al distribuir el software, se incluirán los avisos correspondientes.</td></tr>
+<tr><td><strong>Atribución</strong></td><td>CC-BY-4.0 (<code>caniuse-lite</code>)</td><td>Es una dependencia de desarrollo que usa Vite para decidir qué código compatible con navegadores antiguos incluir. Se le da crédito en esta matriz.</td></tr>
+<tr><td><strong>No usar los nombres de los autores para promocionar el derivado</strong></td><td>BSD-3-Clause (<code>qs</code>, <code>buffer-equal-constant-time</code>, <code>source-map-js</code>)</td><td>El proyecto no usa los nombres de esos autores en su promoción ni en su documentación comercial.</td></tr>
+<tr><td><strong>Conceder licencia de patentes</strong></td><td>Apache-2.0 (<code>ecdsa-sig-formatter</code>, <code>baseline-browser-mapping</code>)</td><td>Obligación del proveedor hacia el proyecto, no al contrario.</td></tr>
+<tr><td><strong>No redistribuir PlantUML</strong></td><td>GPL-3.0</td><td>No se incluye el archivo <code>plantuml.jar</code> en el repositorio ni en la entrega: el script lo descarga en la máquina de quien quiera regenerar los diagramas.</td></tr>
+</tbody></table>
+
+<h1>8. Riesgos detectados y medidas</h1>
+
+<table class=""><thead><tr><th>Riesgo</th><th>Nivel</th><th>Medida adoptada</th></tr></thead><tbody>
+<tr><td>Una dependencia con licencia copyleft fuerte obligaría a liberar el código propio</td><td><span class="badge b-ok">Bajo</span></td><td>Se revisaron las 238 licencias: ninguna dependencia del software distribuido es copyleft. PlantUML (GPL-3.0) es una herramienta externa que no se distribuye ni se enlaza.</td></tr>
+<tr><td>Una dependencia sin licencia declarada dejaría el uso en zona gris</td><td><span class="badge b-ok">Bajo</span></td><td>Ningún paquete quedó sin licencia identificada en el análisis.</td></tr>
+<tr><td>Cambio de licencia en una versión futura de una dependencia</td><td><span class="badge b-warn">Medio</span></td><td>El proyecto fija versiones en <code>package-lock.json</code>, de modo que una actualización no entra sin revisión. Conviene repetir este análisis al actualizar.</td></tr>
+<tr><td>Vulnerabilidad conocida en una dependencia</td><td><span class="badge b-warn">Medio</span></td><td>Fuera del alcance de esta evidencia (es un asunto de seguridad, no de propiedad intelectual). Se recomienda ejecutar <code>npm audit</code> antes de cada entrega.</td></tr>
+<tr><td>Uso de datos de personas reales en la demostración</td><td><span class="badge b-ok">Bajo</span></td><td>Los datos de demostración son ficticios y usan el dominio reservado <code>.test</code>, que no puede pertenecer a nadie. Las tarjetas de prueba son números públicos de test.</td></tr>
+</tbody></table>
+
+<h1>9. Cómo se verificó</h1>
+<p>Las licencias no se copiaron de una página web: se leyeron del <strong>árbol de dependencias instalable</strong> del propio proyecto, que es la fuente autoritativa.</p>
+<pre><code># Analiza backend/package-lock.json y frontend/package-lock.json
+node deep-docs/_generar_licencias.mjs</code></pre>
+<p>El script recorre cada paquete, lee su campo de licencia, agrupa por tipo y <strong>avisa si encuentra una licencia copyleft o una sin declarar</strong>. Su salida es la que alimenta las tablas de este documento.</p>
+
+<div class="caja">
+  <span class="titulo">Mantener esta matriz actualizada</span>
+  <p style="margin-bottom:0">La matriz debe revisarse cuando se añada o actualice una dependencia. Volver a ejecutar el script y regenerar este documento es suficiente; si aparece una licencia nueva, quedará reflejada automáticamente.</p>
+</div>
+
+<footer class="pie-doc">FINAN-X · Evidencia 4 de 7 · Matriz de propiedad intelectual · 238 paquetes npm + 11 componentes de infraestructura y herramientas. Licencias verificadas en el árbol de dependencias.</footer>
+
+</div></body>
+</html>

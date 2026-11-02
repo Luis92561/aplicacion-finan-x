@@ -17,6 +17,7 @@ const SECRETOS_DEBILES = [
 ];
 
 const MIN_LARGO = 32;
+
 /**
  * Comprueba el JWT_SECRET antes de arrancar.
  *
@@ -68,39 +69,59 @@ function revisarJwtSecret() {
 
 const jwtSecret = revisarJwtSecret();
 
+/** Valor booleano desde entorno, con valor por defecto según el entorno. */
+const bandera = (nombre, porDefecto) => (process.env[nombre] ?? (porDefecto ? 'on' : 'off')) === 'on';
+
 export const config = {
+  esProduccion,
   port: Number(process.env.PORT || 4000),
   db: {
     host: process.env.PGHOST || 'localhost',
     port: Number(process.env.PGPORT || 5432),
-    user: process.env.PGUSER || 'finanx',
-    password: process.env.PGPASSWORD || 'finanx',
+    user: process.env.PGUSER || 'finanx_app',
+    password: process.env.PGPASSWORD || 'finanx_app',
     database: process.env.PGDATABASE || 'finanx',
+    ssl: bandera('PGSSL', false),
   },
   jwtSecret,
-  jwtExpiresIn: process.env.JWT_EXPIRES || '8h',
-  /** Orígenes permitidos por CORS (el navegador solo recibe la cabecera si el origen está aquí). */
+  jwtIssuer: 'finanx-api',
+  jwtAudience: 'finanx-web',
+  /** Vida corta: la sesión se renueva iniciando sesión otra vez. */
+  jwtExpiresIn: process.env.JWT_EXPIRES || '2h',
+  /** Cookie de sesión HttpOnly (el navegador no la expone a JavaScript). */
+  cookieNombre: 'fx_session',
+  cookieSecure: bandera('COOKIE_SECURE', esProduccion),
+  cookieMaxAgeSegundos: Number(process.env.COOKIE_MAX_AGE) || 2 * 60 * 60,
+  /** Orígenes permitidos por CORS (con credenciales, nunca "*"). */
   corsOrigins: (process.env.CORS_ORIGINS || 'http://localhost:5173,http://localhost:8080,http://127.0.0.1:5173,http://127.0.0.1:8080')
     .split(',').map((s) => s.trim()).filter(Boolean),
-  /** Intentos fallidos de login permitidos por IP antes de bloquear 429 (ventana de 15 min). */
+  /** Intentos fallidos de login por cuenta antes de bloquear (con retroceso). */
   loginMaxFallidos: Number(process.env.LOGIN_MAX_FAILURES) || 5,
+  /** Minutos de bloqueo base; se multiplica por el número de bloqueos previos. */
+  loginBloqueoMinutos: Number(process.env.LOGIN_LOCK_MINUTES) || 15,
+  /** El autoregistro público se apaga por defecto en producción. */
+  registroAbierto: bandera('REGISTRO_ABIERTO', !esProduccion),
   /** Máximo de solicitudes de autoregistro por IP en 1 hora (anti-spam). */
   registroRateMax: Number(process.env.REGISTRO_RATE_LIMIT) || 20,
-  /** OTP (código de un solo uso) para recuperar contraseña. */
   /**
    * OTP (código de un solo uso) para recuperar contraseña.
    *
-   * ⚠️ Con esto en `true`, el código viaja en la RESPUESTA de la API y la interfaz lo muestra:
+   * Con esto en `true`, el código viaja en la RESPUESTA de la API y la interfaz lo muestra:
    * cualquiera podría pedir el código de otra cuenta y cambiarle la contraseña. Es cómodo para
-   * demostrar el flujo, pero anula el segundo factor, así que NO debe estar activo en producción.
-   *
-   * Por eso el valor por defecto depende del entorno:
-   *   - producción: off  (salvo que se ponga OTP_RETORNO_DEMO=on explícitamente y a conciencia)
-   *   - desarrollo: on   (para poder probar el flujo sin proveedor real de SMS/correo)
+   * demostrar el flujo, pero anula el segundo factor. En producción queda SIEMPRE apagado,
+   * aunque se ponga la variable: no es una decisión de configuración, es una regla.
    */
-  otpDemo: (process.env.OTP_RETORNO_DEMO || (esProduccion ? 'off' : 'on')) !== 'off',
+  otpDemo: !esProduccion && (process.env.OTP_RETORNO_DEMO ?? 'on') !== 'off',
   otpValidezMinutos: Number(process.env.OTP_VALIDEZ_MINUTOS) || 10,
   otpMaxIntentos: Number(process.env.OTP_MAX_INTENTOS) || 5,
-  /** Máximo de solicitudes/intentos de recuperación de contraseña por IP en 15 min (anti-spam OTP). */
+  /** Segundos mínimos entre solicitudes de OTP de una misma cuenta. */
+  otpCooldownSegundos: process.env.OTP_COOLDOWN_SEGUNDOS !== undefined
+    ? Number(process.env.OTP_COOLDOWN_SEGUNDOS)
+    : 60,
+  /** Máximo de solicitudes/intentos de recuperación de contraseña por IP en 15 min. */
   recuperarRateMax: Number(process.env.RECUPERAR_RATE_LIMIT) || 40,
+  /** Coste de bcrypt. 12 es el mínimo razonable en 2026. */
+  bcryptRounds: Number(process.env.BCRYPT_ROUNDS) || 12,
+  /** Límite global de peticiones por IP cada 15 minutos. */
+  limiteGlobal: Number(process.env.RATE_LIMIT_GLOBAL) || 300,
 };

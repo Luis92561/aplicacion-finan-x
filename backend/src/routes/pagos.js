@@ -2,7 +2,7 @@ import { Router } from 'express';
 import pool from '../db.js';
 import { requireAuth, requireRol } from '../middleware/auth.js';
 import { audit } from '../middleware/audit.js';
-import { HttpError, round2, validarDatosPago, idNumerico, METODOS_PAGO } from '../utils.js';
+import { HttpError, round2, validarDatosPago, idNumerico, METODOS_PAGO, normalizarMetodo } from '../utils.js';
 
 const router = Router();
 router.use(requireAuth, requireRol('ADMIN', 'FACTURADOR', 'CAJERO', 'SUPERVISOR'));
@@ -27,7 +27,9 @@ router.get('/', async (req, res, next) => {
 
     const rows = await pool.query(
       `SELECT pg.pago_id, pg.numero_pago, pg.fecha, pg.valor::float8, pg.metodo_pago, pg.referencia, pg.observaciones,
-              pg.banco, pg.titular, pg.tipo_tarjeta, pg.ultimos_digitos_tarjeta, pg.vencimiento_tarjeta, pg.numero_cuenta,
+              pg.banco, pg.titular, pg.tipo_tarjeta, pg.ultimos_digitos_tarjeta,
+              CASE WHEN pg.numero_cuenta IS NULL THEN NULL
+                   ELSE '····' || RIGHT(pg.numero_cuenta, 4) END AS numero_cuenta,
               COALESCE(ui.nombre, uc.username) AS registrado_por,
               CASE WHEN pg.usuario_cliente_id IS NOT NULL THEN 'CLIENTE' ELSE 'INTERNO' END AS registrado_por_tipo,
               f.factura_id, f.numero_factura, c.cliente_id, c.nombre_razon_social
@@ -85,7 +87,7 @@ router.post('/', async (req, res, next) => {
     // `metodo_pago` no tenía lista blanca ni en la aplicación ni en la base (la columna es TEXT
     // sin CHECK), así que se aceptaba cualquier cadena; esos pagos luego no aparecían en los
     // informes, que solo cuentan EFECTIVO / TRANSFERENCIA / TARJETA / CHEQUE.
-    const metodo = String(metodoPago).toUpperCase();
+    const metodo = normalizarMetodo(metodoPago);
     if (!METODOS_PAGO.includes(metodo)) {
       throw new HttpError(400, `Método de pago inválido. Use uno de: ${METODOS_PAGO.join(', ')}`);
     }
@@ -95,7 +97,7 @@ router.post('/', async (req, res, next) => {
       `INSERT INTO pagos (factura_id, valor, metodo_pago, referencia, observaciones, usuario_id,
                           banco, titular, tipo_tarjeta, ultimos_digitos_tarjeta, vencimiento_tarjeta, numero_cuenta)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING pago_id`,
-      [facturaIdNum, valorNum, metodoPago, referencia || null, observaciones || null, req.user.usuarioId ?? null,
+      [facturaIdNum, valorNum, metodo, referencia || null, observaciones || null, req.user.usuarioId ?? null,
         datosPago.banco || null, datosPago.titular || null, datosPago.tipo_tarjeta || null,
         datosPago.ultimos_digitos_tarjeta || null, datosPago.vencimiento_tarjeta || null, datosPago.numero_cuenta || null]
     );
@@ -111,9 +113,8 @@ router.post('/', async (req, res, next) => {
     // La auditoría entra en la MISMA transacción (antes iba después del COMMIT y al pool,
     // así que un fallo al auditar dejaba el pago registrado sin traza).
     await audit({
-      client,
-      usuario: req.user.correo, modulo: MODULO, operacion: 'REGISTRAR', registro: numero,
-      descripcion: `Pago de $${valorNum} en ${f.rows[0].numero_factura} (${metodoPago}) · saldo $${nuevoSaldo}`,
+      req, client, usuario: req.user.correo, modulo: MODULO, operacion: 'REGISTRAR', registro: numero,
+      descripcion: `Pago de $${valorNum} en ${f.rows[0].numero_factura} (${metodo}) · saldo $${nuevoSaldo}`,
     });
 
     await client.query('COMMIT');

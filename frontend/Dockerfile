@@ -1,12 +1,13 @@
-# ---------- Etapa 1: build de la SPA ----------
+# =====================================================================
+# FINAN-X · Frontend (SPA React + nginx)
+# =====================================================================
 FROM node:22-alpine AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm ci --no-audit --no-fund
 COPY . .
 RUN npm run build
 
-# ---------- Etapa 2: servidor estático + proxy /api ----------
 FROM nginx:1.27-alpine
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf

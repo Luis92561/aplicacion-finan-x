@@ -35,9 +35,10 @@ export default function Login() {
   const set = (k) => (e) => setReg((f) => ({ ...f, [k]: e.target.value }));
   const setR = (k) => (e) => setRecov((f) => ({ ...f, [k]: e.target.value }));
 
-  const entrar = (user, token) => {
-    login(user, token);
-    navigate(user.tipo === 'cliente' ? '/portal' : '/', { replace: true });
+  const entrar = (u) => {
+    login(u);
+    const destino = u.debeCambiarClave ? '/cambiar-clave' : (u.tipo === 'cliente' ? '/portal' : '/');
+    navigate(destino, { replace: true });
   };
 
   const submitLogin = async (e) => {
@@ -45,8 +46,8 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      const { token, user } = await api.post('/auth/login', { username, password });
-      entrar(user, token);
+      const { user } = await api.post('/auth/login', { username, password });
+      entrar(user);
     } catch (err) {
       setError(errMsg(err));
     } finally {
@@ -60,7 +61,7 @@ export default function Login() {
     if (reg.regPassword !== reg.confirm) { setError('Las contraseñas no coinciden'); return; }
     setLoading(true);
     try {
-      const { token, user } = await api.post('/auth/registro', {
+      const { user } = await api.post('/auth/registro', {
         tipoCliente: reg.tipoCliente,
         tipoIdentificacion: reg.tipoIdentificacion,
         numeroIdentificacion: reg.numeroIdentificacion,
@@ -100,7 +101,7 @@ export default function Login() {
     e.preventDefault();
     setError('');
     if (recov.nuevaClave !== recov.confirm) { setError('Las contraseñas no coinciden'); return; }
-    if (recov.nuevaClave.length < 6) { setError('La nueva contraseña debe tener al menos 6 caracteres'); return; }
+    if (recov.nuevaClave.length < 12) { setError('La nueva contraseña debe tener al menos 12 caracteres'); return; }
     setLoading(true);
     try {
       const resp = await api.post('/auth/recuperar-cambiar', {
@@ -139,11 +140,6 @@ export default function Login() {
           </button>
           <div style={{ textAlign: 'center', marginTop: 10 }}>
             <button type="button" className="link" onClick={abrirRecuperar}>¿Olvidaste tu contraseña?</button>
-          </div>
-          <div className="login-hint">
-            <strong>Credenciales demo:</strong><br />
-            Interno: <code>admin@finanx.test</code> / <code>admin123</code><br />
-            Cliente: <code>cliente@finanx.test</code> / <code>cliente123</code>
           </div>
           <div className="login-switch">
             ¿Eres cliente nuevo?{' '}
@@ -207,7 +203,7 @@ export default function Login() {
           <div className="row2">
             <div className="field" style={{ marginBottom: 14 }}>
               <label>Contraseña</label>
-              <input type="password" value={reg.regPassword} onChange={set('regPassword')} placeholder="Mínimo 6 caracteres" autoComplete="new-password" required />
+              <input type="password" value={reg.regPassword} onChange={set('regPassword')} placeholder="Mínimo 12 caracteres" autoComplete="new-password" required />
             </div>
             <div className="field" style={{ marginBottom: 14 }}>
               <label>Confirmar contraseña</label>
@@ -279,7 +275,7 @@ export default function Login() {
               <div className="row2">
                 <div className="field" style={{ marginBottom: 14 }}>
                   <label>Nueva contraseña</label>
-                  <input type="password" value={recov.nuevaClave} onChange={setR('nuevaClave')} placeholder="Mínimo 6 caracteres" autoComplete="new-password" required />
+                  <input type="password" value={recov.nuevaClave} onChange={setR('nuevaClave')} placeholder="Mínimo 12 caracteres" autoComplete="new-password" required />
                 </div>
                 <div className="field" style={{ marginBottom: 14 }}>
                   <label>Confirmar contraseña</label>

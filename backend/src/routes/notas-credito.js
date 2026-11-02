@@ -5,7 +5,10 @@ import { audit } from '../middleware/audit.js';
 import { HttpError, round2, idNumerico } from '../utils.js';
 
 const router = Router();
-router.use(requireAuth, requireRol('ADMIN', 'FACTURADOR', 'CAJERO', 'SUPERVISOR'));
+// Devoluciones y anulaciones: solo quien puede autorizar dinero (ADMIN/SUPERVISOR).
+// El CAJERO registra pagos, no emite notas de crédito: sin esta separación, un solo
+// empleado podía devolver dinero sin ningún segundo control.
+router.use(requireAuth, requireRol('ADMIN', 'SUPERVISOR'));
 
 const MODULO = 'NotasCrédito';
 
@@ -63,6 +66,7 @@ router.post('/', async (req, res, next) => {
 
     await client.query('BEGIN');
     if (!facturaId) throw new HttpError(400, 'Debe indicar la factura');
+    const facturaIdNum = idNumerico(facturaId, 'id de factura');
     if (!(Number(valor) > 0)) throw new HttpError(400, 'El valor de la nota crédito debe ser mayor que cero');
     if (!motivo || !String(motivo).trim()) throw new HttpError(400, 'Debe indicar el motivo de la devolución');
 
@@ -81,8 +85,9 @@ router.post('/', async (req, res, next) => {
          SELECT factura_id, SUM(valor) AS notas_previas
          FROM notas_credito WHERE estado = 'ACTIVA' GROUP BY factura_id
        ) nc ON nc.factura_id = f.factura_id
-       WHERE f.factura_id = $1`,
-      [facturaId]
+       WHERE f.factura_id = $1
+       FOR UPDATE OF f`,
+      [facturaIdNum]
     );
     if (!f.rowCount) throw new HttpError(404, 'Factura no encontrada');
     if (f.rows[0].estado !== 'ACTIVA') throw new HttpError(409, 'Solo se pueden crear notas crédito sobre facturas activas');
@@ -97,7 +102,7 @@ router.post('/', async (req, res, next) => {
     const ins = await client.query(
       `INSERT INTO notas_credito (factura_id, cliente_id, valor, motivo, usuario_id)
        VALUES ($1, $2, $3, $4, $5) RETURNING nota_credito_id`,
-      [facturaId, f.rows[0].cliente_id, valorNum, String(motivo).trim(), req.user.usuarioId ?? null]
+      [facturaIdNum, f.rows[0].cliente_id, valorNum, String(motivo).trim(), req.user.usuarioId ?? null]
     );
     const notaId = ins.rows[0].nota_credito_id;
     const numero = `NC-${String(notaId).padStart(6, '0')}`;
@@ -107,8 +112,7 @@ router.post('/', async (req, res, next) => {
 
     // Dentro de la transacción: la devolución no debe existir sin su registro de auditoría.
     await audit({
-      client,
-      usuario: req.user.correo, modulo: MODULO, operacion: 'CREAR', registro: numero,
+      req, client, usuario: req.user.correo, modulo: MODULO, operacion: 'CREAR', registro: numero,
       descripcion: `Nota crédito ${numero} de $${valorNum} sobre ${f.rows[0].numero_factura}: ${motivo}`,
     });
 
@@ -124,33 +128,42 @@ router.post('/', async (req, res, next) => {
 
 // POST /api/notas-credito/:id/anular — { motivo } · anulación lógica
 router.post('/:id/anular', async (req, res, next) => {
+  const client = await pool.connect();
   try {
     const id = idNumerico(req.params.id, 'id');
     const { motivo } = req.body || {};
     if (!motivo || !String(motivo).trim()) throw new HttpError(400, 'Debe indicar el motivo de anulación');
 
-    const n = await pool.query(
+    await client.query('BEGIN');
+    const n = await client.query(
       `SELECT nc.numero_nota, nc.estado, f.numero_factura, c.nombre_razon_social
        FROM notas_credito nc
        JOIN facturas f ON f.factura_id = nc.factura_id
        JOIN clientes c ON c.cliente_id = nc.cliente_id
-       WHERE nc.nota_credito_id = $1`,
+       WHERE nc.nota_credito_id = $1
+       FOR UPDATE OF nc`,
       [id]
     );
     if (!n.rowCount) throw new HttpError(404, 'Nota de crédito no encontrada');
     if (n.rows[0].estado !== 'ACTIVA') throw new HttpError(409, 'La nota de crédito ya no está activa');
 
-    await pool.query(
+    await client.query(
       `UPDATE notas_credito SET estado = 'ANULADA', fecha_anulacion = NOW(), usuario_anulacion = $1, motivo_anulacion = $2
        WHERE nota_credito_id = $3`,
       [req.user.usuarioId ?? null, String(motivo).trim(), id]
     );
     await audit({
-      usuario: req.user.correo, modulo: MODULO, operacion: 'ANULAR', registro: n.rows[0].numero_nota,
+      req, client, usuario: req.user.correo, modulo: MODULO, operacion: 'ANULAR', registro: n.rows[0].numero_nota,
       descripcion: `Anulación de ${n.rows[0].numero_nota} (${n.rows[0].numero_factura}): ${motivo}`,
     });
+    await client.query('COMMIT');
     res.json({ ok: true, estado: 'ANULADA' });
-  } catch (e) { next(e); }
+  } catch (e) {
+    await client.query('ROLLBACK').catch(() => {});
+    next(e);
+  } finally {
+    client.release();
+  }
 });
 
 export default router;

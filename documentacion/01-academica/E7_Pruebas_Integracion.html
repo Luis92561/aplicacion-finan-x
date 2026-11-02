@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>FINAN-X · Pruebas de integración</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 20mm; }
+  :root{
+    --primary:#1e3a8a; --primary-dark:#172554; --accent:#2563eb;
+    --success:#15803d; --success-light:#dcfce7; --warning:#b45309; --warning-light:#fef3c7;
+    --danger:#b91c1c; --danger-light:#fee2e2; --purple:#6d28d9; --purple-light:#ede9fe;
+    --gray:#64748b; --gray-light:#e2e8f0; --bg:#f8fafc; --border:#e2e8f0; --muted:#64748b;
+  }
+  *{box-sizing:border-box}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+    color:#0f172a; margin:0; font-size:10.5pt; line-height:1.55; background:#fff;
+  }
+  .doc{max-width:100%;}
+
+  /* ---------- Portada ---------- */
+  .portada{
+    min-height:245mm; display:flex; flex-direction:column; justify-content:center;
+    text-align:center; page-break-after:always; padding:0 10mm;
+  }
+  .portada .marca{font-size:34pt; font-weight:800; color:var(--primary); letter-spacing:-1px; margin:0}
+  .portada .marca span{color:var(--accent)}
+  .portada .sub{font-size:13pt; color:var(--muted); margin:6px 0 30px}
+  .portada h1{font-size:21pt; color:var(--primary-dark); margin:0 0 8px; line-height:1.25}
+  .portada .evidencia{
+    display:inline-block; background:var(--primary); color:#fff; font-weight:700;
+    padding:5px 16px; border-radius:999px; font-size:10pt; margin-bottom:22px;
+  }
+  .portada .desc{font-size:11pt; color:#334155; max-width:140mm; margin:0 auto 32px}
+  .portada table.meta{margin:0 auto; border-collapse:collapse; font-size:9.5pt; text-align:left}
+  .portada table.meta td{padding:4px 10px; border-bottom:1px solid var(--border)}
+  .portada table.meta td:first-child{color:var(--muted); font-weight:600; white-space:nowrap}
+  .portada .pie{margin-top:38px; font-size:9pt; color:var(--muted)}
+
+  /* ---------- Encabezados ---------- */
+  h1{font-size:16pt; color:var(--primary-dark); margin:0 0 4px; padding-bottom:6px; border-bottom:2.5px solid var(--primary)}
+  h2{font-size:13pt; color:var(--primary); margin:20px 0 8px; padding-bottom:4px; border-bottom:1px solid var(--border); page-break-after:avoid}
+  h3{font-size:11.5pt; color:var(--primary-dark); margin:14px 0 6px; page-break-after:avoid}
+  h4{font-size:10.5pt; color:#334155; margin:11px 0 4px; page-break-after:avoid}
+  p{margin:6px 0}
+  ul,ol{margin:6px 0 6px 18px; padding:0}
+  li{margin:2.5px 0}
+  a{color:var(--accent); text-decoration:none}
+  code{font-family:'Cascadia Mono',Consolas,'Courier New',monospace; font-size:9pt; background:#f1f5f9; padding:1px 4px; border-radius:4px; color:#0f172a}
+  pre{
+    background:#0f172a; color:#e2e8f0; padding:9px 12px; border-radius:7px; font-size:8.5pt;
+    overflow-wrap:anywhere; white-space:pre-wrap; font-family:'Cascadia Mono',Consolas,monospace;
+    page-break-inside:avoid; margin:8px 0; line-height:1.45;
+  }
+  pre code{background:none; color:inherit; padding:0}
+
+  /* ---------- Tablas ---------- */
+  table{width:100%; border-collapse:collapse; margin:9px 0; font-size:9pt; page-break-inside:auto}
+  thead{display:table-header-group}
+  tr{page-break-inside:avoid}
+  th{
+    background:var(--primary); color:#fff; text-align:left; padding:5px 7px;
+    font-size:8.5pt; font-weight:700; text-transform:uppercase; letter-spacing:.3px;
+  }
+  td{padding:4.5px 7px; border-bottom:1px solid var(--border); vertical-align:top}
+  tbody tr:nth-child(even){background:#f8fafc}
+  td.num,th.num{text-align:right; white-space:nowrap}
+  td.c,th.c{text-align:center}
+  table.compacta td,table.compacta th{padding:3.5px 6px; font-size:8.5pt}
+
+  /* ---------- Cajas ---------- */
+  .caja{border-left:4px solid var(--accent); background:#eff6ff; padding:8px 12px; border-radius:0 7px 7px 0; margin:9px 0; page-break-inside:avoid}
+  .caja.ok{border-color:var(--success); background:var(--success-light)}
+  .caja.warn{border-color:var(--warning); background:var(--warning-light)}
+  .caja.err{border-color:var(--danger); background:var(--danger-light)}
+  .caja.purple{border-color:var(--purple); background:var(--purple-light)}
+  .caja p:first-child{margin-top:0}
+  .caja p:last-child{margin-bottom:0}
+  .caja .titulo{font-weight:700; display:block; margin-bottom:2px}
+
+  .badge{display:inline-block; padding:1px 8px; border-radius:999px; font-size:7.5pt; font-weight:700; white-space:nowrap}
+  .b-ok{background:var(--success-light); color:var(--success)}
+  .b-no{background:var(--danger-light); color:var(--danger)}
+  .b-warn{background:var(--warning-light); color:var(--warning)}
+  .b-info{background:#dbeafe; color:var(--primary)}
+  .b-gray{background:var(--gray-light); color:var(--gray)}
+  .b-purple{background:var(--purple-light); color:var(--purple)}
+
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  .grid3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:9px}
+  .kpi{border:1px solid var(--border); border-radius:8px; padding:8px 10px; text-align:center; background:var(--bg)}
+  .kpi .n{font-size:17pt; font-weight:800; color:var(--primary); line-height:1.1}
+  .kpi .t{font-size:8pt; color:var(--muted); text-transform:uppercase; letter-spacing:.4px}
+
+  .captura{border:1px solid var(--border); border-radius:8px; overflow:hidden; margin:9px 0; page-break-inside:avoid; break-inside:avoid}
+  .captura img{width:100%; display:block}
+  /* Capturas muy altas: sin limite ocuparian varias paginas y el navegador partiria el
+     marco, dejando un recuadro vacio en una pagina y la imagen suelta en la siguiente.
+     Se limitan a un alto que quepa de una vez y se centran. */
+  .captura img.alta{width:auto; max-width:100%; max-height:200mm; margin:0 auto}
+  .captura .pie{background:var(--bg); padding:5px 9px; font-size:8pt; color:var(--muted); border-top:1px solid var(--border)}
+  .captura .aviso{font-size:7.6pt; color:var(--muted); font-style:italic}
+
+  .salto{page-break-before:always}
+  .evitar-corte{page-break-inside:avoid}
+  .indice{font-size:10pt}
+  .indice li{margin:3px 0}
+  .firma{margin-top:38px; display:grid; grid-template-columns:1fr 1fr; gap:28px}
+  .firma .l{padding-top:5px; font-size:9pt; color:#334155}
+  .firma .l strong{display:block; color:#172554; font-size:9.5pt; margin-bottom:2px}
+  /* Cada dato bajo la firma va en su propio renglon, con el hueco para escribirlo. */
+  .firma .firma-datos{display:block; margin-bottom:1px}
+  /* Hueco en blanco para completar a mano (los datos de las partes en el contrato).
+     No lleva raya: la franja y el borde de la tabla ya indican donde va cada dato.
+     Es inline-block con ancho completo para que ocupe el ancho de su celda Y pueda
+     usarse dentro de una frase (la linea de la fecha de firma). */
+  .hueco{display:inline-block; width:100%; height:1.3em; vertical-align:bottom}
+  /* Linea sobre la que se firma. Aqui si hay raya: es la referencia de la firma. */
+  .linea-firma{display:block; border-bottom:1px solid #334155}
+  /* Columna de etiquetas de las tablas de formulario. */
+  table.formulario .c-etiqueta{width:32%; font-weight:600}
+  /* En las tablas de formulario la etiqueta va arriba, a la altura de la primera
+     linea de escritura. */
+  table.formulario td{vertical-align:top}
+  /* La ultima fila no necesita el borde inferior: la tabla ya cierra ahi. */
+  table.formulario tbody tr:last-child td{border-bottom:none}
+  footer.pie-doc{margin-top:26px; border-top:1px solid var(--border); padding-top:7px; font-size:8pt; color:var(--muted)}
+</style>
+</head>
+<body><div class="doc">
+
+<section class="portada">
+  <p class="marca">FINAN<span>·X</span></p>
+  <p class="sub">Sistema de facturación y pagos</p>
+  <div class="evidencia">Evidencia 7 de 7</div>
+  <h1>Pruebas de integración</h1>
+  <p class="desc">Resultados de la suite de integración de FINAN-X ejecutada sobre el sistema completo y en funcionamiento. Verifica que las piezas —interfaz, API y base de datos— funcionan juntas y cumplen las reglas de negocio. <strong>154 comprobaciones, 0 fallos.</strong></p>
+  <table class="meta"><tr><td>Sistema</td><td>FINAN-X · Facturación y pagos</td></tr>
+<tr><td>Tipo de prueba</td><td>Integración de extremo a extremo (end-to-end)</td></tr>
+<tr><td>Comprobaciones ejecutadas</td><td>154</td></tr>
+<tr><td>Aprobadas</td><td>154</td></tr>
+<tr><td>Fallidas</td><td>0</td></tr>
+<tr><td>Casos de control documentados</td><td>48</td></tr></table>
+  <p class="pie">Proyecto académico · Integración de Aplicaciones · Sexto semestre</p>
+</section>
+
+<h1>1. Objetivo</h1>
+<p>Demostrar que los componentes de FINAN-X <strong>funcionan correctamente en conjunto</strong>. Responde a la pregunta de la evidencia: <em>¿cómo comprobamos que los componentes funcionan bien juntos?</em></p>
+<p>Una prueba unitaria verifica una función aislada; aquí lo que se verifica es el <strong>recorrido completo</strong> de una operación:</p>
+
+<pre><code>Usuario (navegador)
+   │  petición HTTP
+   ▼
+Frontend (React)  →  API REST (Express)  →  Reglas de negocio
+                                              │
+                                              ▼
+                                        PostgreSQL 16
+                                              │
+   ◄──────────── respuesta JSON ──────────────┘</code></pre>
+
+<p>Cada comprobación recorre esa cadena completa y verifica el resultado de negocio, no solo que la llamada responda.</p>
+
+<h1>2. Alcance</h1>
+<table class=""><thead><tr><th>Se incluye</th><th>Se excluye de esta evidencia</th></tr></thead><tbody>
+<tr><td>Ejecución real de la API contra la base de datos, con datos de demostración.</td><td>Pruebas unitarias de funciones aisladas (la cobertura principal del proyecto es de integración).</td></tr>
+<tr><td>Autenticación, autorización por rol y aislamiento entre clientes.</td><td>Pruebas de carga o de estrés con volúmenes altos de datos.</td></tr>
+<tr><td>Todos los módulos: clientes, productos, pedidos, facturación, pagos, notas de crédito, reportes, auditoría y portal.</td><td>Pruebas de compatibilidad en todos los navegadores del mercado.</td></tr>
+<tr><td>Reglas de negocio: sin sobrepago, sin doble facturación, sin devolver de más, baja lógica.</td><td>Pruebas de usabilidad con usuarios reales.</td></tr>
+<tr><td>Seguridad: roles, cifrado, no exposición de datos de tarjeta, límite de intentos.</td><td>Pruebas de penetración formales.</td></tr>
+<tr><td>Persistencia y cálculo de saldos.</td><td>Pruebas sobre hardware específico (no aplica).</td></tr>
+</tbody></table>
+
+<h1>3. Entorno de pruebas</h1>
+<table class=""><thead><tr><th>Elemento</th><th>Detalle</th></tr></thead><tbody>
+<tr><td><strong>Sistema bajo prueba</strong></td><td>FINAN-X versión 1.0, ejecutándose con sus tres servicios.</td></tr>
+<tr><td><strong>Base de datos</strong></td><td>PostgreSQL 16 en contenedor, creada desde el esquema del proyecto y cargada con datos de demostración.</td></tr>
+<tr><td><strong>Servidor de aplicaciones</strong></td><td>Node.js 24 con Express.</td></tr>
+<tr><td><strong>Cliente de pruebas</strong></td><td>Peticiones HTTP directas a la API (independientes del navegador, para que el resultado no dependa de la interfaz).</td></tr>
+<tr><td><strong>Datos de entrada</strong></td><td>Datos de demostración creados por el sistema, con identificadores únicos por ejecución para que las pruebas puedan repetirse.</td></tr>
+<tr><td><strong>Automatización</strong></td><td>Suite <code>backend/scripts/e2e.mjs</code>, ejecutable con <code>npm test</code>.</td></tr>
+</tbody></table>
+
+<div class="caja">
+  <span class="titulo">Nota sobre la repetibilidad</span>
+  <p style="margin-bottom:0">La suite genera identificadores a partir de la marca de tiempo, de modo que puede ejecutarse varias veces sin que los datos de una corrida interfieran con la siguiente. El bloqueo por intentos fallidos de acceso vive en memoria del proceso, por lo que conviene reiniciar el servicio entre ejecuciones consecutivas; está documentado en el propio código.</p>
+</div>
+
+<h1>4. Procedimiento</h1>
+<ol>
+  <li><strong>Preparar el entorno:</strong> levantar la base de datos y cargar los datos de demostración (<code>npm run seed</code>).</li>
+  <li><strong>Arrancar el sistema:</strong> iniciar la API y comprobar que responde en el punto de salud (<code>/api/health</code>).</li>
+  <li><strong>Ejecutar la suite:</strong> <code>cd backend &amp;&amp; npm test</code>. La suite crea sus propios datos, ejecuta las comprobaciones y devuelve un código de salida distinto de cero si alguna falla.</li>
+  <li><strong>Registrar el resultado:</strong> guardar la salida completa como evidencia.</li>
+  <li><strong>Analizar los fallos:</strong> si hay comprobaciones fallidas, se revisa la causa, se corrige y se repite la ejecución.</li>
+</ol>
+
+<pre><code># Secuencia completa
+docker compose up -d db          # base de datos
+cd backend
+npm run seed                     # datos de demostración
+npm run dev                      # arranca la API (en otra terminal)
+npm test                         # ejecuta las 154 comprobaciones</code></pre>
+
+<h1>5. Resultado de la ejecución</h1>
+
+<div class="grid3">
+  <div class="kpi"><div class="n">154</div><div class="t">Comprobaciones</div></div>
+  <div class="kpi"><div class="n" style="color:#15803d">154</div><div class="t">Aprobadas</div></div>
+  <div class="kpi"><div class="n" style="color:#64748b">0</div><div class="t">Fallidas</div></div>
+</div>
+
+<div class="caja ok">
+  <span class="titulo">Resultado global: TODAS LAS PRUEBAS APROBADAS</span>
+  <pre style="margin:6px 0 0"><code>=== Resultado: 154 aprobadas, 0 fallidas ===</code></pre>
+</div>
+
+<h2>5.1 Resultado por bloque</h2>
+<p>La suite está organizada en bloques temáticos. Este es el recuento de cada uno, leído directamente de la salida de la ejecución:</p>
+
+<table class=""><thead><tr><th>Bloque de pruebas</th><th class="c">Aprobadas</th><th class="c">Fallidas</th><th class="c">Resultado</th></tr></thead><tbody>
+
+</tbody></table>
+
+<h1>6. Casos de prueba de control</h1>
+<p>Se documentan <strong>48 casos de control</strong> que cubren los requisitos más importantes de la Evidencia 3. Cada caso declara sus datos de entrada, el resultado esperado y el <strong>resultado obtenido</strong>, que se corresponde con una comprobación realmente ejecutada (el nombre entre comillas es el que aparece en el registro).</p>
+<p>La columna «Resultado» refleja lo ocurrido en la ejecución registrada en el anexo.</p>
+
+<table class=""><thead><tr><th>ID</th><th>Módulo</th><th>Objetivo</th><th>Datos de entrada</th><th>Resultado esperado</th><th class="c">Res.</th><th>Requisitos</th></tr></thead><tbody>
+<tr><td><strong>CP-01</strong></td><td>Autenticación</td><td>Iniciar sesión con credenciales válidas de administrador.</td><td>Correo <code>admin@finanx.test</code> y contraseña <code>admin123</code>.</td><td>200 y token de sesión con rol ADMIN.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-32, RNF-03</td></tr>
+<tr><td><strong>CP-02</strong></td><td>Autenticación</td><td>Autoregistro de un cliente nuevo desde el portal.</td><td>Datos completos del cliente, usuario y contraseña.</td><td>201, queda autenticado y accede a sus datos.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-01, RF-34</td></tr>
+<tr><td><strong>CP-03</strong></td><td>Clientes</td><td>Impedir el registro de un cliente con identificación duplicada.</td><td>Dos clientes con el mismo tipo y número de identificación.</td><td>409 y no se crea el segundo.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-02, CA-01</td></tr>
+<tr><td><strong>CP-04</strong></td><td>Clientes</td><td>Buscar clientes por coincidencia parcial.</td><td>Filtro de búsqueda con parte del nombre.</td><td>200 con los clientes que coinciden.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-03</td></tr>
+<tr><td><strong>CP-05</strong></td><td>Clientes</td><td>Inactivar un cliente (baja lógica).</td><td>Petición de cambio de estado a INACTIVO.</td><td>200 y el cliente queda inactivo sin borrarse.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-04, RN-13</td></tr>
+<tr><td><strong>CP-06</strong></td><td>Clientes</td><td>Crear la cuenta de portal de un cliente.</td><td>Usuario y contraseña válidos.</td><td>201 con la cuenta creada.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-05</td></tr>
+<tr><td><strong>CP-07</strong></td><td>Productos</td><td>Registrar un producto.</td><td>Código, nombre, precio e impuesto.</td><td>201 con el producto creado.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-06</td></tr>
+<tr><td><strong>CP-08</strong></td><td>Productos</td><td>Rechazar código de producto duplicado y precio negativo.</td><td>Código ya existente; precio negativo.</td><td>409 y 400 respectivamente.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-07</td></tr>
+<tr><td><strong>CP-09</strong></td><td>Pedidos</td><td>Crear un pedido con líneas.</td><td>Cliente activo y uno o más productos con cantidad.</td><td>201 con número de pedido.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-08</td></tr>
+<tr><td><strong>CP-10</strong></td><td>Pedidos</td><td>Verificar que los totales se calculan en el servidor.</td><td>Dos productos con precio y cantidad conocidos.</td><td>Subtotal, impuestos y total coinciden con la aritmética exacta.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-09, RNF-15, CA-02</td></tr>
+<tr><td><strong>CP-11</strong></td><td>Pedidos</td><td>Confirmar un pedido.</td><td>Cambio de estado a CONFIRMADO en un pedido en borrador.</td><td>200 y estado CONFIRMADO.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-10</td></tr>
+<tr><td><strong>CP-12</strong></td><td>Pedidos</td><td>Impedir modificar un pedido ya confirmado.</td><td>Edición de un pedido en estado CONFIRMADO.</td><td>409.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-11, RN-07</td></tr>
+<tr><td><strong>CP-13</strong></td><td>Facturación</td><td>Generar una factura desde un pedido confirmado.</td><td>Identificador del pedido.</td><td>201 con número de factura.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-12</td></tr>
+<tr><td><strong>CP-14</strong></td><td>Facturación</td><td>Impedir facturar dos veces el mismo pedido.</td><td>Segunda petición de facturación del mismo pedido.</td><td>409.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-13, RN-05</td></tr>
+<tr><td><strong>CP-15</strong></td><td>Facturación</td><td>Anular una factura sin pagos indicando motivo.</td><td>Motivo no vacío.</td><td>200 y la factura queda ANULADA.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-14, RN-08</td></tr>
+<tr><td><strong>CP-16</strong></td><td>Facturación</td><td>Impedir anular una factura con pagos.</td><td>Intento de anulación sobre una factura pagada.</td><td>409.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-15, RN-09, CA-06</td></tr>
+<tr><td><strong>CP-17</strong></td><td>Facturación</td><td>Refacturar un pedido cuya factura fue anulada.</td><td>Anular y volver a facturar el mismo pedido.</td><td>201 con otro número; la anulada se conserva.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-16, RN-05, CA-10</td></tr>
+<tr><td><strong>CP-18</strong></td><td>Pagos</td><td>Registrar un pago parcial.</td><td>Importe menor que el saldo.</td><td>201 y la factura queda en PAGO_PARCIAL.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-17, RF-19</td></tr>
+<tr><td><strong>CP-19</strong></td><td>Pagos</td><td>Impedir un pago superior al saldo pendiente.</td><td>Importe mayor que el saldo.</td><td>400 y el saldo no cambia.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-18, RN-03, CA-03</td></tr>
+<tr><td><strong>CP-20</strong></td><td>Pagos</td><td>Completar el pago de una factura.</td><td>Pago del saldo restante.</td><td>Estado PAGADA y saldo 0.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-19, CA-04, CA-05</td></tr>
+<tr><td><strong>CP-21</strong></td><td>Pagos</td><td>Consultar el saldo de una factura.</td><td>Identificador de la factura.</td><td>200 con el saldo, lo pagado y el estado de pago.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-20</td></tr>
+<tr><td><strong>CP-22</strong></td><td>Notas de crédito</td><td>Crear una nota de crédito con motivo.</td><td>Factura activa con pagos, importe válido y motivo.</td><td>201 con número de nota.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-21</td></tr>
+<tr><td><strong>CP-23</strong></td><td>Notas de crédito</td><td>Impedir devolver más de lo pagado.</td><td>Importe superior a lo recaudado.</td><td>400.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-22, RN-10, CA-07</td></tr>
+<tr><td><strong>CP-24</strong></td><td>Notas de crédito</td><td>Verificar que la devolución aumenta el saldo.</td><td>Nota de crédito sobre una factura pagada.</td><td>El saldo sube exactamente el importe devuelto.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-23, RN-11, CA-08</td></tr>
+<tr><td><strong>CP-25</strong></td><td>Notas de crédito</td><td>Anular una nota de crédito y no permitir reanularla.</td><td>Motivo de anulación; segundo intento.</td><td>200 y luego 409.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-24</td></tr>
+<tr><td><strong>CP-26</strong></td><td>Reportes</td><td>Consultar la facturación por rango de fechas.</td><td>Fechas de inicio y fin.</td><td>200 con totales coherentes.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-25</td></tr>
+<tr><td><strong>CP-27</strong></td><td>Reportes</td><td>Consultar el resumen del negocio.</td><td>Sin parámetros.</td><td>200 con los indicadores del panel.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-26</td></tr>
+<tr><td><strong>CP-28</strong></td><td>Reportes</td><td>Consultar el balance por cliente.</td><td>Sin parámetros.</td><td>200 con el resumen y la lista de clientes.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-27</td></tr>
+<tr><td><strong>CP-29</strong></td><td>Reportes</td><td>Consultar el historial financiero de un cliente.</td><td>Identificador de cliente.</td><td>200 con sus facturas y pagos.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-28</td></tr>
+<tr><td><strong>CP-30</strong></td><td>Reportes</td><td>Generar el estado financiero para correo.</td><td>Identificador de cliente.</td><td>200 con asunto, destinatario y cuerpo.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-29</td></tr>
+<tr><td><strong>CP-31</strong></td><td>Auditoría</td><td>Comprobar que las operaciones quedan auditadas.</td><td>Registrar un pago y consultar la auditoría.</td><td>La operación aparece registrada.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-30, RN-14, CA-20</td></tr>
+<tr><td><strong>CP-32</strong></td><td>Auditoría</td><td>Consultar la auditoría filtrando por módulo.</td><td>Filtro por módulo.</td><td>200 con los registros del módulo.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-31</td></tr>
+<tr><td><strong>CP-33</strong></td><td>Usuarios</td><td>Gestionar usuarios internos (solo administrador).</td><td>Creación de usuario con rol.</td><td>201 con el usuario creado.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-32</td></tr>
+<tr><td><strong>CP-34</strong></td><td>Usuarios</td><td>Impedir quedarse sin administradores activos.</td><td>Un administrador intenta desactivarse a sí mismo.</td><td>409.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-33</td></tr>
+<tr><td><strong>CP-35</strong></td><td>Seguridad</td><td>Verificar el control de acceso por rol.</td><td>Un facturador intenta acceder a la gestión de usuarios.</td><td>403.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RNF-06, CA-16</td></tr>
+<tr><td><strong>CP-36</strong></td><td>Seguridad</td><td>Recuperar contraseña con código de un solo uso.</td><td>Solicitar código por correo y usarlo.</td><td>200; el código caduca, se limita en intentos y no se reutiliza.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-35, CA-11, CA-12</td></tr>
+<tr><td><strong>CP-37</strong></td><td>Seguridad</td><td>Comprobar que cambiar la contraseña cierra las sesiones.</td><td>Token obtenido antes del cambio, reutilizado después.</td><td>401 en las peticiones con el token anterior.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RNF-04, CA-13</td></tr>
+<tr><td><strong>CP-38</strong></td><td>Seguridad</td><td>Verificar el aislamiento entre clientes.</td><td>Un cliente intenta pagar o leer una factura ajena.</td><td>404.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-36, RNF-11, CA-09</td></tr>
+<tr><td><strong>CP-39</strong></td><td>Portal</td><td>Pagar una factura propia desde el portal.</td><td>Importe válido con un método en línea.</td><td>201 y el pago queda registrado.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-37</td></tr>
+<tr><td><strong>CP-40</strong></td><td>Portal</td><td>Consultar saldo, facturas, compras y notas propias.</td><td>Peticiones del cliente autenticado.</td><td>200 y solo aparecen sus datos.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-38</td></tr>
+<tr><td><strong>CP-41</strong></td><td>Pagos</td><td>Validar los datos de pago según el método.</td><td>Tarjeta sin datos, con CVV inválido, que no cumple Luhn y vencida.</td><td>400 en cada caso.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-39</td></tr>
+<tr><td><strong>CP-42</strong></td><td>Portal</td><td>Generar un código de pago en efectivo.</td><td>Factura propia y un importe.</td><td>Código con formato válido generado en el servidor.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-40</td></tr>
+<tr><td><strong>CP-43</strong></td><td>Seguridad</td><td>Comprobar que no se exponen datos de tarjeta.</td><td>Pago con tarjeta válida y consulta posterior.</td><td>Solo se guardan los últimos 4 dígitos; sin PAN ni CVV.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RNF-02, CA-15</td></tr>
+<tr><td><strong>CP-44</strong></td><td>Seguridad</td><td>Verificar el bloqueo por intentos fallidos.</td><td>Cinco o más inicios de sesión fallidos.</td><td>429.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RNF-05, CA-14</td></tr>
+<tr><td><strong>CP-45</strong></td><td>Seguridad</td><td>Verificar que el sistema exige una clave de firma válida.</td><td>Arranque sin clave y con el valor de ejemplo.</td><td>El arranque falla en ambos casos.</td><td class="c"><span class="badge b-info">Manual</span></td><td>RNF-07, CA-17</td></tr>
+<tr><td><strong>CP-46</strong></td><td>Seguridad</td><td>Comprobar las cabeceras de seguridad HTTP.</td><td>Petición a la API.</td><td>Presentes <code>X-Content-Type-Options</code> y <code>X-Frame-Options</code>; sin <code>X-Powered-By</code>.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RNF-09</td></tr>
+<tr><td><strong>CP-47</strong></td><td>Seguridad</td><td>Comprobar la lista blanca de CORS.</td><td>Petición desde un origen permitido y desde uno no permitido.</td><td>El permitido recibe la cabecera; el otro no.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RNF-10</td></tr>
+<tr><td><strong>CP-48</strong></td><td>Despliegue</td><td>Levantar el sistema completo con un solo comando.</td><td><code>docker compose up -d --build</code>.</td><td>Los tres servicios quedan disponibles.</td><td class="c"><span class="badge b-info">Manual</span></td><td>RNF-21, CA-18</td></tr>
+</tbody></table>
+
+<h1>7. Errores encontrados y corregidos</h1>
+<p>Esta sección es parte del valor de las pruebas: documenta <strong>defectos reales que aparecieron durante el desarrollo</strong>, cómo se detectaron y cómo se corrigieron. Todos se encontraron <em>antes</em> de esta entrega, y cada corrección quedó cubierta con una comprobación nueva para que no pueda reaparecer sin que la suite lo advierta.</p>
+
+<table class=""><thead><tr><th>Defecto</th><th>Cómo se manifestaba</th><th>Causa</th><th>Corrección</th><th>Comprobación que lo protege</th></tr></thead><tbody>
+<tr><td><strong>Saldo de las facturas incorrecto</strong></td><td>Con una factura que acumulaba varios pagos y varias notas de crédito, el saldo y lo pagado salían multiplicados.</td><td>La vista de saldo unía pagos y notas de crédito con dos <code>LEFT JOIN</code> a la vez, lo que produce el producto cartesiano de ambos conjuntos (P pagos × N notas = P×N filas) y multiplica las sumas.</td><td>Se agregaron los pagos y las notas en subconsultas independientes. Se comprobó contra PostgreSQL real: antes daba 60 donde debía dar 30.</td><td>Bloque 9c-bis: «Valor pagado con 2 pagos es correcto», «Saldo vuelve al total tras devolver todo lo pagado».</td></tr>
+<tr><td><strong>Se podía devolver más dinero del cobrado</strong></td><td>El sistema autorizaba una devolución superior al importe realmente pagado.</td><td>El mismo producto cartesiano, aplicado al cálculo del importe disponible para devolver, lo inflaba.</td><td>Se aplicó el mismo patrón de subconsultas independientes en la creación de notas de crédito.</td><td>Bloque 9c-bis: «CN que supera lo pagado disponible → 400».</td></tr>
+<tr><td><strong>Se podía sobrepagar una factura con devoluciones</strong></td><td>La validación del pago aceptaba un importe mayor que el saldo real.</td><td>El saldo se calculaba como «total − pagos», ignorando las notas de crédito, en cuatro puntos distintos del código.</td><td>Se unificó el cálculo para que todos lean de la vista de saldo. Se añadió bloqueo de fila para evitar el mismo problema con dos pagos simultáneos.</td><td>Bloque 7: «Sobrepago → 400».</td></tr>
+<tr><td><strong>Anular una factura impedía refacturar el pedido</strong></td><td>Tras anular una factura, intentar emitir otra del mismo pedido devolvía un error interno.</td><td>La base de datos exigía una única factura por pedido, así que la factura anulada seguía ocupando el pedido.</td><td>Se sustituyó esa restricción por un índice único parcial que solo afecta a las facturas activas, de modo que las anuladas se conservan como historial.</td><td>Bloque 9f: «Refacturar el pedido tras anular → 201».</td></tr>
+<tr><td><strong>El panel de inicio no funcionaba para dos roles</strong></td><td>El cajero y el facturador veían una pantalla de error en lugar de sus indicadores.</td><td>El panel pedía dos servicios a la vez y uno de ellos exigía un rol que esos usuarios no tienen; el fallo de uno anulaba la carga del otro.</td><td>Se cambió a una carga tolerante a fallos, de modo que cada parte se muestra si está disponible, y se consulta la auditoría solo si el rol tiene permiso.</td><td>Evidencia visual: la captura del panel con datos reales.</td></tr>
+<tr><td><strong>Presentación: avisos sin estilo y tabla desalineada</strong></td><td>Los avisos informativos se veían sin color y una tabla tenía una columna de más en el cuerpo que en la cabecera.</td><td>El estilo usaba dos variables que no existían en la hoja de estilos, y faltaban dos encabezados en la tabla.</td><td>Se corrigieron las variables y se completaron los encabezados.</td><td>Revisión visual: capturas del sistema en funcionamiento.</td></tr>
+</tbody></table>
+
+<div class="caja ok">
+  <span class="titulo">Cómo se verificó que las pruebas nuevas sirven</span>
+  <p style="margin-bottom:0">Una prueba que nunca falla no protege de nada. Para comprobarlo, se <strong>anuló a propósito</strong> la comprobación que cierra las sesiones al cambiar la contraseña y se volvió a ejecutar: con la protección activa, un token anterior responde <strong>401</strong>; con la protección anulada, responde <strong>200</strong>. Es decir, la prueba detecta de verdad la ausencia de la protección.</p>
+</div>
+
+<h1>8. Evidencia visual</h1>
+<p>La suite verifica la API; estas capturas demuestran que el <strong>sistema completo</strong> —con su interfaz— funciona sobre datos reales.</p>
+
+<div class="captura">
+  <img src="capturas/11-dashboard.png" alt="">
+  <div class="pie">Panel de inicio con datos reales: clientes y productos activos, pedidos por facturar, facturas activas, cuentas por cobrar (1.345.800 COP), pagos recibidos y las últimas operaciones registradas en la auditoría. <strong>Requisitos:</strong> RF-26, RF-30.</div>
+</div>
+
+<div class="captura">
+  <img src="capturas/13-facturas.png" alt="">
+  <div class="pie">Listado de facturas con su estado y su estado de cobro (pendiente, pago parcial, pagada, anulada) calculados a partir del saldo. <strong>Requisitos:</strong> RF-12, RF-19, RF-20.</div>
+</div>
+
+<div class="captura">
+  <img src="capturas/14-pagos.png" alt="">
+  <div class="pie">Pagos registrados, con el medio de pago enmascarado (se ven solo los últimos 4 dígitos de la tarjeta) y la columna «Registrado por», que distingue los pagos hechos por el personal de los hechos por el cliente desde el portal. <strong>Requisitos:</strong> RF-17, RNF-02, RF-37.</div>
+</div>
+
+<div class="captura">
+  <img src="capturas/15-balance-clientes.png" alt="">
+  <div class="pie">Balance y cuentas por cobrar por cliente, con los totales de facturación y de lo recaudado. <strong>Requisitos:</strong> RF-27.</div>
+</div>
+
+<div class="captura">
+  <img src="capturas/16-auditoria-recorte.png" alt="">
+  <div class="pie">Registro de auditoría: cada operación sensible queda con su usuario, tipo, módulo, operación, registro afectado y fecha. <strong>Requisitos:</strong> RF-30, RF-31.</div>
+</div>
+
+<div class="captura">
+  <img src="capturas/18-portal-saldo.png" alt="">
+  <div class="pie">Portal del cliente: el cliente ve únicamente su propia información y puede pagar en línea. <strong>Requisitos:</strong> RF-36, RF-37, RF-38.</div>
+</div>
+
+<h1>9. Conclusiones</h1>
+<ul>
+  <li>Las <strong>154 comprobaciones</strong> de integración finalizaron sin fallos, cubriendo todos los módulos del sistema.</li>
+  <li>Se verificaron específicamente las <strong>reglas de negocio críticas</strong>: no sobrepagar, no facturar dos veces el mismo pedido, no devolver más de lo cobrado y no mezclar datos entre clientes.</li>
+  <li>Los <strong>seis defectos detectados durante el desarrollo</strong> están corregidos y cada uno quedó protegido por una comprobación que fallaría si el problema reapareciera.</li>
+  <li>La suite es <strong>repetible y automatizada</strong>, por lo que puede ejecutarse tras cada cambio como red de seguridad.</li>
+</ul>
+
+<div class="caja warn">
+  <span class="titulo">Limitaciones reconocidas</span>
+  <p style="margin-bottom:0">Estas pruebas verifican la <strong>API y las reglas de negocio</strong> contra una base de datos real, no la interfaz gráfica (que se comprueba con las capturas de la sección 8). Tampoco cubren el comportamiento bajo <strong>carga alta</strong> ni la integración con una <strong>pasarela de pagos real</strong>, que no forma parte de esta versión. Algunos escenarios de concurrencia se garantizan por diseño —bloqueo de fila en los pagos— y no por una prueba que lance peticiones simultáneas.</p>
+</div>
+
+<div class="salto"></div>
+<h1>Anexo A · Registro completo de la ejecución</h1>
+<p>Salida íntegra de la suite, tal como se obtuvo. Es la evidencia directa de la sección 5: de aquí se extraen el recuento por bloque, los resultados de la sección 6 y el resultado global.</p>
+
+<pre style="font-size:7.4pt; line-height:1.35">=== FINAN-X · Pruebas end-to-end ===
+
+1) Autenticación
+  ✔ Login inválido → 401
+  ✔ Sin token → 401
+  ✔ Login admin → 200
+  ✔ Login cliente → 200
+1b) Autoregistro de clientes
+  ✔ Registrar cliente → 201 con token
+  ✔ Identificación duplicada → 409
+  ✔ Usuario duplicado → 409
+  ✔ Contraseña corta → 400
+  ✔ Faltan datos obligatorios → 400
+  ✔ Cliente registrado entra al portal aislado
+2) Autorización por rol
+  ✔ Facturador en /usuarios → 403
+  ✔ Cliente en /clientes → 403
+3) Gestión de clientes (RF-C01..C06)
+  ✔ Crear cliente → 201
+  ✔ Cliente duplicado → 409
+  ✔ Búsqueda de cliente
+  ✔ Inactivar cliente
+4) Gestión de productos (CU-15..CU-19)
+  ✔ Crear producto → 201
+  ✔ Código duplicado → 409
+  ✔ Precio negativo → 400
+5) Pedidos (CU-20..CU-24) — cálculo en servidor
+  ✔ Crear pedido → 201 con total calculado
+  ✔ Totales calculados por el servidor
+  ✔ Confirmar pedido
+  ✔ Modificar pedido CONFIRMADO → 409
+6) Facturación (CU-25..CU-30)
+  ✔ Generar factura → 201
+  ✔ Refacturar mismo pedido → 409
+  ✔ Saldo inicial = total (PENDIENTE)
+7) Pagos (RF-04..RF-06)
+  ✔ Pago parcial → PAGO_PARCIAL
+  ✔ Sobrepago → 400
+  ✔ Pago completo → PAGADA
+  ✔ Saldo final = 0
+8) Anulación (RF-03)
+  ✔ Anular factura sin pagos → OK
+  ✔ Anular factura con pagos → 409
+  ✔ Anular sin motivo → 400
+9) Portal del cliente (CU-09..CU-14) — aislamiento
+  ✔ Mis facturas (solo las propias)
+  ✔ Ninguna factura de otro cliente
+  ✔ Mi saldo disponible
+  ✔ Mis datos = cliente autenticado
+9b) Pago desde el portal del cliente
+  ✔ Factura creada para cliente nuevo
+  ✔ No paga factura ajena → 404 (aislamiento)
+  ✔ Factura inexistente → 404
+  ✔ Abono desde portal → 201 PAGO_PARCIAL
+  ✔ Sobrepago desde portal → 400
+  ✔ Pago visible en «mis pagos»
+  ✔ Saldo del cliente refleja el abono
+  ✔ Pago desde portal sin token → 401
+9c) Notas de crédito
+  ✔ CN sobre factura anulada → 409
+  ✔ CN sin pagos disponibles → 409
+  ✔ CN sin motivo → 400
+  ✔ CN valor 0 → 400
+  ✔ CN supera lo pagado → 400
+  ✔ Crear CN → 201 con número NC-
+  ✔ Detalle de CN
+  ✔ Saldo sube tras la CN (reversa el pago devuelto)
+  ✔ Lista de CN activas incluye la creada
+  ✔ Portal: mis notas crédito (aislado al cliente)
+  ✔ Anular CN → OK
+  ✔ Reanular CN → 409
+  ✔ Anular CN sin motivo → 400
+9c-bis) Regresión: saldo con múltiples pagos y notas de crédito
+  ✔ Factura de prueba con total > 0
+  ✔ Valor pagado con 2 pagos es correcto (no multiplicado)
+  ✔ Saldo 0 tras pagar el total con 2 pagos
+  ✔ Nota de crédito 1 creada sobre factura con 2 pagos
+  ✔ Tras la 1ª nota el saldo sube exactamente el valor devuelto
+  ✔ Notas de crédito devueltas = valor de la nota (no duplicado)
+  ✔ Nota de crédito 2 creada sobre factura con 2 pagos
+  ✔ CN que supera lo pagado disponible → 400 (disponible no inflado)
+  ✔ CN que agota exactamente el disponible → 201
+  ✔ Valor pagado sigue siendo el total (no multiplicado por 3 notas)
+  ✔ Notas de crédito acumuladas = total pagado
+  ✔ Saldo vuelve al total tras devolver todo lo pagado
+  ✔ El pago usa el saldo de la vista (coherente con las notas)
+9e) Regresión: validaciones, robustez y cierre de sesiones
+  ✔ Editar cliente con identificación ya usada → 409 (antes 500)
+  ✔ Editar cliente sin campos obligatorios → 400 (antes 500)
+  ✔ id no numérico en /facturas/abc → 400 (antes 500)
+  ✔ id no numérico en /clientes/abc → 400 (antes 500)
+  ✔ id no numérico en /pedidos/abc → 400 (antes 500)
+  ✔ id no numérico en /notas-credito/abc → 400 (antes 500)
+  ✔ id no numérico en PUT /productos/abc → 400 (antes 500)
+  ✔ Pago con facturaId no numérico → 400 (antes 500)
+  ✔ Método de pago inventado → 400 (lista blanca)
+  ✔ Crear usuario con contraseña de 1 carácter → 400
+  ✔ Crear cuenta de portal con contraseña de 1 carácter → 400
+  ✔ Estado de usuario inválido → 400 (antes se guardaba tal cual)
+  ✔ Reporte de facturación con rango → 200
+  ✔ Reporte con rango: saldo_pendiente es numérico y finito
+  ✔ Reporte sin rango responde y es coherente
+  ✔ Pagos de factura inexistente → 404 (antes [])
+  ✔ Auditoría con limit negativo → 200 acotado (antes 500)
+  ✔ Filtro de auditoría por módulo parcial (ILIKE con comodines)
+  ✔ Login de cuenta existente con contraseña mala → 401 (no revela el estado)
+  ✔ Login de cuenta inexistente → mismo 401 (sin enumeración)
+9f) Refacturación: una factura activa + historial de anuladas
+  ✔ Factura 1 emitida
+  ✔ No se puede facturar con una factura ACTIVA → 409
+  ✔ Anular la factura → 200
+  ✔ Refacturar el pedido tras anular → 201 (antes 500)
+  ✔ La nueva factura tiene otro número
+  ✔ El pedido apunta a la factura ACTIVA (no a la anulada)
+  ✔ La factura anulada se conserva como historial
+  ✔ La factura anulada sigue listada con su estado
+9g) M12: trazabilidad del pagador (interno vs portal)
+  ✔ GET /pagos expone registrado_por y su tipo
+  ✔ Un pago del portal queda identificado como CLIENTE
+  ✔ Un pago interno queda identificado como INTERNO
+  ✔ El portal ve quién registró sus pagos
+9h) Salvaguardas: no quedarse sin administradores
+  ✔ Un ADMIN no puede desactivar su propia cuenta → 409
+  ✔ Crear un segundo administrador → 201
+  ✔ Con otro ADMIN activo, desactivar a uno se permite
+9d) Balance por cliente y envío del estado financiero
+  ✔ Balance por cliente → 200 con resumen y lista
+  ✔ Resumen del balance coherente
+  ✔ El cliente nuevo aparece en el balance
+  ✔ Resumen financiero para correo → asunto + cuerpo + destinatario
+  ✔ Cuerpo incluye facturas y saldos
+  ✔ Resumen de cliente inexistente → 404
+10) Reportes y auditoría
+  ✔ Resumen de reportes
+  ✔ Auditoría registra pagos
+11) Seguridad (cabeceras HTTP, CORS y rate limit)
+  ✔ Cabecera de seguridad X-Content-Type-Options: nosniff
+  ✔ Cabecera de seguridad X-Frame-Options presente
+  ✔ No se revela el motor web (sin X-Powered-By)
+  ✔ CORS: origen permitido recibe la cabecera
+  ✔ CORS: origen no permitido es bloqueado
+  ✔ Fuerza bruta: intentos fallidos consecutivos → 429
+  ✔ Login correcto tras bloqueo → 200 (el acierto resetea el contador)
+  ✔ Token renovado sigue aislado en el portal
+12) Recuperación de contraseña (OTP) y datos de pago en línea
+  ✔ Solicitar código → 200 y en demo llega el OTP
+  ✔ Solicitud sin usuario → 400
+  ✔ Cuenta inexistente no se revela (200 genérica sin OTP)
+  ✔ Código incorrecto → 401 en cada intento y se bloquea a los 5
+  ✔ Con intentos agotados el código correcto ya no vale
+  ✔ Nuevo código tras agotar el anterior
+  ✔ Código incorrecto rechazado → 401
+  ✔ Cambiar contraseña con código válido → 200
+  ✔ Login con la nueva contraseña → 200
+  ✔ La contraseña anterior ya no sirve → 401
+  ✔ El código usado no se puede reutilizar
+12b) A7: el cambio de contraseña cierra las sesiones anteriores
+  ✔ Token nuevo funciona antes de cambiar la contraseña
+  ✔ Segundo cambio de contraseña → 200
+  ✔ Token ANTERIOR al cambio de contraseña → 401 (sesión cerrada)
+  ✔ El token del registro también queda invalidado → 401
+  ✔ Token emitido DESPUÉS del cambio → 200
+  ✔ Token con firma manipulada → 401
+  ✔ Sesión retomada tras el cambio de contraseña (REGT renovado)
+  ✔ Factura nueva para pruebas de pago en línea
+  ✔ Tarjeta sin datos → 400 (campos obligatorios)
+  ✔ Tarjeta con CVV inválido → 400
+  ✔ Tarjeta que no pasa Luhn → 400
+  ✔ Tarjeta vencida → 400
+  ✔ Pago con tarjeta válida → 201
+  ✔ Transferencia sin datos → 400
+  ✔ Pago por transferencia válido → 201
+  ✔ Cheque sin banco → 400
+  ✔ Interno: tarjeta sin datos → 400 (validación compartida)
+  ✔ Interno: pago con tarjeta válida → 201
+  ✔ Interno: cheque con banco y número → 201
+  ✔ Se guardan solo los últimos 4 dígitos y la marca de la tarjeta
+  ✔ Nunca se exponen CVV ni número completo de tarjeta
+
+=== Resultado: 154 aprobadas, 0 fallidas ===</pre>
+
+<h1>Anexo B · Cómo reproducir estas pruebas</h1>
+<pre><code># 1. Base de datos y datos de demostración
+docker compose up -d db
+cd backend &amp;&amp; npm install &amp;&amp; npm run seed
+
+# 2. Arrancar la API (en otra terminal)
+cd backend &amp;&amp; npm run dev
+
+# 3. Ejecutar las pruebas y guardar la evidencia
+cd backend &amp;&amp; npm test | tee ../deep-docs/_salida-e2e.txt</code></pre>
+<p>El comando devuelve un código de salida distinto de cero si alguna comprobación falla, lo que permite integrarlo en una verificación automática.</p>
+
+<footer class="pie-doc">FINAN-X · Evidencia 7 de 7 · Pruebas de integración · 154 comprobaciones aprobadas, 0 fallidas · 48 casos de control documentados · Registro completo en el Anexo A.</footer>
+
+</div></body>
+</html>

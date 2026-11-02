@@ -1,54 +1,56 @@
 /**
- * FINAN-X · Limitador de intentos fallidos de inicio de sesión (por IP, en memoria).
+ * FINAN-X · Limitador de intentos fallidos de inicio de sesión.
  *
- * Estrategia: solo se cuentan los intentos FALLIDOS (401). Un login exitoso
- * limpia el contador, de modo que un usuario legítimo nunca queda bloqueado
- * por equivocarse unas veces. Al superar el umbral, cada NUEVO fallo responde 429.
+ * Estrategia: se cuentan los fallos por combinación (IP, usuario). Un inicio de sesión
+ * correcto limpia SOLO esa combinación, nunca el contador global: antes, un login válido
+ * con una cuenta propia reiniciaba el contador de la IP y permitía seguir probando
+ * contraseñas contra el administrador sin llegar nunca al bloqueo.
  *
- * Nota: al ser en memoria, en un despliegue multi-instancia habría que mover
- * este contador a Redis. Para este proyecto (una sola instancia) es suficiente.
+ * El bloqueo "duro" por cuenta (aunque cambie la IP) vive en la base de datos
+ * (`fallos_login` y `bloqueado_hasta`) y lo aplica la ruta de login.
+ *
+ * Nota: al ser en memoria, en un despliegue multi-instancia habría que mover este
+ * contador a Redis. Para una sola instancia es suficiente.
  */
 import { config } from '../config.js';
 
-const fallosPorIp = new Map(); // ip -> { contador, ventanaInicia }
+const fallos = new Map(); // "ip|usuario" -> { contador, ventanaInicia }
 const VENTANA_MS = 15 * 60 * 1000;
 
 function ipDe(req) {
   return req.ip || req.socket?.remoteAddress || 'desconocido';
 }
 
+function claveDe(req, usuario) {
+  return `${ipDe(req)}|${String(usuario || '').trim().toLowerCase()}`;
+}
+
 /** Evita que el Map crezca sin límite: descarta entradas vencidas o poda. */
 function podar(ahora) {
-  if (fallosPorIp.size <= 5000) return;
-  for (const [ip, r] of fallosPorIp) {
-    if (ahora - r.ventanaInicia >= VENTANA_MS) fallosPorIp.delete(ip);
+  if (fallos.size <= 5000) return;
+  for (const [clave, r] of fallos) {
+    if (ahora - r.ventanaInicia >= VENTANA_MS) fallos.delete(clave);
   }
 }
 
 /**
- * Registra un intento fallido. Si la IP ya superó el umbral en la ventana,
- * responde 429 y devuelve true (ya respondió). Si no, devuelve false.
+ * Registra un intento fallido para (IP, usuario) y devuelve true si esa combinación
+ * ya superó el umbral. La ruta decide qué responder.
  */
-export function registrarFalloLogin(req, res) {
-  const ip = ipDe(req);
+export function registrarFalloLogin(req, usuario) {
+  const clave = claveDe(req, usuario);
   const ahora = Date.now();
   podar(ahora);
-  const r = fallosPorIp.get(ip);
+  const r = fallos.get(clave);
   if (r && ahora - r.ventanaInicia < VENTANA_MS) {
     r.contador += 1;
-    if (r.contador >= config.loginMaxFallidos) {
-      res.status(429).json({
-        error: 'Demasiados intentos fallidos de inicio de sesión. Espere 15 minutos antes de volver a intentar.',
-      });
-      return true;
-    }
   } else {
-    fallosPorIp.set(ip, { contador: 1, ventanaInicia: ahora });
+    fallos.set(clave, { contador: 1, ventanaInicia: ahora });
   }
-  return false;
+  return fallos.get(clave).contador >= config.loginMaxFallidos;
 }
 
-/** Un login exitoso limpia el contador de la IP. */
-export function limpiarFallosLogin(req) {
-  fallosPorIp.delete(ipDe(req));
+/** Un login correcto limpia solo la combinación (IP, usuario) que acertó. */
+export function limpiarFallosLogin(req, usuario) {
+  fallos.delete(claveDe(req, usuario));
 }

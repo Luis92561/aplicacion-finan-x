@@ -322,3 +322,34 @@ ALTER TABLE facturas        ADD CONSTRAINT ck_facturas_estado        CHECK (esta
 ALTER TABLE notas_credito   ADD CONSTRAINT ck_notas_credito_estado   CHECK (estado IN ('ACTIVA', 'ANULADA'));
 ALTER TABLE pagos           ADD CONSTRAINT ck_pagos_metodo           CHECK (metodo_pago IN ('EFECTIVO', 'TARJETA', 'TRANSFERENCIA', 'CHEQUE'));
 ALTER TABLE auditoria       ADD CONSTRAINT ck_auditoria_usuario_tipo CHECK (usuario_tipo IN ('INTERNO', 'CLIENTE'));
+
+-- ------------------------------------------------------------
+-- Despliegue seguro: usuario interno, primer ingreso y trazabilidad
+--
+-- Estas mismas sentencias viven en database/migracion_despliegue.sql para
+-- aplicar sobre una base ya creada. Aquí se incluyen para que una instalación
+-- nueva (volumen vacío) quede lista sin pasos manuales.
+-- ------------------------------------------------------------
+ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS username VARCHAR(60);
+ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS debe_cambiar_clave BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS clave_actualizada_en TIMESTAMPTZ;
+ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS fallos_login INT NOT NULL DEFAULT 0;
+ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS bloqueado_hasta TIMESTAMPTZ;
+
+ALTER TABLE usuario_cliente ADD COLUMN IF NOT EXISTS debe_cambiar_clave BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE usuario_cliente ADD COLUMN IF NOT EXISTS clave_actualizada_en TIMESTAMPTZ;
+ALTER TABLE usuario_cliente ADD COLUMN IF NOT EXISTS fallos_login INT NOT NULL DEFAULT 0;
+ALTER TABLE usuario_cliente ADD COLUMN IF NOT EXISTS bloqueado_hasta TIMESTAMPTZ;
+
+ALTER TABLE auditoria ADD COLUMN IF NOT EXISTS ip INET;
+ALTER TABLE auditoria ADD COLUMN IF NOT EXISTS user_agent TEXT;
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_usuarios_username
+  ON usuarios (LOWER(username)) WHERE username IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_facturas_fecha_emision ON facturas (fecha_emision);
+CREATE INDEX IF NOT EXISTS idx_pagos_fecha            ON pagos (fecha);
+
+ALTER TABLE usuarios DROP CONSTRAINT IF EXISTS ck_usuarios_username;
+ALTER TABLE usuarios ADD CONSTRAINT ck_usuarios_username
+  CHECK (username IS NULL OR username ~ '^[a-z0-9._-]{3,32}$');

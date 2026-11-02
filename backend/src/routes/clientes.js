@@ -3,7 +3,8 @@ import bcrypt from 'bcryptjs';
 import pool from '../db.js';
 import { requireAuth, requireRol } from '../middleware/auth.js';
 import { audit } from '../middleware/audit.js';
-import { HttpError, idNumerico, validarPassword } from '../utils.js';
+import { HttpError, idNumerico, validarPassword, generarClaveTemporal } from '../utils.js';
+import { config } from '../config.js';
 
 const router = Router();
 router.use(requireAuth, requireRol('ADMIN', 'FACTURADOR', 'CAJERO', 'SUPERVISOR'));
@@ -60,6 +61,9 @@ router.post('/', async (req, res, next) => {
     const b = req.body || {};
     const { tipoCliente = 'PERSONA', tipoIdentificacion = 'CC', numeroIdentificacion, nombreRazonSocial, telefono, correo, direccion, ciudad } = b;
     if (!numeroIdentificacion || !nombreRazonSocial) throw new HttpError(400, 'Número de identificación y nombre son obligatorios');
+    if (!['PERSONA', 'EMPRESA'].includes(String(tipoCliente))) throw new HttpError(400, 'Tipo de cliente inválido');
+    if (!['CC', 'CE', 'NIT', 'PASAPORTE'].includes(String(tipoIdentificacion))) throw new HttpError(400, 'Tipo de identificación inválido');
+    if (correo && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(correo))) throw new HttpError(400, 'El correo no tiene un formato válido');
 
     const dup = await pool.query(
       'SELECT 1 FROM clientes WHERE tipo_identificacion = $1 AND numero_identificacion = $2',
@@ -72,7 +76,7 @@ router.post('/', async (req, res, next) => {
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING cliente_id`,
       [tipoCliente, tipoIdentificacion, numeroIdentificacion, nombreRazonSocial, telefono || null, correo || null, direccion || null, ciudad || null]
     );
-    await audit({ usuario: req.user.correo, modulo: MODULO, operacion: 'CREAR', registro: r.rows[0].cliente_id, descripcion: `Cliente ${nombreRazonSocial} (${tipoIdentificacion} ${numeroIdentificacion})` });
+    await audit({ req, usuario: req.user.correo, modulo: MODULO, operacion: 'CREAR', registro: r.rows[0].cliente_id, descripcion: `Cliente ${nombreRazonSocial} (${tipoIdentificacion} ${numeroIdentificacion})` });
     res.status(201).json({ cliente_id: r.rows[0].cliente_id });
   } catch (e) { next(e); }
 });
@@ -90,6 +94,9 @@ router.put('/:id', async (req, res, next) => {
     if (!b.tipoIdentificacion || !b.numeroIdentificacion || !b.nombreRazonSocial) {
       throw new HttpError(400, 'Tipo de identificación, número de identificación y nombre son obligatorios');
     }
+    if (!['PERSONA', 'EMPRESA'].includes(String(b.tipoCliente))) throw new HttpError(400, 'Tipo de cliente inválido');
+    if (!['CC', 'CE', 'NIT', 'PASAPORTE'].includes(String(b.tipoIdentificacion))) throw new HttpError(400, 'Tipo de identificación inválido');
+    if (b.correo && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(b.correo))) throw new HttpError(400, 'El correo no tiene un formato válido');
 
     const exists = await pool.query('SELECT nombre_razon_social FROM clientes WHERE cliente_id = $1', [id]);
     if (!exists.rowCount) throw new HttpError(404, 'Cliente no encontrado');
@@ -106,7 +113,7 @@ router.put('/:id', async (req, res, next) => {
        WHERE cliente_id = $9`,
       [b.tipoCliente, b.tipoIdentificacion, b.numeroIdentificacion, b.nombreRazonSocial, b.telefono || null, b.correo || null, b.direccion || null, b.ciudad || null, id]
     );
-    await audit({ usuario: req.user.correo, modulo: MODULO, operacion: 'ACTUALIZAR', registro: id, descripcion: `Actualización de cliente ${b.nombreRazonSocial}` });
+    await audit({ req, usuario: req.user.correo, modulo: MODULO, operacion: 'ACTUALIZAR', registro: id, descripcion: `Actualización de cliente ${b.nombreRazonSocial}` });
     res.json({ ok: true });
   } catch (e) { next(e); }
 });
@@ -119,36 +126,56 @@ router.patch('/:id/estado', async (req, res, next) => {
     if (!['ACTIVO', 'INACTIVO'].includes(estado)) throw new HttpError(400, 'Estado inválido');
     const r = await pool.query('UPDATE clientes SET estado = $1 WHERE cliente_id = $2 RETURNING nombre_razon_social', [estado, id]);
     if (!r.rowCount) throw new HttpError(404, 'Cliente no encontrado');
-    await audit({ usuario: req.user.correo, modulo: MODULO, operacion: 'ESTADO', registro: id, descripcion: `Cliente ${r.rows[0].nombre_razon_social} → ${estado}` });
+    await audit({ req, usuario: req.user.correo, modulo: MODULO, operacion: 'ESTADO', registro: id, descripcion: `Cliente ${r.rows[0].nombre_razon_social} → ${estado}` });
     res.json({ ok: true });
   } catch (e) { next(e); }
 });
 
-// POST /api/clientes/:id/cuenta  — crea cuenta de acceso del cliente
-router.post('/:id/cuenta', async (req, res, next) => {
+// POST /api/clientes/:id/cuenta  — crea la cuenta de portal de un cliente
+// Solo ADMIN: si cualquier rol operativo pudiera hacerlo, podría crear una cuenta con
+// una contraseña elegida por él y entrar al portal suplantando al cliente.
+router.post('/:id/cuenta', requireRol('ADMIN'), async (req, res, next) => {
   try {
     const id = idNumerico(req.params.id, 'id');
-    const { username, password } = req.body || {};
-    if (!username || !password) throw new HttpError(400, 'Usuario y contraseña son obligatorios');
-    validarPassword(password);
+    const { username, password, generar } = req.body || {};
+    const usuario = String(username ?? '').trim().toLowerCase();
+    if (!/^[a-z0-9._-]{3,32}$/.test(usuario)) {
+      throw new HttpError(400, 'El usuario debe tener entre 3 y 32 caracteres: letras, números, punto, guion o guion bajo');
+    }
 
-    const cli = await pool.query('SELECT nombre_razon_social, estado FROM clientes WHERE cliente_id = $1', [id]);
+    const cli = await pool.query('SELECT nombre_razon_social, estado, correo FROM clientes WHERE cliente_id = $1', [id]);
     if (!cli.rowCount) throw new HttpError(404, 'Cliente no encontrado');
     if (cli.rows[0].estado !== 'ACTIVO') throw new HttpError(400, 'El cliente debe estar activo');
 
     const cuenta = await pool.query('SELECT 1 FROM usuario_cliente WHERE cliente_id = $1', [id]);
     if (cuenta.rowCount) throw new HttpError(409, 'El cliente ya tiene una cuenta de acceso');
 
-    const userDup = await pool.query('SELECT 1 FROM usuario_cliente WHERE LOWER(username) = LOWER($1)', [username]);
+    const userDup = await pool.query(
+      `SELECT 1 FROM usuario_cliente WHERE LOWER(username) = LOWER($1)
+       UNION
+       SELECT 1 FROM usuarios WHERE LOWER(correo) = LOWER($1) OR LOWER(COALESCE(username,'')) = LOWER($1)`,
+      [usuario]
+    );
     if (userDup.rowCount) throw new HttpError(409, 'Ese nombre de usuario ya está en uso');
 
-    const hash = await bcrypt.hash(password, 10);
+    const claveTemporal = generar || !password ? generarClaveTemporal() : String(password);
+    validarPassword(claveTemporal, { username: usuario, correo: cli.rows[0].correo, nombre: cli.rows[0].nombre_razon_social });
+
+    const hash = await bcrypt.hash(claveTemporal, config.bcryptRounds);
     await pool.query(
-      'INSERT INTO usuario_cliente (cliente_id, username, password_hash) VALUES ($1, $2, $3)',
-      [id, username, hash]
+      `INSERT INTO usuario_cliente (cliente_id, username, password_hash, debe_cambiar_clave)
+       VALUES ($1, $2, $3, TRUE)`,
+      [id, usuario, hash]
     );
-    await audit({ usuario: req.user.correo, modulo: MODULO, operacion: 'CUENTA', registro: id, descripcion: `Cuenta de acceso creada para ${cli.rows[0].nombre_razon_social} (${username})` });
-    res.status(201).json({ ok: true });
+    await audit({
+      req, usuario: req.user.correo, modulo: MODULO, operacion: 'CUENTA', registro: id,
+      descripcion: `Cuenta de acceso creada para ${cli.rows[0].nombre_razon_social} (${usuario}) con cambio de contraseña obligatorio`,
+    });
+    res.status(201).json({
+      ok: true,
+      username: usuario,
+      ...(generar || !password ? { clave_temporal: claveTemporal, debe_cambiar_clave: true } : {}),
+    });
   } catch (e) { next(e); }
 });
 

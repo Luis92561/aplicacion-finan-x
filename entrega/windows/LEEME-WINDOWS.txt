@@ -1,0 +1,55 @@
+FINAN-X · Cómo abrir la aplicación en Windows
+==============================================
+
+QUÉ NECESITA ESTE EQUIPO (una sola vez)
+---------------------------------------
+1. Windows 10 u 11 de 64 bits.
+2. Docker Desktop instalado y funcionando.
+   - Descarga: https://www.docker.com/products/docker-desktop/
+   - Requiere activar WSL 2 (el instalador lo ofrece) y reiniciar el equipo.
+   - No hace falta saber usar Docker: el lanzador hace todo.
+
+CÓMO ABRIRLA
+------------
+Doble clic en:  ABRIR-FINAN-X.bat
+
+El lanzador:
+  - arranca Docker Desktop si está apagado,
+  - genera el archivo .env con claves aleatorias la primera vez,
+  - carga las imágenes del paquete-offline si no hay internet,
+  - levanta la base de datos, la API y la interfaz,
+  - crea las cuentas iniciales si no existen,
+  - abre el navegador en http://localhost:8080.
+
+La primera vez puede tardar entre 2 y 5 minutos. Las siguientes, menos de un minuto.
+
+CUENTAS
+-------
+Están en:  ..\..\primer-ingreso\Acta-Usuarios-Primer-Ingreso.pdf
+Todas piden cambiar la contraseña en el primer ingreso.
+
+OTROS COMANDOS
+--------------
+  CERRAR-FINAN-X.bat        Detiene la aplicación (conserva los datos).
+  REINICIAR-DATOS.bat       Borra los datos y deja la demo como nueva.
+  ABRIR-MODO-SEGURO.bat     Abre con HTTPS (certificado autofirmado) en
+                            https://localhost:8443 para mostrar TLS y cabeceras.
+
+SI WINDOWS MUESTRA UN AVISO
+---------------------------
+- "Windows protegió su PC" (SmartScreen): clic en "Más información" y
+  "Ejecutar de todas formas". El .bat es un archivo de texto que puede revisar
+  con el Bloc de notas.
+- Si el archivo vino dentro de un ZIP descargado, clic derecho sobre el ZIP,
+  Propiedades, "Desbloquear", y vuelva a extraerlo.
+
+SI ALGO FALLA
+-------------
+- Revise que Docker Desktop diga "Engine running".
+- El lanzador escribe el detalle en: diagnostico.log (en esta carpeta).
+- Puerto 8080 ocupado: cierre el programa que lo use y vuelva a intentar.
+
+DATOS
+-----
+La base vive en un volumen de Docker. Para empezar de cero use
+REINICIAR-DATOS.bat. Para respaldar: ..\..\scripts\respaldo.ps1.

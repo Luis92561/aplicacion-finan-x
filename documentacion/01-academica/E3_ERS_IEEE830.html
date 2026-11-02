@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>FINAN-X · Especificación de Requisitos (IEEE 830)</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 20mm; }
+  :root{
+    --primary:#1e3a8a; --primary-dark:#172554; --accent:#2563eb;
+    --success:#15803d; --success-light:#dcfce7; --warning:#b45309; --warning-light:#fef3c7;
+    --danger:#b91c1c; --danger-light:#fee2e2; --purple:#6d28d9; --purple-light:#ede9fe;
+    --gray:#64748b; --gray-light:#e2e8f0; --bg:#f8fafc; --border:#e2e8f0; --muted:#64748b;
+  }
+  *{box-sizing:border-box}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+    color:#0f172a; margin:0; font-size:10.5pt; line-height:1.55; background:#fff;
+  }
+  .doc{max-width:100%;}
+
+  /* ---------- Portada ---------- */
+  .portada{
+    min-height:245mm; display:flex; flex-direction:column; justify-content:center;
+    text-align:center; page-break-after:always; padding:0 10mm;
+  }
+  .portada .marca{font-size:34pt; font-weight:800; color:var(--primary); letter-spacing:-1px; margin:0}
+  .portada .marca span{color:var(--accent)}
+  .portada .sub{font-size:13pt; color:var(--muted); margin:6px 0 30px}
+  .portada h1{font-size:21pt; color:var(--primary-dark); margin:0 0 8px; line-height:1.25}
+  .portada .evidencia{
+    display:inline-block; background:var(--primary); color:#fff; font-weight:700;
+    padding:5px 16px; border-radius:999px; font-size:10pt; margin-bottom:22px;
+  }
+  .portada .desc{font-size:11pt; color:#334155; max-width:140mm; margin:0 auto 32px}
+  .portada table.meta{margin:0 auto; border-collapse:collapse; font-size:9.5pt; text-align:left}
+  .portada table.meta td{padding:4px 10px; border-bottom:1px solid var(--border)}
+  .portada table.meta td:first-child{color:var(--muted); font-weight:600; white-space:nowrap}
+  .portada .pie{margin-top:38px; font-size:9pt; color:var(--muted)}
+
+  /* ---------- Encabezados ---------- */
+  h1{font-size:16pt; color:var(--primary-dark); margin:0 0 4px; padding-bottom:6px; border-bottom:2.5px solid var(--primary)}
+  h2{font-size:13pt; color:var(--primary); margin:20px 0 8px; padding-bottom:4px; border-bottom:1px solid var(--border); page-break-after:avoid}
+  h3{font-size:11.5pt; color:var(--primary-dark); margin:14px 0 6px; page-break-after:avoid}
+  h4{font-size:10.5pt; color:#334155; margin:11px 0 4px; page-break-after:avoid}
+  p{margin:6px 0}
+  ul,ol{margin:6px 0 6px 18px; padding:0}
+  li{margin:2.5px 0}
+  a{color:var(--accent); text-decoration:none}
+  code{font-family:'Cascadia Mono',Consolas,'Courier New',monospace; font-size:9pt; background:#f1f5f9; padding:1px 4px; border-radius:4px; color:#0f172a}
+  pre{
+    background:#0f172a; color:#e2e8f0; padding:9px 12px; border-radius:7px; font-size:8.5pt;
+    overflow-wrap:anywhere; white-space:pre-wrap; font-family:'Cascadia Mono',Consolas,monospace;
+    page-break-inside:avoid; margin:8px 0; line-height:1.45;
+  }
+  pre code{background:none; color:inherit; padding:0}
+
+  /* ---------- Tablas ---------- */
+  table{width:100%; border-collapse:collapse; margin:9px 0; font-size:9pt; page-break-inside:auto}
+  thead{display:table-header-group}
+  tr{page-break-inside:avoid}
+  th{
+    background:var(--primary); color:#fff; text-align:left; padding:5px 7px;
+    font-size:8.5pt; font-weight:700; text-transform:uppercase; letter-spacing:.3px;
+  }
+  td{padding:4.5px 7px; border-bottom:1px solid var(--border); vertical-align:top}
+  tbody tr:nth-child(even){background:#f8fafc}
+  td.num,th.num{text-align:right; white-space:nowrap}
+  td.c,th.c{text-align:center}
+  table.compacta td,table.compacta th{padding:3.5px 6px; font-size:8.5pt}
+
+  /* ---------- Cajas ---------- */
+  .caja{border-left:4px solid var(--accent); background:#eff6ff; padding:8px 12px; border-radius:0 7px 7px 0; margin:9px 0; page-break-inside:avoid}
+  .caja.ok{border-color:var(--success); background:var(--success-light)}
+  .caja.warn{border-color:var(--warning); background:var(--warning-light)}
+  .caja.err{border-color:var(--danger); background:var(--danger-light)}
+  .caja.purple{border-color:var(--purple); background:var(--purple-light)}
+  .caja p:first-child{margin-top:0}
+  .caja p:last-child{margin-bottom:0}
+  .caja .titulo{font-weight:700; display:block; margin-bottom:2px}
+
+  .badge{display:inline-block; padding:1px 8px; border-radius:999px; font-size:7.5pt; font-weight:700; white-space:nowrap}
+  .b-ok{background:var(--success-light); color:var(--success)}
+  .b-no{background:var(--danger-light); color:var(--danger)}
+  .b-warn{background:var(--warning-light); color:var(--warning)}
+  .b-info{background:#dbeafe; color:var(--primary)}
+  .b-gray{background:var(--gray-light); color:var(--gray)}
+  .b-purple{background:var(--purple-light); color:var(--purple)}
+
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  .grid3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:9px}
+  .kpi{border:1px solid var(--border); border-radius:8px; padding:8px 10px; text-align:center; background:var(--bg)}
+  .kpi .n{font-size:17pt; font-weight:800; color:var(--primary); line-height:1.1}
+  .kpi .t{font-size:8pt; color:var(--muted); text-transform:uppercase; letter-spacing:.4px}
+
+  .captura{border:1px solid var(--border); border-radius:8px; overflow:hidden; margin:9px 0; page-break-inside:avoid}
+  .captura img{width:100%; display:block}
+  .captura .pie{background:var(--bg); padding:5px 9px; font-size:8pt; color:var(--muted); border-top:1px solid var(--border)}
+
+  .salto{page-break-before:always}
+  .evitar-corte{page-break-inside:avoid}
+  .indice{font-size:10pt}
+  .indice li{margin:3px 0}
+  .firma{margin-top:38px; display:grid; grid-template-columns:1fr 1fr; gap:28px}
+  .firma .l{border-top:1px solid #334155; padding-top:5px; font-size:9pt; color:#334155}
+  .placeholder{background:#fef3c7; border-bottom:1px dashed var(--warning); padding:0 3px; font-weight:600}
+  footer.pie-doc{margin-top:26px; border-top:1px solid var(--border); padding-top:7px; font-size:8pt; color:var(--muted)}
+</style>
+</head>
+<body><div class="doc">
+
+<section class="portada">
+  <p class="marca">FINAN<span>·X</span></p>
+  <p class="sub">Sistema de facturación y pagos</p>
+  <div class="evidencia">Evidencia 3 de 7</div>
+  <h1>Especificación de Requisitos de Software</h1>
+  <p class="desc">Documento de requisitos elaborado siguiendo la estructura del estándar IEEE 830. Define qué debe hacer el sistema FINAN-X y bajo qué condiciones debe funcionar, con requisitos verificables y trazables al software realmente construido.</p>
+  <table class="meta"><tr><td>Sistema</td><td>FINAN-X · Facturación y pagos</td></tr>
+<tr><td>Estándar de referencia</td><td>IEEE 830 (estructura de una ERS)</td></tr>
+<tr><td>Requisitos funcionales</td><td>40</td></tr>
+<tr><td>Requisitos no funcionales</td><td>27</td></tr>
+<tr><td>Reglas de negocio</td><td>15</td></tr>
+<tr><td>Criterios de aceptación</td><td>20</td></tr></table>
+  <p class="pie">Proyecto académico · Integración de Aplicaciones · Sexto semestre</p>
+</section>
+
+<h1>1. Introducción</h1>
+
+<h2>1.1 Propósito</h2>
+<p>Este documento especifica los requisitos de <strong>FINAN-X</strong>, un sistema de facturación y pagos con portal de autoservicio para el cliente. Está dirigido a:</p>
+<ul>
+  <li>El <strong>equipo de desarrollo</strong>, como contrato de lo que debe construirse.</li>
+  <li>El <strong>docente evaluador</strong> o un revisor externo, para verificar que lo entregado corresponde a lo especificado.</li>
+  <li>Un <strong>desarrollador futuro</strong> que reciba el proyecto, para entender qué hace y por qué.</li>
+</ul>
+<p>Responde a la pregunta guía de la evidencia: <em>¿qué debe hacer exactamente el sistema y bajo qué condiciones debe funcionar?</em></p>
+
+<h2>1.2 Alcance</h2>
+<p>FINAN-X cubre el <strong>ciclo de venta y cobro</strong> de una empresa que factura a sus clientes:</p>
+<pre><code>Cliente → Pedido → Factura → Pago → (Nota de crédito si hay devolución)</code></pre>
+<p>El sistema ofrece dos áreas diferenciadas: un <strong>panel interno</strong> para el personal de la empresa (administrador, facturador, cajero y supervisor) y un <strong>portal del cliente</strong> para que cada cliente consulte y pague sus propias facturas.</p>
+
+<div class="caja warn">
+  <span class="titulo">Fuera de alcance</span>
+  <p style="margin-bottom:0">FINAN-X <strong>no es un sistema ERP</strong>. Quedan expresamente fuera: contabilidad general, gestión de inventario y stock, nómina, compras a proveedores, y la integración fiscal con la DIAN (el documento de factura es informativo, no tiene validez tributaria). Ver la sección 7, Restricciones.</p>
+</div>
+
+<h2>1.3 Definiciones y abreviaturas</h2>
+<table class=""><thead><tr><th>Término</th><th>Significado en este documento</th></tr></thead><tbody>
+<tr><td><strong>Pedido</strong></td><td>Documento interno que registra qué productos pidió un cliente, antes de facturarse.</td></tr>
+<tr><td><strong>Factura</strong></td><td>Documento de cobro emitido a partir de un pedido confirmado.</td></tr>
+<tr><td><strong>Pago</strong></td><td>Abono contra una factura. Puede ser parcial o total.</td></tr>
+<tr><td><strong>Saldo</strong></td><td>Lo que queda por cobrar de una factura: total − pagos + devoluciones.</td></tr>
+<tr><td><strong>Nota de crédito</strong></td><td>Devolución de dinero sobre una factura ya pagada.</td></tr>
+<tr><td><strong>OTP</strong></td><td>One-Time Password: código de un solo uso para recuperar la contraseña.</td></tr>
+<tr><td><strong>RBAC</strong></td><td>Control de acceso basado en roles.</td></tr>
+<tr><td><strong>JWT</strong></td><td>Token firmado que identifica la sesión del usuario.</td></tr>
+<tr><td><strong>Baja lógica</strong></td><td>Marcar un registro como inactivo sin eliminarlo, para conservar el historial.</td></tr>
+<tr><td><strong>API REST</strong></td><td>Interfaz de programación sobre HTTP con formato JSON.</td></tr>
+</tbody></table>
+
+<h2>1.4 Referencias</h2>
+<ul>
+  <li>IEEE Std 830-1998 — <em>Recommended Practice for Software Requirements Specifications</em> (estructura seguida).</li>
+  <li><code>documentacion/SPEC_Funcional.md</code> — especificación funcional e historias de usuario (HU-01 a HU-22).</li>
+  <li><code>documentacion/SPEC_Tecnico.md</code> — especificación técnica: esquema, contrato de la API y seguridad.</li>
+  <li><code>database/init.sql</code> — esquema real de la base de datos.</li>
+  <li><code>backend/scripts/e2e.mjs</code> — suite de pruebas que verifica estos requisitos.</li>
+</ul>
+
+<h1>2. Descripción general</h1>
+
+<h2>2.1 Perspectiva del producto</h2>
+<p>FINAN-X es un producto <strong>independiente y autocontenido</strong>: se levanta con un solo comando y no depende de servicios externos. Se compone de tres piezas que se comunican por HTTP:</p>
+<pre><code>Navegador  →  Frontend (React)  →  API REST (Node/Express)  →  PostgreSQL 16</code></pre>
+
+<h2>2.2 Funciones principales</h2>
+<table class=""><thead><tr><th>Grupo de funciones</th><th>Qué incluye</th></tr></thead><tbody>
+<tr><td>Autenticación y seguridad</td><td>Acceso interno y de cliente, autoregistro, recuperación de contraseña con OTP, cierre de sesiones, control por roles.</td></tr>
+<tr><td>Clientes</td><td>Alta, edición, búsqueda, activar/inactivar y creación de la cuenta de portal.</td></tr>
+<tr><td>Productos</td><td>Catálogo con precio, impuesto, unidad de medida y baja lógica.</td></tr>
+<tr><td>Pedidos</td><td>Creación con líneas, cálculo de totales en el servidor, confirmación y cancelación.</td></tr>
+<tr><td>Facturación</td><td>Emisión desde un pedido, consulta, saldo, anulación con motivo y refacturación.</td></tr>
+<tr><td>Pagos</td><td>Registro con distintos medios, control de saldo y estado de pago automático.</td></tr>
+<tr><td>Notas de crédito</td><td>Devoluciones con motivo y anulación lógica.</td></tr>
+<tr><td>Reportes</td><td>Resumen del negocio, facturación por rango, balance por cliente e historial.</td></tr>
+<tr><td>Auditoría</td><td>Registro y consulta de todas las operaciones sensibles.</td></tr>
+<tr><td>Portal del cliente</td><td>Consulta de saldo, compras, facturas, pagos, notas y datos propios, y pago en línea.</td></tr>
+</tbody></table>
+
+<h2>2.3 Usuarios del sistema</h2>
+<p>El sistema distingue <strong>cinco tipos de usuario</strong>. Los cuatro primeros son personal interno de la empresa y se reparten las tareas; el quinto es el cliente, que solo accede a su propia información.</p>
+<table class=""><thead><tr><th>Rol</th><th>Quién es</th><th>Qué puede hacer</th><th>Qué NO puede hacer</th></tr></thead><tbody>
+<tr><td><strong>Administrador</strong></td><td>Responsable del sistema</td><td>Todo lo del sistema y, además, la gestión de usuarios internos. Consulta la auditoría.</td><td>Nada restringido, salvo desactivarse a sí mismo o al último administrador.</td></tr>
+<tr><td><strong>Facturador</strong></td><td>Área comercial</td><td>Clientes, productos, pedidos, emisión y anulación de facturas, reportes, envío del estado financiero.</td><td>Gestionar usuarios. Consultar la auditoría.</td></tr>
+<tr><td><strong>Cajero</strong></td><td>Área de caja</td><td>Registrar pagos y notas de crédito, consultar facturas, clientes y pedidos.</td><td>Gestionar usuarios, consultar la auditoría ni emitir facturas.</td></tr>
+<tr><td><strong>Supervisor</strong></td><td>Área de control</td><td>Consultar todo, reportes, balances e historial. Consultar la auditoría.</td><td>Registrar pagos, emitir facturas ni gestionar usuarios.</td></tr>
+<tr><td><strong>Cliente</strong></td><td>Cliente de la empresa</td><td>Ver y pagar <strong>sus propias</strong> facturas, consultar su saldo, sus compras, sus pagos y sus datos.</td><td>Ver información de otros clientes, ni acceder al panel interno.</td></tr>
+</tbody></table>
+
+<h2>2.4 Entorno de operación</h2>
+<ul>
+  <li><strong>Servidor:</strong> cualquier equipo con Docker. Tres contenedores: PostgreSQL 16, la API en Node.js y el frontend servido por nginx.</li>
+  <li><strong>Cliente:</strong> navegador web actual (Chrome, Edge, Firefox o Safari). No requiere instalación.</li>
+  <li><strong>Base de datos:</strong> PostgreSQL 16 con un volumen persistente para los datos.</li>
+</ul>
+
+<h2>2.5 Restricciones de diseño y supuestos</h2>
+<table class=""><thead><tr><th>Tipo</th><th>Descripción</th></tr></thead><tbody>
+<tr><td><strong>Tecnológica</strong></td><td>El frontend se desarrolla con <strong>React 18 + Vite</strong>; el backend con <strong>Node.js + Express</strong>; la base de datos es <strong>PostgreSQL 16</strong>. Son las tecnologías vistas en la asignatura.</td></tr>
+<tr><td><strong>De despliegue</strong></td><td>El sistema se ejecuta en <strong>contenedores Docker</strong> orquestados con Docker Compose, sobre cualquier máquina con Docker instalado.</td></tr>
+<tr><td><strong>De entorno</strong></td><td>Node.js 20 o superior. El proyecto se ha probado con Node 24 y PostgreSQL 16.</td></tr>
+<tr><td><strong>Legal</strong></td><td>El software se distribuye bajo licencia de uso; las dependencias de terceros conservan sus licencias (ver Evidencias 4 y 5).</td></tr>
+<tr><td><strong>De alcance</strong></td><td>El sistema <strong>no es un ERP</strong>: no incluye contabilidad general, inventario, nómina ni compras a proveedores. La facturación <strong>no tiene validez fiscal</strong> (no emite CUFE ni se integra con la DIAN).</td></tr>
+<tr><td><strong>De seguridad</strong></td><td>La recuperación de contraseña por SMS o correo <strong>no envía mensajes reales</strong> en esta versión: el proveedor de mensajería queda como punto de extensión.</td></tr>
+<tr><td><strong>De integración</strong></td><td>El código de pago en efectivo es una <strong>simulación</strong>: no se persiste ni se redime contra una pasarela real.</td></tr>
+<tr><td><strong>Académica</strong></td><td>Proyecto de la asignatura <em>Integración de Aplicaciones</em>. La variedad de roles, los límites de peticiones y las credenciales de demostración responden a fines didácticos.</td></tr>
+</tbody></table>
+<p><strong>Supuestos:</strong> el equipo dispone de Docker; el cliente final tiene acceso a un navegador; la entrega del OTP por SMS o correo se sustituye por el modo demostración mientras no se contrate un proveedor.</p>
+
+<h1>3. Requisitos funcionales</h1>
+<p>Se especifican <strong>40 requisitos funcionales</strong>. Cada uno declara el actor que lo usa, su prioridad, cómo se verifica y su estado. <strong>No hay requisitos «pendientes»</strong>: todo lo especificado aquí está construido y probado, y lo que no existe figura en el alcance como fuera de alcance en lugar de como requisito incumplido.</p>
+<p>La columna «Verificación» enlaza con los casos de prueba de la <strong>Evidencia 7</strong> y con la matriz de trazabilidad de la <strong>Evidencia 6</strong>.</p>
+
+<table class=""><thead><tr><th>ID</th><th>Enunciado del requisito</th><th>Actor</th><th class="c">Prioridad</th><th>Verificación</th><th class="c">Estado</th></tr></thead><tbody>
+<tr><td><strong>RF-01</strong></td><td>El sistema debe permitir <strong>registrar clientes</strong> con tipo (persona o empresa), tipo y número de identificación, nombre o razón social y datos de contacto.</td><td>Facturador</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-03</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-02</strong></td><td>El sistema debe <strong>impedir clientes duplicados</strong> por combinación de tipo y número de identificación, respondiendo 409.</td><td>Facturador</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-03</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-03</strong></td><td>El sistema debe permitir <strong>buscar clientes</strong> por nombre, razón social, número de documento o NIT, y filtrar por estado.</td><td>Facturador, Cajero</td><td class="c"><span class="badge b-gray">Media</span></td><td>Prueba CP-04</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-04</strong></td><td>El sistema debe permitir <strong>activar e inactivar clientes</strong> sin eliminarlos (baja lógica), conservando su historial.</td><td>Facturador</td><td class="c"><span class="badge b-gray">Media</span></td><td>Prueba CP-05</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-05</strong></td><td>El sistema debe permitir <strong>crear la cuenta de portal de un cliente</strong> (usuario y contraseña) para que acceda a su autoservicio.</td><td>Facturador</td><td class="c"><span class="badge b-gray">Media</span></td><td>Prueba CP-06</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-06</strong></td><td>El sistema debe permitir <strong>registrar productos</strong> con código único, precio e impuesto (porcentaje entre 0 y 100).</td><td>Facturador</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-07</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-07</strong></td><td>El sistema debe <strong>rechazar códigos de producto duplicados</strong> (409) y precios negativos o impuestos fuera de rango (400).</td><td>Facturador</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-08</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-08</strong></td><td>El sistema debe permitir <strong>crear pedidos</strong> con uno o más productos y cantidades para un cliente activo.</td><td>Cajero, Facturador</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-09</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-09</strong></td><td>El sistema debe <strong>calcular los totales en el servidor</strong> (subtotal, impuestos y total), sin aceptar importes enviados por el navegador.</td><td>Sistema</td><td class="c"><span class="badge b-no">Crítica</span></td><td>Prueba CP-10</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-10</strong></td><td>El sistema debe permitir <strong>confirmar o cancelar un pedido</strong>, admitiendo solo las transiciones válidas entre estados.</td><td>Cajero, Facturador</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-11</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-11</strong></td><td>El sistema debe permitir <strong>modificar un pedido solo mientras esté en borrador</strong>; una vez confirmado debe rechazar la edición (409).</td><td>Facturador</td><td class="c"><span class="badge b-gray">Media</span></td><td>Prueba CP-12</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-12</strong></td><td>El sistema debe permitir <strong>generar una factura a partir de un pedido confirmado</strong>, copiando sus importes y numerándola de forma única.</td><td>Facturador</td><td class="c"><span class="badge b-no">Crítica</span></td><td>Prueba CP-13</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-13</strong></td><td>El sistema debe <strong>impedir facturar un pedido que no esté confirmado</strong>, ya facturado o cancelado (409).</td><td>Sistema</td><td class="c"><span class="badge b-no">Crítica</span></td><td>Prueba CP-14</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-14</strong></td><td>El sistema debe permitir <strong>anular una factura indicando el motivo</strong>, de forma lógica (sin borrarla) y conservándola en el historial.</td><td>Facturador</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-15</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-15</strong></td><td>El sistema debe <strong>impedir anular una factura que tenga pagos registrados</strong> (409).</td><td>Sistema</td><td class="c"><span class="badge b-no">Crítica</span></td><td>Prueba CP-16</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-16</strong></td><td>El sistema debe permitir <strong>refacturar un pedido cuya factura fue anulada</strong>, conservando la anulada como historial y admitiendo una sola factura activa por pedido.</td><td>Facturador</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-17</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-17</strong></td><td>El sistema debe permitir <strong>registrar pagos</strong> contra una factura activa, con método de pago y referencia.</td><td>Cajero</td><td class="c"><span class="badge b-no">Crítica</span></td><td>Prueba CP-18</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-18</strong></td><td>El sistema debe <strong>impedir que un pago supere el saldo pendiente</strong> de la factura (400).</td><td>Sistema</td><td class="c"><span class="badge b-no">Crítica</span></td><td>Prueba CP-19</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-19</strong></td><td>El sistema debe <strong>calcular automáticamente el estado de pago</strong> de cada factura: PENDIENTE, PAGO_PARCIAL o PAGADA.</td><td>Sistema</td><td class="c"><span class="badge b-no">Crítica</span></td><td>Prueba CP-20</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-20</strong></td><td>El sistema debe permitir <strong>consultar el saldo pendiente</strong> de una factura.</td><td>Todos los internos</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-21</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-21</strong></td><td>El sistema debe permitir <strong>crear notas de crédito</strong> (devoluciones) sobre facturas activas, con motivo obligatorio.</td><td>Cajero</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-22</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-22</strong></td><td>El sistema debe <strong>impedir devolver más de lo realmente pagado</strong> y no admitir más de una devolución sobre el mismo importe (400/409).</td><td>Sistema</td><td class="c"><span class="badge b-no">Crítica</span></td><td>Prueba CP-23</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-23</strong></td><td>El sistema debe <strong>revertir el pago devuelto</strong>: una nota de crédito activa aumenta el saldo de la factura.</td><td>Sistema</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-24</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-24</strong></td><td>El sistema debe permitir <strong>anular una nota de crédito con motivo</strong>, de forma lógica y una sola vez.</td><td>Cajero</td><td class="c"><span class="badge b-gray">Media</span></td><td>Prueba CP-25</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-25</strong></td><td>El sistema debe generar <strong>reportes de facturación por rango de fechas</strong>, con totales y desglose por método de pago.</td><td>Supervisor</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-26</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-26</strong></td><td>El sistema debe mostrar un <strong>resumen del negocio</strong>: clientes y productos activos, pedidos por facturar, facturas activas y anuladas, pagos recibidos y cuentas por cobrar.</td><td>Supervisor, Administrador</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-27</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-27</strong></td><td>El sistema debe mostrar el <strong>balance y las cuentas por cobrar por cliente</strong>.</td><td>Supervisor</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-28</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-28</strong></td><td>El sistema debe permitir consultar el <strong>historial financiero de un cliente</strong> (facturas, pagos y notas con su saldo).</td><td>Supervisor</td><td class="c"><span class="badge b-gray">Media</span></td><td>Prueba CP-29</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-29</strong></td><td>El sistema debe generar el <strong>estado financiero de un cliente en texto</strong> para enviarlo por correo.</td><td>Facturador</td><td class="c"><span class="badge b-gray">Baja</span></td><td>Prueba CP-30</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-30</strong></td><td>El sistema debe <strong>registrar en auditoría</strong> toda operación sensible, con usuario, tipo, módulo, operación y fecha.</td><td>Administrador</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-31</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-31</strong></td><td>El sistema debe permitir <strong>consultar la auditoría</strong> filtrando por módulo, usuario y operación.</td><td>Administrador, Supervisor</td><td class="c"><span class="badge b-gray">Media</span></td><td>Prueba CP-32</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-32</strong></td><td>El sistema debe permitir <strong>gestionar usuarios internos</strong> (crear, listar y habilitar/inhabilitar) con rol asignado, solo al administrador.</td><td>Administrador</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-33</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-33</strong></td><td>El sistema debe permitir <strong>impedir quedarse sin administradores</strong>: un administrador no puede desactivarse a sí mismo ni al último activo (409).</td><td>Sistema</td><td class="c"><span class="badge b-gray">Media</span></td><td>Prueba CP-34</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-34</strong></td><td>El sistema debe permitir a un <strong>cliente autoregistrarse</strong> y quedar autenticado para usar el portal de inmediato.</td><td>Cliente</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-02</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-35</strong></td><td>El sistema debe permitir a un cliente <strong>recuperar su contraseña con un código de un solo uso (OTP)</strong> de 6 dígitos, con caducidad e intentos limitados.</td><td>Cliente</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-36</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-36</strong></td><td>El sistema debe <strong>aislar los datos entre clientes</strong>: un cliente solo puede ver lo suyo, y una factura ajena responde 404.</td><td>Sistema</td><td class="c"><span class="badge b-no">Crítica</span></td><td>Prueba CP-38</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-37</strong></td><td>El sistema debe permitir al cliente <strong>pagar o abonar sus propias facturas en línea</strong>, respetando el saldo pendiente.</td><td>Cliente</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-39</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-38</strong></td><td>El sistema debe permitir al cliente <strong>consultar su saldo, facturas, compras, pagos y notas de crédito</strong>, y sus datos personales.</td><td>Cliente</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-40</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-39</strong></td><td>El sistema debe <strong>validar los datos de pago según el método</strong> (tarjeta, transferencia o cheque) y rechazar los inválidos.</td><td>Sistema</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-41</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-40</strong></td><td>El sistema debe <strong>generar un código de pago en efectivo</strong> para que el cliente pague en un punto físico, sin registrar el pago en el portal.</td><td>Cliente</td><td class="c"><span class="badge b-gray">Media</span></td><td>Prueba CP-42</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+</tbody></table>
+
+<h1>4. Requisitos no funcionales</h1>
+<p>Los requisitos no funcionales describen <strong>cómo</strong> debe comportarse el sistema, no qué hace. Se agrupan por atributo de calidad.</p>
+
+<table class=""><thead><tr><th>ID</th><th>Categoría</th><th>Requisito</th><th class="c">Prioridad</th><th>Cómo se verifica</th></tr></thead><tbody>
+<tr><td><strong>RNF-01</strong></td><td>Seguridad · contraseñas</td><td>Las contraseñas y los códigos OTP se almacenan cifrados con <strong>bcrypt</strong> (coste 10). Nunca en texto plano.</td><td class="c"><span class="badge b-no">Crítica</span></td><td>Inspección de la base: la columna <code>password_hash</code> no contiene texto legible.</td></tr>
+<tr><td><strong>RNF-02</strong></td><td>Seguridad · datos de tarjeta</td><td>Nunca se almacenan el número completo de la tarjeta ni el CVV. Solo los <strong>últimos 4 dígitos</strong> y la marca (PCI-DSS).</td><td class="c"><span class="badge b-no">Crítica</span></td><td>Prueba CP-43: la respuesta de la API no contiene el PAN ni el CVV.</td></tr>
+<tr><td><strong>RNF-03</strong></td><td>Seguridad · sesiones</td><td>La sesión se firma con <strong>JWT</strong> con caducidad de 8 horas.</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Inspección: el token incluye <code>exp</code>.</td></tr>
+<tr><td><strong>RNF-04</strong></td><td>Seguridad · revocación de sesiones</td><td>Al cambiar la contraseña o desactivar una cuenta, <strong>las sesiones anteriores dejan de ser válidas</strong> de inmediato.</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-37: el token anterior responde 401.</td></tr>
+<tr><td><strong>RNF-05</strong></td><td>Seguridad · fuerza bruta</td><td>El sistema bloquea temporalmente (429) tras <strong>5 intentos fallidos</strong> de inicio de sesión desde la misma dirección, en una ventana de 15 minutos. Un acceso correcto reinicia el contador.</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-44.</td></tr>
+<tr><td><strong>RNF-06</strong></td><td>Seguridad · autorización</td><td>Cada operación exige el rol adecuado (RBAC). Un rol sin permiso recibe <strong>403</strong>.</td><td class="c"><span class="badge b-no">Crítica</span></td><td>Prueba CP-35.</td></tr>
+<tr><td><strong>RNF-07</strong></td><td>Seguridad · fuerza del secreto</td><td>El sistema <strong>no arranca</strong> sin una clave de firma propia de al menos 32 caracteres, y rechaza los valores de ejemplo publicados en el repositorio.</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-45: sin clave o con la de ejemplo, el arranque falla.</td></tr>
+<tr><td><strong>RNF-08</strong></td><td>Seguridad · exposición del OTP</td><td>En producción el código OTP <strong>no se devuelve</strong> en la respuesta de la API (solo en modo demostración).</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Inspección de configuración: el valor por defecto depende del entorno.</td></tr>
+<tr><td><strong>RNF-09</strong></td><td>Seguridad · cabeceras HTTP</td><td>Las respuestas incluyen cabeceras de seguridad (<code>X-Content-Type-Options</code>, <code>X-Frame-Options</code>) y no revelan el servidor.</td><td class="c"><span class="badge b-gray">Media</span></td><td>Prueba CP-46.</td></tr>
+<tr><td><strong>RNF-10</strong></td><td>Seguridad · CORS</td><td>Solo los orígenes de la lista blanca reciben permiso de CORS.</td><td class="c"><span class="badge b-gray">Media</span></td><td>Prueba CP-47.</td></tr>
+<tr><td><strong>RNF-11</strong></td><td>Integridad · aislamiento de datos</td><td>El identificador de cliente se toma <strong>siempre del token</strong>, nunca de la petición.</td><td class="c"><span class="badge b-no">Crítica</span></td><td>Revisión de código y prueba CP-38.</td></tr>
+<tr><td><strong>RNF-12</strong></td><td>Integridad · atomicidad</td><td>Las operaciones que afectan a varias tablas se ejecutan en <strong>transacción</strong>: o se aplican todas o ninguna.</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Inspección: <code>BEGIN</code>/<code>COMMIT</code> en las rutas que lo requieren.</td></tr>
+<tr><td><strong>RNF-13</strong></td><td>Integridad · concurrencia</td><td>Dos pagos simultáneos sobre la misma factura no pueden superar el saldo (bloqueo de fila).</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Inspección: <code>SELECT … FOR UPDATE</code>.</td></tr>
+<tr><td><strong>RNF-14</strong></td><td>Integridad · trazabilidad</td><td>La auditoría se registra <strong>dentro de la misma transacción</strong> que la operación, para que no existan cambios sin rastro.</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Inspección del código de auditoría.</td></tr>
+<tr><td><strong>RNF-15</strong></td><td>Precisión monetaria</td><td>Los cálculos se redondean a 2 decimales en cada paso para evitar errores de coma flotante.</td><td class="c"><span class="badge b-no">Crítica</span></td><td>Inspección de <code>round2()</code> y prueba CP-10.</td></tr>
+<tr><td><strong>RNF-16</strong></td><td>Usabilidad · idioma</td><td>Toda la interfaz y los mensajes de error están en <strong>español</strong>, con mensajes que explican la causa.</td><td class="c"><span class="badge b-gray">Media</span></td><td>Revisión de la interfaz.</td></tr>
+<tr><td><strong>RNF-17</strong></td><td>Usabilidad · formato local</td><td>Los importes se muestran en formato de moneda colombiana (COP) y las fechas en hora de Colombia.</td><td class="c"><span class="badge b-gray">Media</span></td><td>Revisión: <code>Intl.NumberFormat(&quot;es-CO&quot;)</code> y zona <code>America/Bogota</code>.</td></tr>
+<tr><td><strong>RNF-18</strong></td><td>Usabilidad · adaptabilidad</td><td>La interfaz es utilizable en pantallas de escritorio y se reordena en pantallas estrechas (una sola hoja de estilos, sin dependencias).</td><td class="c"><span class="badge b-gray">Baja</span></td><td>Revisión de la hoja de estilos (punto de quiebre a 900 px).</td></tr>
+<tr><td><strong>RNF-19</strong></td><td>Rendimiento · tiempo de respuesta</td><td>Las operaciones habituales responden en menos de <strong>2 segundos</strong> con la base de demostración.</td><td class="c"><span class="badge b-gray">Media</span></td><td>Ejecución de la suite completa: 154 comprobaciones sin esperas anómalas.</td></tr>
+<tr><td><strong>RNF-20</strong></td><td>Rendimiento · listados</td><td>Los listados están acotados (<code>LIMIT 300</code>) para no degradar la respuesta con volúmenes grandes.</td><td class="c"><span class="badge b-gray">Media</span></td><td>Inspección de las consultas.</td></tr>
+<tr><td><strong>RNF-21</strong></td><td>Portabilidad · despliegue</td><td>El sistema completo se levanta con <strong>un solo comando</strong> (<code>docker compose up</code>) en cualquier máquina con Docker.</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-48: los tres contenedores quedan sanos.</td></tr>
+<tr><td><strong>RNF-22</strong></td><td>Portabilidad · configuración</td><td>Toda la configuración se hace por variables de entorno; no hay valores sensibles en el código.</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-45 e inspección del archivo de composición.</td></tr>
+<tr><td><strong>RNF-23</strong></td><td>Mantenibilidad · separación de capas</td><td>La interfaz, la API y los datos están separados, y se comunican por HTTP con formato JSON.</td><td class="c"><span class="badge b-gray">Media</span></td><td>Revisión de la estructura del repositorio.</td></tr>
+<tr><td><strong>RNF-24</strong></td><td>Mantenibilidad · pruebas</td><td>Existe una suite de pruebas ejecutable que verifica los requisitos de punta a punta.</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Ejecución: <code>npm test</code> → 154 aprobadas, 0 fallidas.</td></tr>
+<tr><td><strong>RNF-25</strong></td><td>Documentación</td><td>El proyecto incluye documentación de instalación, guía técnica, documentación funcional y estas evidencias.</td><td class="c"><span class="badge b-gray">Media</span></td><td>Revisión de la carpeta <code>documentacion/</code>.</td></tr>
+<tr><td><strong>RNF-26</strong></td><td>Disponibilidad de datos</td><td>Los datos persisten entre reinicios del sistema mediante volúmenes de Docker.</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Inspección: volumen <code>finanx_pgdata</code>.</td></tr>
+<tr><td><strong>RNF-27</strong></td><td>Licenciamiento</td><td>Todas las dependencias usan licencias permisivas compatibles con el uso comercial; ninguna es copyleft fuerte.</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Evidencia 4: revisión de las 238 dependencias.</td></tr>
+</tbody></table>
+
+<h1>5. Interfaces</h1>
+<table class=""><thead><tr><th>Interfaz</th><th>Descripción</th></tr></thead><tbody>
+<tr><td><strong>Interfaz de usuario</strong></td><td>Aplicación web de página única (SPA) servida por nginx. Dos áreas: <strong>panel interno</strong> (personal de la empresa) y <strong>portal del cliente</strong> (autoservicio). Accesible desde un navegador actual, sin instalación.</td></tr>
+<tr><td><strong>Interfaz de programación (API)</strong></td><td><strong>API REST</strong> con formato JSON. Autenticación por <code>Authorization: Bearer &lt;token&gt;</code>. Los errores devuelven siempre <code>{ "error": "mensaje" }</code>. Se documenta en la Evidencia 6.</td></tr>
+<tr><td><strong>Interfaz de datos</strong></td><td>PostgreSQL por el puerto 5432 con consultas SQL parametrizadas. El acceso se hace mediante un <strong>pool de conexiones</strong> (máximo 10) y una única vista de lectura (<code>factura_saldo</code>).</td></tr>
+<tr><td><strong>Interfaz de correo</strong></td><td>El envío del estado financiero se resuelve con un enlace <code>mailto:</code> generado por la aplicación: no requiere servidor de correo.</td></tr>
+<tr><td><strong>Interfaz de notificaciones</strong></td><td>La entrega del código OTP está <strong>aislada en un único módulo</strong> (<code>notificar.js</code>) para poder conectar un proveedor real (SMS o correo) sin tocar el resto del sistema.</td></tr>
+<tr><td><strong>Interfaz de hardware</strong></td><td>No aplica: no hay dispositivos específicos. Se usa un navegador estándar en un equipo convencional.</td></tr>
+</tbody></table>
+
+<h1>6. Reglas de negocio</h1>
+<p>Las reglas de negocio son las invariantes del sistema: condiciones que deben cumplirse <strong>siempre</strong>, independientemente de quién ejecute la operación o desde dónde. Se aplican en la base de datos y en la API, no solo en la interfaz.</p>
+
+<table class=""><thead><tr><th>ID</th><th>Regla</th><th>Dónde se aplica</th></tr></thead><tbody>
+<tr><td><strong>RN-01</strong></td><td>Un cliente no puede repetirse por tipo y número de identificación.</td><td>Restricción <code>UNIQUE</code> + validación previa → 409.</td></tr>
+<tr><td><strong>RN-02</strong></td><td>Los importes de un pedido los calcula <strong>siempre el servidor</strong> a partir del precio del catálogo.</td><td>El navegador nunca envía totales; el precio se lee de la base.</td></tr>
+<tr><td><strong>RN-03</strong></td><td>Un pago no puede superar el saldo pendiente.</td><td>Validación contra la vista <code>factura_saldo</code> → 400.</td></tr>
+<tr><td><strong>RN-04</strong></td><td>El saldo de una factura <strong>no se almacena</strong>: se deriva de los pagos y las devoluciones.</td><td>Vista <code>factura_saldo</code>.</td></tr>
+<tr><td><strong>RN-05</strong></td><td>Como mucho <strong>una factura activa</strong> por pedido; las anuladas se conservan como historial.</td><td>Índice único parcial <code>uq_factura_activa_por_pedido</code>.</td></tr>
+<tr><td><strong>RN-06</strong></td><td>Solo se puede facturar un pedido <strong>confirmado</strong>.</td><td>Validación de estado → 409.</td></tr>
+<tr><td><strong>RN-07</strong></td><td>Un pedido facturado no se puede modificar.</td><td>El pedido pasa a FACTURADO y la edición exige BORRADOR → 409.</td></tr>
+<tr><td><strong>RN-08</strong></td><td>La anulación de facturas y notas de crédito es <strong>lógica</strong> y exige motivo.</td><td>Se marca el estado y se guarda el motivo → 400 si falta.</td></tr>
+<tr><td><strong>RN-09</strong></td><td>No se puede anular una factura <strong>con pagos</strong>.</td><td>Comprobación → 409.</td></tr>
+<tr><td><strong>RN-10</strong></td><td>Una nota de crédito <strong>no puede devolver más de lo pagado</strong> menos lo ya devuelto.</td><td>Cálculo del disponible → 400/409.</td></tr>
+<tr><td><strong>RN-11</strong></td><td>Una nota de crédito activa <strong>aumenta</strong> el saldo de la factura (revierte el pago devuelto).</td><td>Fórmula de la vista.</td></tr>
+<tr><td><strong>RN-12</strong></td><td>El <code>clienteId</code> de una consulta del portal <strong>se toma del token</strong>, nunca de la petición.</td><td>Guarda <code>requireCliente</code> + filtro por <code>cliente_id</code>.</td></tr>
+<tr><td><strong>RN-13</strong></td><td>Ningún dato se elimina: la baja es lógica (se cambia el estado).</td><td><code>PATCH /estado</code> y anulaciones.</td></tr>
+<tr><td><strong>RN-14</strong></td><td>Toda operación sensible queda <strong>auditada</strong> en la misma transacción.</td><td>Módulo de auditoría.</td></tr>
+<tr><td><strong>RN-15</strong></td><td>El número completo de la tarjeta y el CVV <strong>nunca</strong> se almacenan.</td><td>Validación que descarta esos campos antes de guardar.</td></tr>
+</tbody></table>
+
+<h1>7. Criterios de aceptación</h1>
+<p>Un requisito está cumplido cuando se puede comprobar de forma objetiva. Estos son los criterios de aceptación del sistema; cada uno se verifica con un caso de prueba concreto de la Evidencia 7.</p>
+
+<table class="compacta "><thead><tr><th>ID</th><th>Criterio de aceptación</th><th>Se verifica con</th></tr></thead><tbody>
+<tr><td><strong>CA-01</strong></td><td>Un cliente duplicado (mismo tipo y número de identificación) se rechaza con 409 y el sistema no crea la fila.</td><td><code>CP-03</code></td></tr>
+<tr><td><strong>CA-02</strong></td><td>Los totales de un pedido coinciden exactamente con la aritmética calculada sobre los precios del catálogo.</td><td><code>CP-10</code></td></tr>
+<tr><td><strong>CA-03</strong></td><td>Un pago superior al saldo se rechaza con 400 y el saldo no cambia.</td><td><code>CP-19</code></td></tr>
+<tr><td><strong>CA-04</strong></td><td>Tras pagar el total, la factura queda en estado PAGADA y el saldo es 0.</td><td><code>CP-20</code></td></tr>
+<tr><td><strong>CA-05</strong></td><td>Un pago parcial deja la factura en PAGO_PARCIAL con el saldo correcto.</td><td><code>CP-20</code></td></tr>
+<tr><td><strong>CA-06</strong></td><td>No se puede anular una factura con pagos: responde 409.</td><td><code>CP-16</code></td></tr>
+<tr><td><strong>CA-07</strong></td><td>Una nota de crédito de un importe superior a lo pagado se rechaza con 400.</td><td><code>CP-23</code></td></tr>
+<tr><td><strong>CA-08</strong></td><td>Tras una nota de crédito, el saldo de la factura aumenta exactamente en el importe devuelto.</td><td><code>CP-24</code></td></tr>
+<tr><td><strong>CA-09</strong></td><td>Un cliente no puede leer ni pagar una factura ajena: responde 404.</td><td><code>CP-38</code></td></tr>
+<tr><td><strong>CA-10</strong></td><td>Anular una factura permite emitir una nueva del mismo pedido, con otro número, y la anulada sigue consultable.</td><td><code>CP-17</code></td></tr>
+<tr><td><strong>CA-11</strong></td><td>El código OTP caduca, admite un número limitado de intentos y no se puede reutilizar.</td><td><code>CP-36</code></td></tr>
+<tr><td><strong>CA-12</strong></td><td>Las solicitudes de recuperación no revelan si una cuenta existe.</td><td><code>CP-36</code></td></tr>
+<tr><td><strong>CA-13</strong></td><td>Tras cambiar la contraseña, los tokens emitidos antes dejan de funcionar (401).</td><td><code>CP-37</code></td></tr>
+<tr><td><strong>CA-14</strong></td><td>Cinco intentos fallidos de acceso desde la misma dirección producen 429.</td><td><code>CP-44</code></td></tr>
+<tr><td><strong>CA-15</strong></td><td>Las respuestas de pago no contienen el número completo de la tarjeta ni el CVV.</td><td><code>CP-43</code></td></tr>
+<tr><td><strong>CA-16</strong></td><td>Un rol sin permiso recibe 403 en las operaciones restringidas.</td><td><code>CP-35</code></td></tr>
+<tr><td><strong>CA-17</strong></td><td>El sistema no arranca sin una clave de firma válida.</td><td><code>CP-45</code></td></tr>
+<tr><td><strong>CA-18</strong></td><td>Los tres servicios (base de datos, API y frontend) quedan disponibles con un solo comando.</td><td><code>CP-48</code></td></tr>
+<tr><td><strong>CA-19</strong></td><td>La suite de pruebas finaliza con 0 fallos.</td><td><code>Todas</code></td></tr>
+<tr><td><strong>CA-20</strong></td><td>Toda operación auditada aparece registrada con usuario, módulo, operación y fecha.</td><td><code>CP-31</code></td></tr>
+</tbody></table>
+
+<h1>8. Trazabilidad</h1>
+<p>Este documento no es un elemento aislado: eslabona con el resto de la documentación.</p>
+<pre><code>REQUISITOS (esta ERS)
+    ↓
+CASOS DE USO (documentación técnica)
+    ↓
+CLASES Y MER (Evidencia 1)
+    ↓
+DICCIONARIO DE DATOS (Evidencia 2)
+    ↓
+IMPLEMENTACIÓN (backend/ y frontend/)
+    ↓
+PRUEBAS DE INTEGRACIÓN (Evidencia 7)
+    ↓
+LICENCIAMIENTO (Evidencias 4 y 5)</code></pre>
+<p>Como ejemplo, el requisito <strong>RF-22</strong> («no devolver más de lo pagado») se puede seguir por toda la cadena:</p>
+<ul>
+  <li>Especificado aquí como RF-22, con prioridad Crítica y criterio de aceptación CA-07.</li>
+  <li>Implementado en <code>backend/src/routes/notas-credito.js</code>.</li>
+  <li>Apoyado en la entidad <code>notas_credito</code> y en la vista <code>factura_saldo</code> (Evidencia 1 y 2).</li>
+  <li>Expuesto en <code>POST /api/notas-credito</code>.</li>
+  <li>Visible en la pantalla de notas de crédito (prototipo y aplicación).</li>
+  <li>Verificado por el caso de prueba <strong>CP-23</strong> de la Evidencia 7.</li>
+</ul>
+
+<footer class="pie-doc">FINAN-X · Evidencia 3 de 7 · Especificación de Requisitos de Software (IEEE 830) · 40 requisitos funcionales, 27 no funcionales, 15 reglas de negocio, 20 criterios de aceptación.</footer>
+
+</div></body>
+</html>

@@ -47,13 +47,17 @@ router.post('/', async (req, res, next) => {
   try {
     const { pedidoId } = req.body || {};
     if (!pedidoId) throw new HttpError(400, 'Debe indicar el pedidoId');
+    const pedidoIdNum = idNumerico(pedidoId, 'id de pedido');
 
     await client.query('BEGIN');
 
+    // FOR UPDATE: si dos personas intentan facturar el mismo pedido a la vez, la segunda
+    // espera y vuelve a leer el estado, en lugar de chocar contra el índice único.
     const ped = await client.query(
       `SELECT p.pedido_id, p.cliente_id, p.subtotal, p.impuestos, p.total, p.estado, p.numero_pedido
-       FROM pedidos p WHERE p.pedido_id = $1`,
-      [pedidoId]
+       FROM pedidos p WHERE p.pedido_id = $1
+       FOR UPDATE`,
+      [pedidoIdNum]
     );
     if (!ped.rowCount) throw new HttpError(404, 'El pedido no existe');
     const p = ped.rows[0];
@@ -66,7 +70,7 @@ router.post('/', async (req, res, next) => {
     // uq_factura_activa_por_pedido).
     const yaFacturado = await client.query(
       `SELECT 1 FROM facturas WHERE pedido_id = $1 AND estado = 'ACTIVA'`,
-      [pedidoId]
+      [pedidoIdNum]
     );
     if (yaFacturado.rowCount) throw new HttpError(409, 'El pedido ya tiene una factura activa');
 
@@ -76,16 +80,16 @@ router.post('/', async (req, res, next) => {
     const ins = await client.query(
       `INSERT INTO facturas (pedido_id, cliente_id, subtotal, impuestos, total, fecha_vencimiento)
        VALUES ($1, $2, $3, $4, $5, NOW() + interval '30 days') RETURNING factura_id`,
-      [pedidoId, p.cliente_id, p.subtotal, p.impuestos, p.total]
+      [pedidoIdNum, p.cliente_id, p.subtotal, p.impuestos, p.total]
     );
     const facturaId = ins.rows[0].factura_id;
     const numero = `FAC-${String(facturaId).padStart(6, '0')}`;
     await client.query('UPDATE facturas SET numero_factura = $1 WHERE factura_id = $2', [numero, facturaId]);
-    await client.query(`UPDATE pedidos SET estado = 'FACTURADO' WHERE pedido_id = $1`, [pedidoId]);
+    await client.query(`UPDATE pedidos SET estado = 'FACTURADO' WHERE pedido_id = $1`, [pedidoIdNum]);
 
     // Dentro de la transacción: la factura no debe existir sin su registro de auditoría.
     await audit({
-      client,
+      req, client,
       usuario: req.user.correo, modulo: MODULO, operacion: 'GENERAR', registro: numero,
       descripcion: `Factura ${numero} generada del pedido ${p.numero_pedido} para ${cli.rows[0].nombre_razon_social}`,
     });
@@ -173,7 +177,8 @@ router.get('/:id/saldo', async (req, res, next) => {
 });
 
 // POST /api/facturas/:id/anular  — { motivo } · anulación lógica, solo sin pagos
-router.post('/:id/anular', async (req, res, next) => {
+// Solo ADMIN/SUPERVISOR: anular una factura es una decisión financiera, no operativa.
+router.post('/:id/anular', requireRol('ADMIN', 'SUPERVISOR'), async (req, res, next) => {
   const client = await pool.connect();
   try {
     const id = idNumerico(req.params.id, 'id');
@@ -209,7 +214,7 @@ router.post('/:id/anular', async (req, res, next) => {
     // La anulación y la reversión del pedido se confirman juntas: antes eran dos UPDATE
     // sueltos y, si fallaba el segundo, la factura quedaba anulada con el pedido en FACTURADO.
     await audit({
-      client,
+      req, client,
       usuario: req.user.correo, modulo: MODULO, operacion: 'ANULAR', registro: f.rows[0].numero_factura,
       descripcion: `Anulación de ${f.rows[0].numero_factura}: ${motivo}`,
     });

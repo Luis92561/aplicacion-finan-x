@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>FINAN-X · Diccionario de datos</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 20mm; }
+  :root{
+    --primary:#1e3a8a; --primary-dark:#172554; --accent:#2563eb;
+    --success:#15803d; --success-light:#dcfce7; --warning:#b45309; --warning-light:#fef3c7;
+    --danger:#b91c1c; --danger-light:#fee2e2; --purple:#6d28d9; --purple-light:#ede9fe;
+    --gray:#64748b; --gray-light:#e2e8f0; --bg:#f8fafc; --border:#e2e8f0; --muted:#64748b;
+  }
+  *{box-sizing:border-box}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+    color:#0f172a; margin:0; font-size:10.5pt; line-height:1.55; background:#fff;
+  }
+  .doc{max-width:100%;}
+
+  /* ---------- Portada ---------- */
+  .portada{
+    min-height:245mm; display:flex; flex-direction:column; justify-content:center;
+    text-align:center; page-break-after:always; padding:0 10mm;
+  }
+  .portada .marca{font-size:34pt; font-weight:800; color:var(--primary); letter-spacing:-1px; margin:0}
+  .portada .marca span{color:var(--accent)}
+  .portada .sub{font-size:13pt; color:var(--muted); margin:6px 0 30px}
+  .portada h1{font-size:21pt; color:var(--primary-dark); margin:0 0 8px; line-height:1.25}
+  .portada .evidencia{
+    display:inline-block; background:var(--primary); color:#fff; font-weight:700;
+    padding:5px 16px; border-radius:999px; font-size:10pt; margin-bottom:22px;
+  }
+  .portada .desc{font-size:11pt; color:#334155; max-width:140mm; margin:0 auto 32px}
+  .portada table.meta{margin:0 auto; border-collapse:collapse; font-size:9.5pt; text-align:left}
+  .portada table.meta td{padding:4px 10px; border-bottom:1px solid var(--border)}
+  .portada table.meta td:first-child{color:var(--muted); font-weight:600; white-space:nowrap}
+  .portada .pie{margin-top:38px; font-size:9pt; color:var(--muted)}
+
+  /* ---------- Encabezados ---------- */
+  h1{font-size:16pt; color:var(--primary-dark); margin:0 0 4px; padding-bottom:6px; border-bottom:2.5px solid var(--primary)}
+  h2{font-size:13pt; color:var(--primary); margin:20px 0 8px; padding-bottom:4px; border-bottom:1px solid var(--border); page-break-after:avoid}
+  h3{font-size:11.5pt; color:var(--primary-dark); margin:14px 0 6px; page-break-after:avoid}
+  h4{font-size:10.5pt; color:#334155; margin:11px 0 4px; page-break-after:avoid}
+  p{margin:6px 0}
+  ul,ol{margin:6px 0 6px 18px; padding:0}
+  li{margin:2.5px 0}
+  a{color:var(--accent); text-decoration:none}
+  code{font-family:'Cascadia Mono',Consolas,'Courier New',monospace; font-size:9pt; background:#f1f5f9; padding:1px 4px; border-radius:4px; color:#0f172a}
+  pre{
+    background:#0f172a; color:#e2e8f0; padding:9px 12px; border-radius:7px; font-size:8.5pt;
+    overflow-wrap:anywhere; white-space:pre-wrap; font-family:'Cascadia Mono',Consolas,monospace;
+    page-break-inside:avoid; margin:8px 0; line-height:1.45;
+  }
+  pre code{background:none; color:inherit; padding:0}
+
+  /* ---------- Tablas ---------- */
+  table{width:100%; border-collapse:collapse; margin:9px 0; font-size:9pt; page-break-inside:auto}
+  thead{display:table-header-group}
+  tr{page-break-inside:avoid}
+  th{
+    background:var(--primary); color:#fff; text-align:left; padding:5px 7px;
+    font-size:8.5pt; font-weight:700; text-transform:uppercase; letter-spacing:.3px;
+  }
+  td{padding:4.5px 7px; border-bottom:1px solid var(--border); vertical-align:top}
+  tbody tr:nth-child(even){background:#f8fafc}
+  td.num,th.num{text-align:right; white-space:nowrap}
+  td.c,th.c{text-align:center}
+  table.compacta td,table.compacta th{padding:3.5px 6px; font-size:8.5pt}
+
+  /* ---------- Cajas ---------- */
+  .caja{border-left:4px solid var(--accent); background:#eff6ff; padding:8px 12px; border-radius:0 7px 7px 0; margin:9px 0; page-break-inside:avoid}
+  .caja.ok{border-color:var(--success); background:var(--success-light)}
+  .caja.warn{border-color:var(--warning); background:var(--warning-light)}
+  .caja.err{border-color:var(--danger); background:var(--danger-light)}
+  .caja.purple{border-color:var(--purple); background:var(--purple-light)}
+  .caja p:first-child{margin-top:0}
+  .caja p:last-child{margin-bottom:0}
+  .caja .titulo{font-weight:700; display:block; margin-bottom:2px}
+
+  .badge{display:inline-block; padding:1px 8px; border-radius:999px; font-size:7.5pt; font-weight:700; white-space:nowrap}
+  .b-ok{background:var(--success-light); color:var(--success)}
+  .b-no{background:var(--danger-light); color:var(--danger)}
+  .b-warn{background:var(--warning-light); color:var(--warning)}
+  .b-info{background:#dbeafe; color:var(--primary)}
+  .b-gray{background:var(--gray-light); color:var(--gray)}
+  .b-purple{background:var(--purple-light); color:var(--purple)}
+
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  .grid3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:9px}
+  .kpi{border:1px solid var(--border); border-radius:8px; padding:8px 10px; text-align:center; background:var(--bg)}
+  .kpi .n{font-size:17pt; font-weight:800; color:var(--primary); line-height:1.1}
+  .kpi .t{font-size:8pt; color:var(--muted); text-transform:uppercase; letter-spacing:.4px}
+
+  .captura{border:1px solid var(--border); border-radius:8px; overflow:hidden; margin:9px 0; page-break-inside:avoid; break-inside:avoid}
+  .captura img{width:100%; display:block}
+  /* Capturas muy altas: sin limite ocuparian varias paginas y el navegador partiria el
+     marco, dejando un recuadro vacio en una pagina y la imagen suelta en la siguiente.
+     Se limitan a un alto que quepa de una vez y se centran. */
+  .captura img.alta{width:auto; max-width:100%; max-height:200mm; margin:0 auto}
+  .captura .pie{background:var(--bg); padding:5px 9px; font-size:8pt; color:var(--muted); border-top:1px solid var(--border)}
+  .captura .aviso{font-size:7.6pt; color:var(--muted); font-style:italic}
+
+  .salto{page-break-before:always}
+  .evitar-corte{page-break-inside:avoid}
+  .indice{font-size:10pt}
+  .indice li{margin:3px 0}
+  .firma{margin-top:38px; display:grid; grid-template-columns:1fr 1fr; gap:28px}
+  .firma .l{padding-top:5px; font-size:9pt; color:#334155}
+  .firma .l strong{display:block; color:#172554; font-size:9.5pt; margin-bottom:2px}
+  /* Cada dato bajo la firma va en su propio renglon, con el hueco para escribirlo. */
+  .firma .firma-datos{display:block; margin-bottom:1px}
+  /* Hueco en blanco para completar a mano (los datos de las partes en el contrato).
+     No lleva raya: la franja y el borde de la tabla ya indican donde va cada dato.
+     Es inline-block con ancho completo para que ocupe el ancho de su celda Y pueda
+     usarse dentro de una frase (la linea de la fecha de firma). */
+  .hueco{display:inline-block; width:100%; height:1.3em; vertical-align:bottom}
+  /* Linea sobre la que se firma. Aqui si hay raya: es la referencia de la firma. */
+  .linea-firma{display:block; border-bottom:1px solid #334155}
+  /* Columna de etiquetas de las tablas de formulario. */
+  table.formulario .c-etiqueta{width:32%; font-weight:600}
+  /* En las tablas de formulario la etiqueta va arriba, a la altura de la primera
+     linea de escritura. */
+  table.formulario td{vertical-align:top}
+  /* La ultima fila no necesita el borde inferior: la tabla ya cierra ahi. */
+  table.formulario tbody tr:last-child td{border-bottom:none}
+  footer.pie-doc{margin-top:26px; border-top:1px solid var(--border); padding-top:7px; font-size:8pt; color:var(--muted)}
+</style>
+</head>
+<body><div class="doc">
+
+<section class="portada">
+  <p class="marca">FINAN<span>·X</span></p>
+  <p class="sub">Sistema de facturación y pagos</p>
+  <div class="evidencia">Evidencia 2 de 7</div>
+  <h1>Diccionario de datos</h1>
+  <p class="desc">Definición precisa de los 117 campos que componen la base de datos de FINAN-X. Para cada uno se indica su tipo, longitud, si es clave primaria o foránea, si es obligatorio y qué representa en el negocio.</p>
+  <table class="meta"><tr><td>Sistema</td><td>FINAN-X · Facturación y pagos</td></tr>
+<tr><td>Entidades documentadas</td><td>12 tablas + 1 vista</td></tr>
+<tr><td>Campos documentados</td><td>133</td></tr>
+<tr><td>Claves primarias</td><td>12</td></tr>
+<tr><td>Claves foráneas</td><td>16</td></tr>
+<tr><td>Campos obligatorios (NOT NULL)</td><td>81</td></tr></table>
+  <p class="pie">Proyecto académico · Integración de Aplicaciones · Sexto semestre</p>
+</section>
+
+<h1>1. Propósito y método</h1>
+<p>Este diccionario define <strong>cada campo</strong> que utiliza FINAN-X. Responde a la pregunta de la evidencia: <em>¿qué significa exactamente cada dato que guardamos?</em></p>
+<p>Los datos técnicos —tipo, longitud, clave primaria, clave foránea y obligatoriedad— <strong>no se han escrito a mano</strong>: se extraen de la base de datos PostgreSQL en funcionamiento. Las descripciones de negocio se mantienen junto al código y se validan contra el esquema, de modo que <strong>no puede existir una columna sin documentar ni una descripción que hable de un campo inexistente</strong>. Si alguien añade una columna y no la describe, el generador avisa.</p>
+
+<div class="caja">
+  <span class="titulo">Convenciones de este documento</span>
+  <ul style="margin-bottom:0">
+    <li><strong>Tipo</strong>: tipo real en PostgreSQL. <code>NUMERIC(14,2)</code> equivale a un decimal con 14 dígitos, 2 de ellos decimales.</li>
+    <li><strong>Long.</strong>: longitud máxima. Para <code>NUMERIC</code> se indica precisión y escala.</li>
+    <li><strong>PK</strong>: forma parte de la clave primaria. <strong>FK</strong>: es clave foránea; se indica a qué campo apunta.</li>
+    <li><strong>Oblig.</strong>: si el campo admite <code>NULL</code> o no.</li>
+    <li>Los identificadores son <code>SERIAL</code>: enteros que genera automáticamente la base de datos.</li>
+    <li>Las fechas son <code>TIMESTAMPTZ</code> (con zona horaria), salvo <code>fecha_vencimiento</code>, que es una fecha sin hora.</li>
+  </ul>
+</div>
+
+<h1>2. Panorama de las entidades</h1>
+<table class=""><thead><tr><th>Entidad</th><th>Qué representa</th><th class="c">Campos</th><th>Clave primaria</th><th class="c">FK</th><th class="c">Oblig.</th></tr></thead><tbody>
+<tr><td><code>roles</code></td><td>Catálogo de roles del personal interno. Define qué puede hacer cada usuario del sistema (RBAC).</td><td class="c">3</td><td><code>rol_id</code></td><td class="c">0</td><td class="c">2</td></tr>
+<tr><td><code>usuarios</code></td><td>Personal interno de la empresa (administrador, facturador, cajero, supervisor). No incluye a los clientes: esos viven en clientes + usuario_cliente.</td><td class="c">8</td><td><code>usuario_id</code></td><td class="c">1</td><td class="c">8</td></tr>
+<tr><td><code>clientes</code></td><td>Personas o empresas a las que se les factura. Es la entidad central del negocio: los pedidos y las facturas cuelgan de aquí.</td><td class="c">11</td><td><code>cliente_id</code></td><td class="c">0</td><td class="c">7</td></tr>
+<tr><td><code>usuario_cliente</code></td><td>Credenciales de acceso del cliente al portal de autoservicio. Un cliente tiene como máximo una cuenta (cliente_id es único), por eso es una tabla aparte y no columnas en clientes.</td><td class="c">8</td><td><code>usuario_cliente_id</code></td><td class="c">1</td><td class="c">7</td></tr>
+<tr><td><code>productos</code></td><td>Catálogo de artículos y servicios que se pueden vender. El precio se copia al pedido en el momento de la venta.</td><td class="c">11</td><td><code>producto_id</code></td><td class="c">0</td><td class="c">9</td></tr>
+<tr><td><code>pedidos</code></td><td>Documento interno que registra qué productos pidió un cliente, antes de facturarse. Recorre los estados BORRADOR, CONFIRMADO, CANCELADO y FACTURADO.</td><td class="c">10</td><td><code>pedido_id</code></td><td class="c">1</td><td class="c">8</td></tr>
+<tr><td><code>detalle_pedido</code></td><td>Líneas del pedido: un registro por producto y cantidad. Es la tabla que resuelve la relación de muchos a muchos entre pedidos y productos, guardando además el precio aplicado.</td><td class="c">6</td><td><code>detalle_id</code></td><td class="c">2</td><td class="c">6</td></tr>
+<tr><td><code>facturas</code></td><td>Documento de cobro generado a partir de un pedido confirmado. Un pedido puede tener varias facturas a lo largo del tiempo (por ejemplo si se anula una), pero solo una ACTIVA a la vez.</td><td class="c">14</td><td><code>factura_id</code></td><td class="c">3</td><td class="c">9</td></tr>
+<tr><td><code>pagos</code></td><td>Abonos recibidos contra una factura. Una factura puede tener varios pagos (pago parcial) hasta completar el total. Nunca se borran ni se editan: si hubo un error se corrige con una nota de crédito.</td><td class="c">17</td><td><code>pago_id</code></td><td class="c">3</td><td class="c">6</td></tr>
+<tr><td><code>notas_credito</code></td><td>Devoluciones sobre una factura. Una nota ACTIVA revierte el pago que devuelve, es decir, AUMENTA el saldo pendiente de la factura. Regla clave: no se puede devolver más de lo que realmente se ha pagado.</td><td class="c">13</td><td><code>nota_credito_id</code></td><td class="c">4</td><td class="c">8</td></tr>
+<tr><td><code>auditoria</code></td><td>Bitácora de operaciones. Cada acción sensible (login, creación, cambio de estado, anulación, pago…) deja un registro aquí. El campo usuario guarda el identificador como TEXTO y no como clave foránea, a propósito: el rastro debe sobrevivir aunque la cuenta se elimine.</td><td class="c">8</td><td><code>auditoria_id</code></td><td class="c">0</td><td class="c">3</td></tr>
+<tr><td><code>recuperaciones_clave</code></td><td>Solicitudes de recuperación de contraseña mediante código de un solo uso (OTP). El código se guarda CIFRADO con bcrypt, nunca en texto plano, y caduca.</td><td class="c">8</td><td><code>recuperacion_id</code></td><td class="c">1</td><td class="c">8</td></tr>
+</tbody></table>
+
+<div class="grid3">
+  <div class="kpi"><div class="n">12</div><div class="t">Tablas</div></div>
+  <div class="kpi"><div class="n">117</div><div class="t">Campos en tablas</div></div>
+  <div class="kpi"><div class="n">16</div><div class="t">Campos en la vista</div></div>
+</div>
+
+<div class="salto"></div>
+<h1>3. Diccionario por entidad</h1>
+<p>Las entidades aparecen en orden funcional: primero quién usa el sistema, después el ciclo de venta y cobro, y por último las tablas de soporte.</p>
+
+<h3>3.1. <code>roles</code></h3>
+<p>Catálogo de roles del personal interno. Define qué puede hacer cada usuario del sistema (RBAC).</p>
+<table class="compacta "><thead><tr><th>Campo</th><th>Tipo</th><th class="c">Long.</th><th class="c">PK</th><th class="c">FK</th><th class="c">Oblig.</th><th>Descripción</th></tr></thead><tbody>
+<tr><td><code>rol_id</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-info">Sí</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Identificador único del rol. Clave primaria.</td></tr>
+<tr><td><code>nombre</code></td><td>VARCHAR</td><td class="c">50</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Nombre corto del rol, en mayúsculas: ADMIN, FACTURADOR, CAJERO o SUPERVISOR. Es el valor que comparan las guardas de la API.</td></tr>
+<tr><td><code>descripcion</code></td><td>TEXT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Explicación legible de qué puede hacer el rol. Se muestra en la pantalla de gestión de usuarios.</td></tr>
+</tbody></table>
+
+<h3>3.2. <code>usuarios</code></h3>
+<p>Personal interno de la empresa (administrador, facturador, cajero, supervisor). No incluye a los clientes: esos viven en clientes + usuario_cliente.</p>
+<table class="compacta "><thead><tr><th>Campo</th><th>Tipo</th><th class="c">Long.</th><th class="c">PK</th><th class="c">FK</th><th class="c">Oblig.</th><th>Descripción</th></tr></thead><tbody>
+<tr><td><code>usuario_id</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-info">Sí</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Identificador único del usuario interno. Clave primaria.</td></tr>
+<tr><td><code>nombre</code></td><td>VARCHAR</td><td class="c">120</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Nombre completo de la persona.</td></tr>
+<tr><td><code>correo</code></td><td>VARCHAR</td><td class="c">150</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Correo electrónico. Es el nombre de usuario para iniciar sesión. Único en el sistema.</td></tr>
+<tr><td><code>password_hash</code></td><td>TEXT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Contraseña cifrada con bcrypt (coste 10). Nunca se almacena la contraseña en texto plano.</td></tr>
+<tr><td><code>rol_id</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td><span class="badge b-purple">Sí</span> <code>roles.rol_id</code></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Rol asignado. Clave foránea a roles. Determina los permisos en toda la API.</td></tr>
+<tr><td><code>estado</code></td><td>VARCHAR</td><td class="c">20</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>ACTIVO o INACTIVO. Un usuario inactivo no puede iniciar sesión. Es baja lógica: nunca se borra la fila.</td></tr>
+<tr><td><code>fecha_creacion</code></td><td>TIMESTAMPTZ</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Momento en que se creó la cuenta.</td></tr>
+<tr><td><code>token_version</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Versión de sesión. Viaja dentro del JWT y se compara en cada petición. Al cambiar la contraseña o desactivar la cuenta se incrementa, y todos los tokens anteriores dejan de ser válidos (permite cerrar sesiones sin esperar a que caduquen).</td></tr>
+</tbody></table>
+
+<h3>3.3. <code>clientes</code></h3>
+<p>Personas o empresas a las que se les factura. Es la entidad central del negocio: los pedidos y las facturas cuelgan de aquí.</p>
+<table class="compacta "><thead><tr><th>Campo</th><th>Tipo</th><th class="c">Long.</th><th class="c">PK</th><th class="c">FK</th><th class="c">Oblig.</th><th>Descripción</th></tr></thead><tbody>
+<tr><td><code>cliente_id</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-info">Sí</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Identificador único del cliente. Clave primaria.</td></tr>
+<tr><td><code>tipo_cliente</code></td><td>VARCHAR</td><td class="c">20</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>PERSONA o EMPRESA. Determina si se pide nombre o razón social.</td></tr>
+<tr><td><code>tipo_identificacion</code></td><td>VARCHAR</td><td class="c">20</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>CC (cédula), CE (cédula de extranjería), NIT o PASAPORTE.</td></tr>
+<tr><td><code>numero_identificacion</code></td><td>VARCHAR</td><td class="c">30</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Número del documento. Junto con el tipo forma una restricción única: no puede haber dos clientes con la misma identificación.</td></tr>
+<tr><td><code>nombre_razon_social</code></td><td>VARCHAR</td><td class="c">200</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Nombre completo (persona) o razón social (empresa).</td></tr>
+<tr><td><code>telefono</code></td><td>VARCHAR</td><td class="c">30</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Teléfono de contacto. Se usa para enviar el OTP por SMS.</td></tr>
+<tr><td><code>correo</code></td><td>VARCHAR</td><td class="c">150</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Correo de contacto. Se usa para enviar el OTP y el resumen financiero.</td></tr>
+<tr><td><code>direccion</code></td><td>VARCHAR</td><td class="c">200</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Dirección física.</td></tr>
+<tr><td><code>ciudad</code></td><td>VARCHAR</td><td class="c">100</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Ciudad de residencia o de la sede.</td></tr>
+<tr><td><code>estado</code></td><td>VARCHAR</td><td class="c">20</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>ACTIVO o INACTIVO. Un cliente inactivo no puede recibir pedidos ni autenticarse en el portal. Baja lógica.</td></tr>
+<tr><td><code>fecha_creacion</code></td><td>TIMESTAMPTZ</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Momento en que se registró el cliente.</td></tr>
+</tbody></table>
+
+<h3>3.4. <code>usuario_cliente</code></h3>
+<p>Credenciales de acceso del cliente al portal de autoservicio. Un cliente tiene como máximo una cuenta (cliente_id es único), por eso es una tabla aparte y no columnas en clientes.</p>
+<table class="compacta "><thead><tr><th>Campo</th><th>Tipo</th><th class="c">Long.</th><th class="c">PK</th><th class="c">FK</th><th class="c">Oblig.</th><th>Descripción</th></tr></thead><tbody>
+<tr><td><code>usuario_cliente_id</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-info">Sí</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Identificador único de la cuenta de portal. Clave primaria.</td></tr>
+<tr><td><code>cliente_id</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td><span class="badge b-purple">Sí</span> <code>clientes.cliente_id</code></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Cliente al que pertenece la cuenta. Clave foránea a clientes y ÚNICA: garantiza la relación 1 a 0..1.</td></tr>
+<tr><td><code>username</code></td><td>VARCHAR</td><td class="c">150</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Nombre de usuario para entrar al portal. Único, para no confundir dos cuentas.</td></tr>
+<tr><td><code>password_hash</code></td><td>TEXT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Contraseña cifrada con bcrypt (coste 10).</td></tr>
+<tr><td><code>estado</code></td><td>VARCHAR</td><td class="c">20</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>ACTIVO o INACTIVO. Permite bloquear el acceso al portal sin desactivar al cliente.</td></tr>
+<tr><td><code>fecha_creacion</code></td><td>TIMESTAMPTZ</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Momento en que se creó la cuenta de portal.</td></tr>
+<tr><td><code>ultimo_acceso</code></td><td>TIMESTAMPTZ</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Fecha y hora del último inicio de sesión correcto. Se actualiza en cada login del portal.</td></tr>
+<tr><td><code>token_version</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Versión de sesión, igual que en usuarios. Se incrementa al restablecer la contraseña con OTP, lo que invalida las sesiones abiertas.</td></tr>
+</tbody></table>
+
+<h3>3.5. <code>productos</code></h3>
+<p>Catálogo de artículos y servicios que se pueden vender. El precio se copia al pedido en el momento de la venta.</p>
+<table class="compacta "><thead><tr><th>Campo</th><th>Tipo</th><th class="c">Long.</th><th class="c">PK</th><th class="c">FK</th><th class="c">Oblig.</th><th>Descripción</th></tr></thead><tbody>
+<tr><td><code>producto_id</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-info">Sí</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Identificador único del producto. Clave primaria.</td></tr>
+<tr><td><code>codigo</code></td><td>VARCHAR</td><td class="c">30</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Código interno del producto (por ejemplo PROD-001). Único: no puede haber dos productos con el mismo código.</td></tr>
+<tr><td><code>nombre</code></td><td>VARCHAR</td><td class="c">150</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Nombre del producto o servicio.</td></tr>
+<tr><td><code>descripcion</code></td><td>TEXT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Descripción ampliada.</td></tr>
+<tr><td><code>categoria</code></td><td>VARCHAR</td><td class="c">60</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Agrupación libre del producto (para filtrar el catálogo).</td></tr>
+<tr><td><code>precio</code></td><td>NUMERIC</td><td class="c">14,2</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Precio unitario sin impuestos. Debe ser mayor o igual que cero.</td></tr>
+<tr><td><code>impuesto</code></td><td>NUMERIC</td><td class="c">5,2</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Porcentaje de impuesto aplicable (0 a 100). El sistema lo usa para calcular los impuestos del pedido.</td></tr>
+<tr><td><code>unidad_medida</code></td><td>VARCHAR</td><td class="c">20</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Unidad en la que se vende: UND (unidad), HORA, KG, M, CAJA.</td></tr>
+<tr><td><code>estado</code></td><td>VARCHAR</td><td class="c">20</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>ACTIVO o INACTIVO. Un producto inactivo no se puede añadir a pedidos nuevos, pero se conserva en las facturas históricas. Baja lógica.</td></tr>
+<tr><td><code>fecha_creacion</code></td><td>TIMESTAMPTZ</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Momento en que se dio de alta el producto.</td></tr>
+<tr><td><code>fecha_actualizacion</code></td><td>TIMESTAMPTZ</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Momento de la última modificación. Se actualiza al editar el producto o cambiar su estado.</td></tr>
+</tbody></table>
+
+<h3>3.6. <code>pedidos</code></h3>
+<p>Documento interno que registra qué productos pidió un cliente, antes de facturarse. Recorre los estados BORRADOR, CONFIRMADO, CANCELADO y FACTURADO.</p>
+<table class="compacta "><thead><tr><th>Campo</th><th>Tipo</th><th class="c">Long.</th><th class="c">PK</th><th class="c">FK</th><th class="c">Oblig.</th><th>Descripción</th></tr></thead><tbody>
+<tr><td><code>pedido_id</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-info">Sí</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Identificador único del pedido. Clave primaria.</td></tr>
+<tr><td><code>numero_pedido</code></td><td>VARCHAR</td><td class="c">20</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Número legible del pedido, con formato PED-000123. Único.</td></tr>
+<tr><td><code>cliente_id</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td><span class="badge b-purple">Sí</span> <code>clientes.cliente_id</code></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Cliente que hizo el pedido. Clave foránea a clientes.</td></tr>
+<tr><td><code>fecha</code></td><td>TIMESTAMPTZ</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Fecha del pedido.</td></tr>
+<tr><td><code>subtotal</code></td><td>NUMERIC</td><td class="c">14,2</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Suma de las líneas sin impuestos. Lo calcula siempre el servidor a partir de los precios del catálogo.</td></tr>
+<tr><td><code>impuestos</code></td><td>NUMERIC</td><td class="c">14,2</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Suma de los impuestos de todas las líneas. Calculado en el servidor.</td></tr>
+<tr><td><code>total</code></td><td>NUMERIC</td><td class="c">14,2</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>subtotal + impuestos. Calculado y verificado en el servidor; el navegador nunca envía montos.</td></tr>
+<tr><td><code>estado</code></td><td>VARCHAR</td><td class="c">20</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>BORRADOR (se puede editar), CONFIRMADO (listo para facturar), CANCELADO (descartado) o FACTURADO (ya tiene factura activa).</td></tr>
+<tr><td><code>observaciones</code></td><td>TEXT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Notas libres sobre el pedido.</td></tr>
+<tr><td><code>fecha_creacion</code></td><td>TIMESTAMPTZ</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Momento en que se registró el pedido.</td></tr>
+</tbody></table>
+
+<h3>3.7. <code>detalle_pedido</code></h3>
+<p>Líneas del pedido: un registro por producto y cantidad. Es la tabla que resuelve la relación de muchos a muchos entre pedidos y productos, guardando además el precio aplicado.</p>
+<table class="compacta "><thead><tr><th>Campo</th><th>Tipo</th><th class="c">Long.</th><th class="c">PK</th><th class="c">FK</th><th class="c">Oblig.</th><th>Descripción</th></tr></thead><tbody>
+<tr><td><code>detalle_id</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-info">Sí</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Identificador único de la línea. Clave primaria.</td></tr>
+<tr><td><code>pedido_id</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td><span class="badge b-purple">Sí</span> <code>pedidos.pedido_id</code></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Pedido al que pertenece la línea. Clave foránea a pedidos, con borrado en cascada (al borrar el pedido se borran sus líneas).</td></tr>
+<tr><td><code>producto_id</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td><span class="badge b-purple">Sí</span> <code>productos.producto_id</code></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Producto vendido en esta línea. Clave foránea a productos.</td></tr>
+<tr><td><code>cantidad</code></td><td>NUMERIC</td><td class="c">12,2</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Cantidad vendida. Debe ser mayor que cero.</td></tr>
+<tr><td><code>precio_unitario</code></td><td>NUMERIC</td><td class="c">14,2</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Precio del producto en el momento de la venta. Se copia aquí a propósito: si después cambia el precio del catálogo, el pedido y la factura históricos no se alteran.</td></tr>
+<tr><td><code>subtotal</code></td><td>NUMERIC</td><td class="c">14,2</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>cantidad × precio_unitario de esta línea, redondeado a 2 decimales.</td></tr>
+</tbody></table>
+
+<h3>3.8. <code>facturas</code></h3>
+<p>Documento de cobro generado a partir de un pedido confirmado. Un pedido puede tener varias facturas a lo largo del tiempo (por ejemplo si se anula una), pero solo una ACTIVA a la vez.</p>
+<table class="compacta "><thead><tr><th>Campo</th><th>Tipo</th><th class="c">Long.</th><th class="c">PK</th><th class="c">FK</th><th class="c">Oblig.</th><th>Descripción</th></tr></thead><tbody>
+<tr><td><code>factura_id</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-info">Sí</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Identificador único de la factura. Clave primaria.</td></tr>
+<tr><td><code>numero_factura</code></td><td>VARCHAR</td><td class="c">20</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Número legible de la factura, con formato FAC-000123. Único.</td></tr>
+<tr><td><code>pedido_id</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td><span class="badge b-purple">Sí</span> <code>pedidos.pedido_id</code></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Pedido facturado. Clave foránea a pedidos. NO es único: la regla real es «como mucho una factura ACTIVA por pedido», y la impone el índice único parcial uq_factura_activa_por_pedido.</td></tr>
+<tr><td><code>cliente_id</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td><span class="badge b-purple">Sí</span> <code>clientes.cliente_id</code></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Cliente al que se le cobra. Clave foránea a clientes. Se copia del pedido para poder consultar y filtrar sin unir con pedidos.</td></tr>
+<tr><td><code>fecha_emision</code></td><td>TIMESTAMPTZ</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Momento en que se emitió la factura.</td></tr>
+<tr><td><code>fecha_vencimiento</code></td><td>DATE</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Fecha límite de pago. Se fija a 30 días desde la emisión.</td></tr>
+<tr><td><code>subtotal</code></td><td>NUMERIC</td><td class="c">14,2</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Subtotal copiado del pedido en el momento de facturar.</td></tr>
+<tr><td><code>impuestos</code></td><td>NUMERIC</td><td class="c">14,2</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Impuestos copiados del pedido.</td></tr>
+<tr><td><code>total</code></td><td>NUMERIC</td><td class="c">14,2</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Total a pagar. Es la base para calcular el saldo: saldo = total − pagos + notas de crédito activas.</td></tr>
+<tr><td><code>estado</code></td><td>VARCHAR</td><td class="c">20</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>ACTIVA o ANULADA. La anulación es lógica (se conserva la fila) y exige motivo.</td></tr>
+<tr><td><code>motivo_anulacion</code></td><td>TEXT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Razón de la anulación, obligatoria cuando se anula.</td></tr>
+<tr><td><code>fecha_anulacion</code></td><td>TIMESTAMPTZ</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Momento en que se anuló.</td></tr>
+<tr><td><code>usuario_anulacion</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td><span class="badge b-purple">Sí</span> <code>usuarios.usuario_id</code></td><td class="c"><span class="badge b-gray">No</span></td><td>Usuario interno que anuló la factura. Clave foránea a usuarios. Ayuda a la trazabilidad.</td></tr>
+<tr><td><code>fecha_creacion</code></td><td>TIMESTAMPTZ</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Momento en que se registró la factura.</td></tr>
+</tbody></table>
+
+<h3>3.9. <code>pagos</code></h3>
+<p>Abonos recibidos contra una factura. Una factura puede tener varios pagos (pago parcial) hasta completar el total. Nunca se borran ni se editan: si hubo un error se corrige con una nota de crédito.</p>
+<table class="compacta "><thead><tr><th>Campo</th><th>Tipo</th><th class="c">Long.</th><th class="c">PK</th><th class="c">FK</th><th class="c">Oblig.</th><th>Descripción</th></tr></thead><tbody>
+<tr><td><code>pago_id</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-info">Sí</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Identificador único del pago. Clave primaria.</td></tr>
+<tr><td><code>numero_pago</code></td><td>VARCHAR</td><td class="c">20</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Número legible del pago, con formato PAG-000123. Único.</td></tr>
+<tr><td><code>factura_id</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td><span class="badge b-purple">Sí</span> <code>facturas.factura_id</code></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Factura que se está pagando. Clave foránea a facturas.</td></tr>
+<tr><td><code>fecha</code></td><td>TIMESTAMPTZ</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Fecha del pago.</td></tr>
+<tr><td><code>valor</code></td><td>NUMERIC</td><td class="c">14,2</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Importe abonado. Debe ser mayor que cero y no puede superar el saldo pendiente.</td></tr>
+<tr><td><code>metodo_pago</code></td><td>VARCHAR</td><td class="c">30</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>EFECTIVO, TARJETA, TRANSFERENCIA o CHEQUE. La base de datos lo valida con una restricción CHECK.</td></tr>
+<tr><td><code>referencia</code></td><td>VARCHAR</td><td class="c">60</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Número de comprobante, transferencia o cheque. Obligatorio para transferencia y cheque.</td></tr>
+<tr><td><code>observaciones</code></td><td>TEXT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Notas libres sobre el pago.</td></tr>
+<tr><td><code>usuario_id</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td><span class="badge b-purple">Sí</span> <code>usuarios.usuario_id</code></td><td class="c"><span class="badge b-gray">No</span></td><td>Usuario INTERNO que registró el pago en caja. Clave foránea a usuarios. Queda vacío si el pago vino del portal.</td></tr>
+<tr><td><code>usuario_cliente_id</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td><span class="badge b-purple">Sí</span> <code>usuario_cliente.usuario_cliente_id</code></td><td class="c"><span class="badge b-gray">No</span></td><td>Cuenta de portal del cliente que hizo el pago. Clave foránea a usuario_cliente. Queda vacío si el pago lo registró el personal interno. Junto con usuario_id permite saber siempre quién pagó, porque son dos actores distintos.</td></tr>
+<tr><td><code>fecha_registro</code></td><td>TIMESTAMPTZ</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Momento en que se grabó el pago en el sistema.</td></tr>
+<tr><td><code>banco</code></td><td>TEXT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Banco emisor de la tarjeta, banco de la transferencia o banco del cheque.</td></tr>
+<tr><td><code>titular</code></td><td>TEXT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Titular de la tarjeta.</td></tr>
+<tr><td><code>tipo_tarjeta</code></td><td>TEXT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>VISA, MASTERCARD, AMEX u OTRA. Se deduce de los primeros dígitos del número.</td></tr>
+<tr><td><code>ultimos_digitos_tarjeta</code></td><td>TEXT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Solo los 4 últimos dígitos de la tarjeta. Por PCI-DSS el número completo y el CVV NUNCA se almacenan.</td></tr>
+<tr><td><code>vencimiento_tarjeta</code></td><td>TEXT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Fecha de vencimiento de la tarjeta, en formato MM/AA.</td></tr>
+<tr><td><code>numero_cuenta</code></td><td>TEXT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Número de cuenta para transferencias.</td></tr>
+</tbody></table>
+
+<h3>3.10. <code>notas_credito</code></h3>
+<p>Devoluciones sobre una factura. Una nota ACTIVA revierte el pago que devuelve, es decir, AUMENTA el saldo pendiente de la factura. Regla clave: no se puede devolver más de lo que realmente se ha pagado.</p>
+<table class="compacta "><thead><tr><th>Campo</th><th>Tipo</th><th class="c">Long.</th><th class="c">PK</th><th class="c">FK</th><th class="c">Oblig.</th><th>Descripción</th></tr></thead><tbody>
+<tr><td><code>nota_credito_id</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-info">Sí</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Identificador único de la nota de crédito. Clave primaria.</td></tr>
+<tr><td><code>numero_nota</code></td><td>VARCHAR</td><td class="c">20</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Número legible, con formato NC-000123. Único.</td></tr>
+<tr><td><code>factura_id</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td><span class="badge b-purple">Sí</span> <code>facturas.factura_id</code></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Factura sobre la que se devuelve. Clave foránea a facturas.</td></tr>
+<tr><td><code>cliente_id</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td><span class="badge b-purple">Sí</span> <code>clientes.cliente_id</code></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Cliente al que se le devuelve. Clave foránea a clientes.</td></tr>
+<tr><td><code>fecha</code></td><td>TIMESTAMPTZ</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Fecha de la devolución.</td></tr>
+<tr><td><code>valor</code></td><td>NUMERIC</td><td class="c">14,2</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Importe devuelto. Debe ser mayor que cero y no superar lo pagado menos las devoluciones anteriores.</td></tr>
+<tr><td><code>motivo</code></td><td>TEXT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Razón de la devolución. Es obligatoria: la base de datos no admite una nota sin motivo.</td></tr>
+<tr><td><code>estado</code></td><td>VARCHAR</td><td class="c">20</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>ACTIVA o ANULADA. Solo las ACTIVAS afectan al saldo.</td></tr>
+<tr><td><code>fecha_creacion</code></td><td>TIMESTAMPTZ</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Momento en que se registró la nota.</td></tr>
+<tr><td><code>usuario_id</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td><span class="badge b-purple">Sí</span> <code>usuarios.usuario_id</code></td><td class="c"><span class="badge b-gray">No</span></td><td>Usuario interno que emitió la devolución. Clave foránea a usuarios.</td></tr>
+<tr><td><code>fecha_anulacion</code></td><td>TIMESTAMPTZ</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Momento en que se anuló la nota.</td></tr>
+<tr><td><code>usuario_anulacion</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td><span class="badge b-purple">Sí</span> <code>usuarios.usuario_id</code></td><td class="c"><span class="badge b-gray">No</span></td><td>Usuario interno que la anuló. Clave foránea a usuarios.</td></tr>
+<tr><td><code>motivo_anulacion</code></td><td>TEXT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Razón de la anulación de la nota, obligatoria.</td></tr>
+</tbody></table>
+
+<h3>3.11. <code>auditoria</code></h3>
+<p>Bitácora de operaciones. Cada acción sensible (login, creación, cambio de estado, anulación, pago…) deja un registro aquí. El campo usuario guarda el identificador como TEXTO y no como clave foránea, a propósito: el rastro debe sobrevivir aunque la cuenta se elimine.</p>
+<table class="compacta "><thead><tr><th>Campo</th><th>Tipo</th><th class="c">Long.</th><th class="c">PK</th><th class="c">FK</th><th class="c">Oblig.</th><th>Descripción</th></tr></thead><tbody>
+<tr><td><code>auditoria_id</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-info">Sí</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Identificador único del registro. Clave primaria.</td></tr>
+<tr><td><code>usuario</code></td><td>VARCHAR</td><td class="c">200</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Quién hizo la operación (correo del interno o username del cliente). Se guarda como texto, sin clave foránea, para que el histórico no dependa de que la cuenta siga existiendo.</td></tr>
+<tr><td><code>usuario_tipo</code></td><td>VARCHAR</td><td class="c">20</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>INTERNO o CLIENTE. Distingue si la acción vino del panel interno o del portal.</td></tr>
+<tr><td><code>fecha_hora</code></td><td>TIMESTAMPTZ</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Momento exacto de la operación.</td></tr>
+<tr><td><code>modulo</code></td><td>VARCHAR</td><td class="c">50</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Módulo afectado: Autenticación, Usuarios, Clientes, Productos, Pedidos, Facturas, Pagos o NotasCrédito.</td></tr>
+<tr><td><code>operacion</code></td><td>VARCHAR</td><td class="c">30</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Tipo de operación: LOGIN, LOGIN_FALLIDO, CREAR, ACTUALIZAR, ESTADO, GENERAR, ANULAR, REGISTRAR, PAGO_PORTAL, AUTORREGISTRO, CLAVE_RECUPERADA, CODIGO_EFECTY…</td></tr>
+<tr><td><code>registro_afectado</code></td><td>VARCHAR</td><td class="c">50</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Identificador del registro tocado (número de factura, de pago, id del cliente…).</td></tr>
+<tr><td><code>descripcion</code></td><td>TEXT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Descripción legible de lo que ocurrió, con los datos relevantes.</td></tr>
+</tbody></table>
+
+<h3>3.12. <code>recuperaciones_clave</code></h3>
+<p>Solicitudes de recuperación de contraseña mediante código de un solo uso (OTP). El código se guarda CIFRADO con bcrypt, nunca en texto plano, y caduca.</p>
+<table class="compacta "><thead><tr><th>Campo</th><th>Tipo</th><th class="c">Long.</th><th class="c">PK</th><th class="c">FK</th><th class="c">Oblig.</th><th>Descripción</th></tr></thead><tbody>
+<tr><td><code>recuperacion_id</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-info">Sí</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Identificador único de la solicitud. Clave primaria.</td></tr>
+<tr><td><code>usuario_cliente_id</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td><span class="badge b-purple">Sí</span> <code>usuario_cliente.usuario_cliente_id</code></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Cuenta de portal que pidió el código. Clave foránea a usuario_cliente, con borrado en cascada.</td></tr>
+<tr><td><code>canal</code></td><td>VARCHAR</td><td class="c">10</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>EMAIL o SMS: por dónde se envía el código. La base de datos lo valida con una restricción CHECK.</td></tr>
+<tr><td><code>codigo_hash</code></td><td>TEXT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Código OTP cifrado con bcrypt. Nunca se almacena el código en claro.</td></tr>
+<tr><td><code>intentos</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Intentos fallidos acumulados. Al llegar al máximo (5) la solicitud se invalida.</td></tr>
+<tr><td><code>usado</code></td><td>BOOLEAN</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Verdadero cuando la solicitud ya se consumió o se invalidó. Un código solo sirve una vez.</td></tr>
+<tr><td><code>expira_en</code></td><td>TIMESTAMPTZ</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Momento en que el código deja de ser válido (10 minutos desde su creación).</td></tr>
+<tr><td><code>creado_en</code></td><td>TIMESTAMPTZ</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Momento en que se solicitó el código.</td></tr>
+</tbody></table>
+
+<div class="salto"></div>
+<h1>4. La vista <code>factura_saldo</code></h1>
+<p>No es una tabla: es una <strong>vista</strong>, un cálculo que la base de datos resuelve en el momento de consultarla. El estado de cobro de una factura <strong>no se almacena</strong> y por eso no puede quedar desincronizado con los pagos.</p>
+
+<div class="caja purple">
+  <span class="titulo">Fórmula del saldo</span>
+  <pre><code>saldo = total − Σ(pagos) + Σ(notas de crédito ACTIVAS)</code></pre>
+  <p style="margin-bottom:0">Las notas de crédito <strong>suman</strong> al saldo: al devolver dinero, ese pago se revierte y la factura vuelve a deberlo. El estado de pago (<code>estado_pago</code>) se deriva de la misma fórmula: si el saldo es cero o menos, está PAGADA; si no se ha pagado nada, PENDIENTE; en otro caso, PAGO_PARCIAL.</p>
+</div>
+
+<table class="compacta "><thead><tr><th>Campo</th><th>Tipo</th><th class="c">Long.</th><th>Descripción</th></tr></thead><tbody>
+<tr><td><code>factura_id</code></td><td>INT</td><td class="c">—</td><td>Clave primaria de la vista (la de la factura)</td></tr>
+<tr><td><code>numero_factura</code></td><td>VARCHAR</td><td class="c">20</td><td>Número legible de la factura</td></tr>
+<tr><td><code>pedido_id</code></td><td>INT</td><td class="c">—</td><td>Pedido del que nació la factura</td></tr>
+<tr><td><code>cliente_id</code></td><td>INT</td><td class="c">—</td><td>Cliente al que se le cobra</td></tr>
+<tr><td><code>fecha_emision</code></td><td>TIMESTAMPTZ</td><td class="c">—</td><td>Fecha de emisión</td></tr>
+<tr><td><code>fecha_vencimiento</code></td><td>DATE</td><td class="c">—</td><td>Fecha límite de pago</td></tr>
+<tr><td><code>subtotal</code></td><td>FLOAT8</td><td class="c">—</td><td>Subtotal de la factura</td></tr>
+<tr><td><code>impuestos</code></td><td>FLOAT8</td><td class="c">—</td><td>Impuestos de la factura</td></tr>
+<tr><td><code>total</code></td><td>FLOAT8</td><td class="c">—</td><td>Total facturado</td></tr>
+<tr><td><code>valor_pagado</code></td><td>FLOAT8</td><td class="c">—</td><td>Suma de todos los pagos recibidos</td></tr>
+<tr><td><code>saldo</code></td><td>FLOAT8</td><td class="c">—</td><td>total − valor_pagado + notas de crédito activas</td></tr>
+<tr><td><code>estado</code></td><td>VARCHAR</td><td class="c">20</td><td>ACTIVA o ANULADA</td></tr>
+<tr><td><code>estado_pago</code></td><td>VARCHAR</td><td class="c">—</td><td>Calculado: PENDIENTE, PAGO_PARCIAL, PAGADA o ANULADA</td></tr>
+<tr><td><code>motivo_anulacion</code></td><td>TEXT</td><td class="c">—</td><td>Motivo, si la factura está anulada</td></tr>
+<tr><td><code>fecha_anulacion</code></td><td>TIMESTAMPTZ</td><td class="c">—</td><td>Fecha de anulación, si procede</td></tr>
+<tr><td><code>notas_credito</code></td><td>FLOAT8</td><td class="c">—</td><td>Suma de las notas de crédito ACTIVAS</td></tr>
+</tbody></table>
+
+<div class="caja warn">
+  <span class="titulo">Detalle de implementación que conviene conocer</span>
+  <p style="margin-bottom:0">Los pagos y las notas de crédito se agregan en <strong>subconsultas independientes</strong>. Hacerlo con dos <code>LEFT JOIN</code> a la vez sobre la misma factura produce el <em>producto cartesiano</em> de ambos conjuntos (P pagos × N notas = P×N filas) y multiplicaría las sumas, dejando el saldo mal. Este error existió y se corrigió; está documentado con su prueba en la Evidencia 7.</p>
+</div>
+
+<h1>5. Reglas de integridad asociadas a los campos</h1>
+<p>El diccionario no describe solo nombres y tipos: cada restricción es una <strong>regla de negocio que la base de datos hace cumplir</strong>.</p>
+
+<table class=""><thead><tr><th>Tipo de restricción</th><th>Cuántas</th><th>Qué garantiza</th><th>Ejemplo del proyecto</th></tr></thead><tbody>
+<tr><td>Clave primaria</td><td class="c">12</td><td>Cada fila es identificable de forma única</td><td><code>facturas.factura_id</code></td></tr>
+<tr><td>Clave foránea</td><td class="c">16</td><td>No puede haber un hijo sin su padre</td><td><code>pagos.factura_id</code> → <code>facturas</code></td></tr>
+<tr><td>UNIQUE</td><td class="c">11</td><td>Un valor no puede repetirse</td><td><code>clientes</code>: tipo + número de identificación</td></tr>
+<tr><td>CHECK</td><td class="c">15</td><td>Solo se admiten valores de una lista cerrada</td><td><code>facturas.estado</code> ∈ (ACTIVA, ANULADA)</td></tr>
+<tr><td>NOT NULL</td><td class="c">81</td><td>El dato es imprescindible</td><td><code>facturas.total</code></td></tr>
+<tr><td>Índice único parcial</td><td class="c">1</td><td>Una regla condicional sobre un subconjunto de filas</td><td>Como mucho <strong>una factura ACTIVA</strong> por pedido</td></tr>
+</tbody></table>
+
+<footer class="pie-doc">FINAN-X · Evidencia 2 de 7 · Diccionario de datos · 117 campos en tablas + 16 en la vista, extraídos de PostgreSQL 16.</footer>
+
+</div></body>
+</html>

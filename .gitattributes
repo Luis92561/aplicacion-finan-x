@@ -5,6 +5,13 @@
 # Los scripts bash deben quedar SIEMPRE con LF, o fallan en Mac/Linux
 *.sh text eol=lf
 
+# Los lanzadores de macOS también: un CRLF rompe el doble clic
+*.command text eol=lf
+
+# Los .bat de Windows necesitan CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
 # Binarios/medios se copian tal cual
 *.png binary
 *.jpg binary
@@ -12,3 +19,5 @@
 *.pdf binary
 *.dmg binary
 *.zip binary
+*.tar.gz binary
+*.sql.gz binary
