@@ -39,6 +39,10 @@ Las cuentas y sus **claves temporales** están en
 `primer-ingreso/Acta-Usuarios-Primer-Ingreso.pdf`. Todas obligan a **cambiar la contraseña
 en el primer ingreso**.
 
+> El acta, `primer-ingreso/usuarios-iniciales.json` y los paquetes de imágenes sin conexión
+> **no se versionan** (contienen secretos y superan el límite de GitHub). Se entregan en el
+> ZIP/USB de la versión final; `SHA256SUMS.txt` cubre esa carpeta completa.
+
 Otros lanzadores:
 
 | Acción | Windows | macOS |
