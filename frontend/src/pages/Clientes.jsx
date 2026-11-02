@@ -17,6 +17,8 @@ export default function Clientes() {
   const [cuenta, setCuenta] = useState({ username: '' });
   const [cuentaPara, setCuentaPara] = useState(null);
   const [temporal, setTemporal] = useState(null);
+  const [borrar, setBorrar] = useState(null);
+  const [confirmarBorrado, setConfirmarBorrado] = useState('');
   const [msg, setMsg] = useState('');
 
   const load = async () => {
@@ -70,6 +72,17 @@ export default function Clientes() {
       setCuentaPara(null); setCuenta({ username: '' });
       setMsg('Cuenta de acceso creada. El cliente debe cambiar la contraseña al entrar.');
       if (res.clave_temporal) setTemporal({ usuario: res.username, clave: res.clave_temporal });
+      await load();
+    } catch (err) { setError(errMsg(err)); }
+  };
+
+  const eliminar = async () => {
+    if (!borrar) return;
+    setError(''); setMsg('');
+    try {
+      await api.delete(`/clientes/${borrar.cliente_id}`);
+      setMsg(`Cliente ${borrar.nombre_razon_social} eliminado`);
+      setBorrar(null); setConfirmarBorrado('');
       await load();
     } catch (err) { setError(errMsg(err)); }
   };
@@ -171,6 +184,11 @@ export default function Clientes() {
                           <button className={`btn btn-sm ${r.estado === 'ACTIVO' ? 'btn-warn' : 'btn-success'}`} onClick={() => toggleEstado(r)}>
                             {r.estado === 'ACTIVO' ? 'Inactivar' : 'Activar'}
                           </button>
+                          {user?.rol === 'ADMIN' && (
+                            <button className="btn btn-danger btn-sm" onClick={() => { setBorrar(r); setConfirmarBorrado(''); }}>
+                              Eliminar
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -186,6 +204,29 @@ export default function Clientes() {
             <div><b>Contraseña temporal de {temporal.usuario}:</b> <code>{temporal.clave}</code></div>
             <div style={{ fontSize: 12.5, marginTop: 4 }}>
               Se muestra una sola vez. El cliente deberá cambiarla en su primer ingreso.
+            </div>
+          </div>
+        )}
+
+        {borrar && (
+          <div className="card" style={{ borderColor: 'var(--danger)' }}>
+            <h3>Eliminar cliente</h3>
+            <p style={{ marginTop: 0 }}>
+              ¿Eliminar a <b>{borrar.nombre_razon_social}</b> ({borrar.tipo_identificacion} {borrar.numero_identificacion})?
+              Solo se permite si no tiene pedidos, facturas, pagos ni notas de crédito.
+              Si tiene movimientos, use <b>Inactivar</b> para conservar el historial.
+            </p>
+            <div className="field" style={{ maxWidth: 320, marginBottom: 12 }}>
+              <label>Escriba ELIMINAR para confirmar</label>
+              <input value={confirmarBorrado} onChange={(e) => setConfirmarBorrado(e.target.value)} placeholder="ELIMINAR" />
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button className="btn btn-danger" disabled={confirmarBorrado !== 'ELIMINAR'} onClick={eliminar}>
+                Eliminar definitivamente
+              </button>
+              <button className="btn btn-ghost" onClick={() => { setBorrar(null); setConfirmarBorrado(''); }}>
+                Cancelar
+              </button>
             </div>
           </div>
         )}

@@ -669,6 +669,17 @@ async function main() {
   const crudo = JSON.stringify(listaP.data);
   check('Nunca se exponen CVV ni número completo de tarjeta', !crudo.includes('codigoSeguridad') && !crudo.includes('4111111111111111'));
 
+  // ---------- Eliminación de clientes ----------
+  console.log('13) Eliminación de clientes');
+  const cliBorrar = await call('POST', '/clientes', {
+    token: AT,
+    body: { nombreRazonSocial: `Cliente Borrar ${suffix}`, tipoIdentificacion: 'CC', numeroIdentificacion: `77${suffix}` },
+  });
+  const delOk = await call('DELETE', `/clientes/${cliBorrar.data?.cliente_id}`, { token: AT });
+  check('Eliminar cliente sin movimientos → 200', delOk.status === 200, JSON.stringify(delOk.data));
+  const delConMov = await call('DELETE', `/clientes/${cliNuevoId}`, { token: AT });
+  check('Eliminar cliente con facturas → 409 (conserva historial)', delConMov.status === 409, JSON.stringify(delConMov.data));
+
   // ---------- Resumen ----------
   console.log(`\n=== Resultado: ${passed} aprobadas, ${failed} fallidas ===\n`);
   if (failed > 0) {

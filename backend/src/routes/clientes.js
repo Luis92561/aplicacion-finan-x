@@ -131,6 +131,57 @@ router.patch('/:id/estado', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
+// DELETE /api/clientes/:id — solo ADMIN y solo si el cliente no tiene movimientos.
+// Un cliente con pedidos, facturas, pagos o notas NO se borra: se inactiva, para no
+// perder el historial contable (y porque la base lo impediría por las claves foráneas).
+router.delete('/:id', requireRol('ADMIN'), async (req, res, next) => {
+  const client = await pool.connect();
+  try {
+    const id = idNumerico(req.params.id, 'id');
+    await client.query('BEGIN');
+
+    const cli = await client.query(
+      'SELECT nombre_razon_social FROM clientes WHERE cliente_id = $1 FOR UPDATE',
+      [id]
+    );
+    if (!cli.rowCount) throw new HttpError(404, 'Cliente no encontrado');
+
+    const dep = await client.query(
+      `SELECT
+         (SELECT COUNT(*) FROM pedidos       WHERE cliente_id = $1)::int AS pedidos,
+         (SELECT COUNT(*) FROM facturas      WHERE cliente_id = $1)::int AS facturas,
+         (SELECT COUNT(*) FROM notas_credito WHERE cliente_id = $1)::int AS notas,
+         (SELECT COUNT(*) FROM pagos p JOIN facturas f ON f.factura_id = p.factura_id
+           WHERE f.cliente_id = $1)::int AS pagos`,
+      [id]
+    );
+    const d = dep.rows[0];
+    if (d.pedidos + d.facturas + d.notas + d.pagos > 0) {
+      throw new HttpError(
+        409,
+        `No se puede eliminar: el cliente tiene ${d.pedidos} pedido(s), ${d.facturas} factura(s), ${d.pagos} pago(s) y ${d.notas} nota(s) de crédito. Use "Inactivar" para conservar el historial.`
+      );
+    }
+
+    // Primero la cuenta de portal (clave foránea), después el cliente.
+    await client.query('DELETE FROM usuario_cliente WHERE cliente_id = $1', [id]);
+    await client.query('DELETE FROM clientes WHERE cliente_id = $1', [id]);
+
+    await audit({
+      req, client, usuario: req.user.correo, modulo: MODULO, operacion: 'ELIMINAR', registro: id,
+      descripcion: `Cliente ${cli.rows[0].nombre_razon_social} eliminado (sin movimientos)`,
+    });
+
+    await client.query('COMMIT');
+    res.json({ ok: true });
+  } catch (e) {
+    await client.query('ROLLBACK').catch(() => {});
+    next(e);
+  } finally {
+    client.release();
+  }
+});
+
 // POST /api/clientes/:id/cuenta  — crea la cuenta de portal de un cliente
 // Solo ADMIN: si cualquier rol operativo pudiera hacerlo, podría crear una cuenta con
 // una contraseña elegida por él y entrar al portal suplantando al cliente.

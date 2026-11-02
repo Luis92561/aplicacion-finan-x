@@ -72,8 +72,8 @@ Fecha de cierre: 2 de noviembre de 2026 · Versión: 1.0.0
 
 ## 6. Cómo se verificó
 
-- Suite end-to-end: **155 comprobaciones en verde** (`npm test`), incluidas las nuevas de
-  primer ingreso, bloqueo por cuenta, roles y dashboard.
+- Suite end-to-end: **157 comprobaciones en verde** (`npm test`), incluidas las nuevas de
+  primer ingreso, bloqueo por cuenta, roles, dashboard y eliminación de clientes.
 - Pruebas manuales contra el stack Docker: login → 403 de cambio obligatorio → cambio →
   200; token anterior → 401; CAJERO → 403 en notas; panel del CAJERO sin cartera.
 - `npm audit --audit-level=high` sin hallazgos altos.

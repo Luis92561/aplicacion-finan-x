@@ -144,6 +144,7 @@ POST   /api/auth/logout              Cerrar sesión (opcional: todas)
 
 GET    /api/dashboard                Panel (rol-consciente)
 GET    /api/clientes · /productos · /pedidos · /facturas · /pagos
+DELETE /api/clientes/:id             Eliminar cliente (ADMIN, solo sin movimientos)
 POST   /api/notas-credito            Devolución (ADMIN/SUPERVISOR)
 POST   /api/facturas/:id/anular      Anulación (ADMIN/SUPERVISOR)
 GET    /api/reportes/* · /api/auditoria
@@ -158,7 +159,7 @@ La sesión viaja en una cookie `HttpOnly` (`fx_session`); también se acepta
 ## 8. Pruebas
 
 ```bash
-cd backend && npm test          # suite end-to-end (155 comprobaciones)
+cd backend && npm test          # suite end-to-end (157 comprobaciones)
 npm audit --audit-level=high    # dependencias (backend y frontend)
 ```
 
