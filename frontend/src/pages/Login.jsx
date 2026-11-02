@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api, { errMsg } from '../api.js';
 import { useAuth } from '../auth.jsx';
+import { CampoClave } from '../ui.jsx';
 
 const ID_TIPOS = ['CC', 'CE', 'NIT', 'PASAPORTE'];
 
@@ -131,13 +132,23 @@ export default function Login() {
             <label>Usuario o correo</label>
             <input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="usuario@empresa.com" autoComplete="username" required />
           </div>
-          <div className="field" style={{ marginBottom: 18 }}>
-            <label>Contraseña</label>
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" autoComplete="current-password" required />
+          <div style={{ marginBottom: 18 }}>
+            <CampoClave
+              label="Contraseña"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              autoComplete="current-password"
+              required
+            />
           </div>
           <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }} disabled={loading}>
             {loading ? 'Ingresando…' : 'Iniciar sesión'}
           </button>
+          <p style={{ fontSize: 12, color: 'var(--muted)', textAlign: 'center', marginTop: 10, marginBottom: 0 }}>
+            Use el usuario (o correo) y la clave temporal del acta. Pulse <b>Ver</b> para
+            comprobar que la escribió completa.
+          </p>
           <div style={{ textAlign: 'center', marginTop: 10 }}>
             <button type="button" className="link" onClick={abrirRecuperar}>¿Olvidaste tu contraseña?</button>
           </div>
@@ -201,13 +212,11 @@ export default function Login() {
             <input value={reg.regUsername} onChange={set('regUsername')} placeholder="mi.usuario" autoComplete="username" required />
           </div>
           <div className="row2">
-            <div className="field" style={{ marginBottom: 14 }}>
-              <label>Contraseña</label>
-              <input type="password" value={reg.regPassword} onChange={set('regPassword')} placeholder="Mínimo 12 caracteres" autoComplete="new-password" required />
+            <div style={{ marginBottom: 14 }}>
+              <CampoClave label="Contraseña" value={reg.regPassword} onChange={set('regPassword')} placeholder="Mínimo 12 caracteres" autoComplete="new-password" required />
             </div>
-            <div className="field" style={{ marginBottom: 14 }}>
-              <label>Confirmar contraseña</label>
-              <input type="password" value={reg.confirm} onChange={set('confirm')} placeholder="Repítela" autoComplete="new-password" required />
+            <div style={{ marginBottom: 14 }}>
+              <CampoClave label="Confirmar contraseña" value={reg.confirm} onChange={set('confirm')} placeholder="Repítela" autoComplete="new-password" required />
             </div>
           </div>
 
@@ -273,13 +282,11 @@ export default function Login() {
                 <input value={recov.codigo} onChange={setR('codigo')} placeholder="123456" inputMode="numeric" maxLength={6} required />
               </div>
               <div className="row2">
-                <div className="field" style={{ marginBottom: 14 }}>
-                  <label>Nueva contraseña</label>
-                  <input type="password" value={recov.nuevaClave} onChange={setR('nuevaClave')} placeholder="Mínimo 12 caracteres" autoComplete="new-password" required />
+                <div style={{ marginBottom: 14 }}>
+                  <CampoClave label="Nueva contraseña" value={recov.nuevaClave} onChange={setR('nuevaClave')} placeholder="Mínimo 12 caracteres" autoComplete="new-password" required />
                 </div>
-                <div className="field" style={{ marginBottom: 14 }}>
-                  <label>Confirmar contraseña</label>
-                  <input type="password" value={recov.confirm} onChange={setR('confirm')} placeholder="Repítela" autoComplete="new-password" required />
+                <div style={{ marginBottom: 14 }}>
+                  <CampoClave label="Confirmar contraseña" value={recov.confirm} onChange={setR('confirm')} placeholder="Repítela" autoComplete="new-password" required />
                 </div>
               </div>
               <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }} disabled={loading}>

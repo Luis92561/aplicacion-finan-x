@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 const TONES = {
   ACTIVO: 'green', INACTIVO: 'red',
   BORRADOR: 'gray', CONFIRMADO: 'blue', CANCELADO: 'red', FACTURADO: 'purple',
@@ -122,6 +124,52 @@ export function Section({ title, children, actions }) {
         {actions}
       </div>
       {children}
+    </div>
+  );
+}
+
+/**
+ * Campo de contraseña con botón "Ver/Ocultar".
+ *
+ * Permite comprobar que la clave temporal se escribió completa (mayúsculas, símbolos,
+ * etc.) sin renunciar a que el campo esté oculto por defecto.
+ */
+export function CampoClave({
+  label,
+  value,
+  onChange,
+  autoComplete = 'current-password',
+  placeholder = '',
+  minLength,
+  required = false,
+  disabled = false,
+}) {
+  const [ver, setVer] = useState(false);
+  return (
+    <div className="field">
+      {label ? <label>{label}</label> : null}
+      <div className="campo-clave">
+        <input
+          type={ver ? 'text' : 'password'}
+          value={value}
+          onChange={onChange}
+          autoComplete={autoComplete}
+          placeholder={placeholder}
+          minLength={minLength}
+          required={required}
+          disabled={disabled}
+        />
+        <button
+          type="button"
+          className="ver-clave"
+          onClick={() => setVer((v) => !v)}
+          aria-label={ver ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+          aria-pressed={ver}
+          title={ver ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+        >
+          {ver ? 'Ocultar' : 'Ver'}
+        </button>
+      </div>
     </div>
   );
 }

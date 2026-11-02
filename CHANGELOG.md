@@ -10,6 +10,8 @@ remediación, el panel de control interactivo y el flujo de primer ingreso.
 
 ### Añadido
 
+- **Ver/Ocultar contraseña** en el login, el registro, la recuperación y el cambio
+  obligatorio, para comprobar que la clave temporal se escribió completa.
 - **Eliminar cliente** desde la pantalla de Clientes (solo ADMIN). Se permite únicamente
   si el cliente no tiene pedidos, facturas, pagos ni notas de crédito; si tiene historial,
   la API responde 409 y se sugiere inactivarlo. La operación queda en auditoría.

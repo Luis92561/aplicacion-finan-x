@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api, { errMsg } from '../api.js';
 import { useAuth } from '../auth.jsx';
+import { CampoClave } from '../ui.jsx';
 
 /**
  * Cambio de contraseña obligatorio del primer ingreso.
@@ -56,10 +57,9 @@ export default function CambiarClave() {
         {ok && <div className="alert alert-success">Contraseña actualizada. Redirigiendo…</div>}
         {error && <div className="alert alert-error">{error}</div>}
 
-        <div className="field" style={{ marginBottom: 12 }}>
-          <label>Contraseña actual (temporal) *</label>
-          <input
-            type="password"
+        <div style={{ marginBottom: 12 }}>
+          <CampoClave
+            label="Contraseña actual (temporal) *"
             value={actual}
             onChange={(e) => setActual(e.target.value)}
             autoComplete="current-password"
@@ -67,10 +67,9 @@ export default function CambiarClave() {
           />
         </div>
 
-        <div className="field" style={{ marginBottom: 12 }}>
-          <label>Nueva contraseña *</label>
-          <input
-            type="password"
+        <div style={{ marginBottom: 12 }}>
+          <CampoClave
+            label="Nueva contraseña *"
             value={nueva}
             onChange={(e) => setNueva(e.target.value)}
             placeholder="Mínimo 12 caracteres"
@@ -80,10 +79,9 @@ export default function CambiarClave() {
           />
         </div>
 
-        <div className="field" style={{ marginBottom: 16 }}>
-          <label>Confirmar nueva contraseña *</label>
-          <input
-            type="password"
+        <div style={{ marginBottom: 16 }}>
+          <CampoClave
+            label="Confirmar nueva contraseña *"
             value={confirmar}
             onChange={(e) => setConfirmar(e.target.value)}
             autoComplete="new-password"
