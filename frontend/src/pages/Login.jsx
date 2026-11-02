@@ -299,6 +299,7 @@ export default function Login() {
           </div>
         </div>
       )}
+      <div className="login-version">FINAN-X v1.0.0</div>
     </div>
   );
 }
