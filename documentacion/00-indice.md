@@ -38,6 +38,7 @@
 | `02-tecnica/diagrams/` | Diagramas UML y de arquitectura (fuentes y SVG). |
 | `02-tecnica/generador-documentos/` | Scripts que generan las evidencias E1–E7. |
 | `../refactor.md` (raíz del proyecto) | Plan de refactor por fases y deuda técnica priorizada. |
+| `../capacidad.md` (raíz del proyecto) | Plan de capacidad para 600–1.000 clientes y para 600–1.000 empresas (SaaS), con umbrales y checklist. |
 
 ## 03 · Operación y despliegue
 
