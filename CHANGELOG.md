@@ -3,6 +3,47 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 Versionado semántico.
 
+## [1.0.1] — 2026-11-15
+
+### Documentación
+
+- Evidencias **E1–E7 regeneradas** desde el sistema real: esquema de **128 columnas y 16 claves
+  foráneas**, **276 dependencias**, suite de **157 comprobaciones** y **51 casos de control**.
+- Portada y pie de E1–E7 con **autores, versión y fecha**.
+- E3 incorpora los requisitos del primer ingreso, la eliminación de clientes y el panel de control;
+  E6 los traza (25 historias, 43 requisitos) y E7 añade CP-49 a CP-51.
+- Fuera las credenciales de demostración de las especificaciones, el plan y la guía de código
+  (sustituidas por el flujo de primer ingreso del acta).
+- Enlaces del acta corregidos; variables reales de la suite documentadas.
+
+### Cambiado
+
+- El **portal del cliente** permite iniciar sesión con el **correo** registrado en su
+  ficha, además del nombre de usuario.
+
+### Corregido
+
+- **Autoregistro de clientes:** la pantalla llamaba a `entrar(user, token)` con una variable
+  inexistente. El servidor creaba el cliente (201 + cookie), pero el navegador mostraba
+  "token is not defined" y el alta parecia fallar; ahora entra directo al portal.
+- Documentacion alineada con el codigo: contrasena minima de **12 caracteres**, version 1.0.1
+  y enlaces de operacion actualizados.
+
+### Cambiado
+
+- **La carpeta `entrega/` deja de versionarse** (paquete de imagenes de ~191 MB y lanzadores).
+  El paquete se publica como adjunto del Release y el repositorio se ejecuta con
+  `docker compose up -d --build`.
+- Se retiran `LEEME-PRIMERO.txt`, `LEEME-WINDOWS.md` y `SHA256SUMS.txt`: su contenido
+  queda en el README, en `documentacion/03-operacion/ABRIR-EN-OTRA-PC.md` y en las notas del
+  Release, que incluye el SHA-256 del ZIP.
+- **Retiro formal de las credenciales de demostracion:** nuevo documento
+  `documentacion/04-seguridad/06-Retiro-Credenciales-Demo.md` y redaccion de las claves en la
+  documentacion vigente.
+- Se declara el uso de **agentes de IA bajo supervision constante de los autores** en el README
+  y en las especificaciones.
+- **Integracion continua** (GitHub Actions): compilacion del frontend, instalacion del backend,
+  validacion de los tres perfiles de Compose y construccion de imagenes.
 ## [1.0.0] — 2026-11-02
 
 Primera versión preparada para despliegue. Incluye la auditoría de seguridad y su

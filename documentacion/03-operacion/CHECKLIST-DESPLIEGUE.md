@@ -42,8 +42,9 @@ considera desplegable.
 - [ ] Dos notas de crédito simultáneas no superan lo pagado.
 - [ ] La API no devuelve `numero_cuenta` completo ni el vencimiento de la tarjeta.
 - [ ] `npm audit --audit-level=high` sin hallazgos altos.
-- [ ] No queda ningún `admin123`, `finanx.test` ni "Credenciales demo" en código o docs
-      vigentes (solo pueden aparecer en el informe histórico de auditoría).
+- [ ] No queda ningún `[clave retirada]`/`finanx.test` en la **interfaz ni en la documentación vigente**.
+      Solo pueden aparecer en (a) el informe histórico de auditoría, (b) el **seed de demostración**
+      (exige `SEED_DEMO=true` y `NODE_ENV≠production`) y (c) la lista de contraseñas bloqueadas.
 
 ## 6. Operación
 
@@ -57,5 +58,5 @@ considera desplegable.
 
 - [ ] `version final finan-x/` completa (código, docs, acta, entrega, base demo).
 - [ ] El informe de auditoría y el estado de remediación están incluidos.
-- [ ] El ZIP/tar entregado tiene checksums (`SHA256SUMS.txt`).
+- [ ] Las notas del Release publican el SHA-256 del ZIP entregado.
 - [ ] El proyecto original quedó intacto (manifiesto SHA-256).

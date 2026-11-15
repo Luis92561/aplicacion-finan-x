@@ -215,7 +215,7 @@ Este plan ordena el trabajo en **8 fases**, de la más rentable a la más estruc
 - ADRs: dinero, numeración, inmutabilidad, capas.
 - Corregir la descripción “hexagonal” a la arquitectura real de 3 capas.
 - OpenAPI, runbooks de incidentes y de respaldo.
-- Mantener `CHANGELOG` y `SHA256SUMS`.
+- Mantener `CHANGELOG` y el SHA-256 en las notas del Release.
 
 **Qué se espera**
 - Onboarding más rápido y decisiones trazables.

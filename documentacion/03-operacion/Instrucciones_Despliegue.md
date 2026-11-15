@@ -1,7 +1,7 @@
 # FINAN-X · Instrucciones de despliegue
 
 > **Proyecto:** FINAN-X · **Autores:** Luis Alfredo Jaramillo Restrepo · Mayra Juliana Velez
-> **Versión:** 1.0.0 · **Fecha:** noviembre de 2026
+> **Versión:** 1.0.1 · **Fecha:** noviembre de 2026
 
 Este documento explica cómo dejar FINAN-X funcionando **en otro equipo** y cómo
 desplegarla con TLS. Para la guía rápida de doble clic, ver
@@ -124,8 +124,8 @@ docker compose exec -T backend node scripts/crear-usuarios-iniciales.mjs \
 | Cabeceras | `curl -I http://localhost:8080/` → CSP, X-Frame-Options, no-store. |
 | Suite e2e (dev) | `docker compose exec -e API_BASE=http://localhost:4000/api backend npm test` |
 
-La suite e2e requiere modo demostración (`NODE_ENV != production`, `SEED_DEMO=true`,
-`OTP_RETORNO_DEMO=on`); no se ejecuta contra producción.
+La suite e2e requiere **modo demostración**: `NODE_ENV=development`, `SEED_DEMO=true`,
+`OTP_RETORNO_DEMO=on`, `REGISTRO_ABIERTO=on` y `OTP_COOLDOWN_SEGUNDOS=0`; no se ejecuta contra producción.
 
 ---
 
@@ -181,7 +181,7 @@ docker compose exec -T db psql -U postgres -d finanx < database/migracion_recupe
 | `Falta JWT_SECRET` | `.env` incompleto | Genere el secreto (sección 3). |
 | La cookie no se guarda en HTTPS | `COOKIE_SECURE=off` | Póngalo en `on` y use HTTPS. |
 | El navegador avisa del certificado | Autofirmado | Acepte la excepción (solo demo). |
-| `npm test` falla con 403/OTP | Está en modo producción | Use un entorno de desarrollo con `SEED_DEMO` y `OTP_RETORNO_DEMO`. |
+| `npm test` falla con 403/OTP | Está en modo producción o faltan indicadores | Use `NODE_ENV=development`, `SEED_DEMO=true`, `OTP_RETORNO_DEMO=on`, `REGISTRO_ABIERTO=on` y `OTP_COOLDOWN_SEGUNDOS=0`. |
 
 ---
 

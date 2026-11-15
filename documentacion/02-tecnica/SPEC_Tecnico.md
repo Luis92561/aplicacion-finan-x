@@ -1,15 +1,22 @@
 # FINAN-X · Especificación Técnica
 
-> **Aviso de vigencia (v1.0.0).** Las credenciales de demostración que aparecen en este
+> **Aviso de vigencia (v1.0.0).** Las credenciales de demostración que aparecen en este
+> El retiro de esas credenciales se documenta en `documentacion/04-seguridad/06-Retiro-Credenciales-Demo.md`.
 > documento son históricas. La versión 1.0.0 no crea cuentas con contraseñas fijas: use las
 > cuentas y claves temporales de primer-ingreso/Acta-Usuarios-Primer-Ingreso.pdf (cambio
 > obligatorio en el primer ingreso). Ver documentacion/04-seguridad/04-Estado-de-Remediacion.md.
+
+> **Uso de IA.** Este documento y el proyecto se construyeron con asistencia de agentes de IA
+> (Claude Code y OpenCode) **bajo supervisión constante de los autores**: cada fase fue
+> dirigida, revisada, probada y aprobada manualmente antes de continuar. Las decisiones de
+> diseño, la validación funcional y la verificación de seguridad son responsabilidad de los
+> autores.
 
 
 > **Propósito de este documento:** describir **cómo** está construido FINAN-X hasta el último detalle necesario para **recrearlo desde cero** con Claude Code u OpenCode (léalo junto con `SPEC_Funcional.md`; la secuencia de ejecución está en `PLAN_Creacion.md`).
 >
 > **Proyecto:** FINAN-X · **Desarrolladores:** Luis Alfredo Jaramillo Restrepo · Mayra Juliana Velez
-> **Estado:** funcional · **Verificación:** suite e2e 154/154 aprobadas.
+> **Estado:** funcional · **Verificación:** suite e2e 157/157 aprobadas.
 
 ---
 
@@ -106,7 +113,7 @@ project/
 │   ├── package.json                # ESM; scripts: dev/start/seed/test
 │   ├── scripts/
 │   │   ├── seed.js                 # Datos demo idempotentes (roles, usuarios, clientes, producto)
-│   │   └── e2e.mjs                 # Suite end-to-end (154 comprobaciones) — npm test
+│   │   └── e2e.mjs                 # Suite end-to-end (157 comprobaciones) — npm test
 │   └── src/
 │       ├── index.js                # Express bootstrap: helmet, CORS, JSON, montaje de rutas, error handler
 │       ├── config.js               # Variables de entorno (BD, JWT, CORS, límites, OTP)
@@ -554,30 +561,38 @@ Dockerfiles: backend `node:22-alpine`, `npm ci --omit=dev`, `CMD sh -c "node src
 ## 9. Cómo levantar y verificar
 
 ```bash
-# 1. Arranque (crea BD con esquema + seed idempotente)
+# 1. Arranque (crea la BD con esquema y migraciones; el seed NO corre en producción)
 docker compose up -d --build
 
-# 2. Verificación de salud
-curl http://localhost:4000/api/health        # → {"ok":true,...}
-curl -X POST http://localhost:4000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"username":"admin@finanx.test","password":"admin123"}'
+# 2. Crear las cuentas iniciales (una sola vez; claves temporales del acta)
+docker compose exec -T backend node scripts/crear-usuarios-iniciales.mjs \
+  --archivo /primer-ingreso/usuarios-iniciales.json
 
-# 3. Pruebas end-to-end (154 comprobaciones)
+# 3. Verificación de salud
+curl http://localhost:4000/api/health        # → {"ok":true,...}
+# El login usa el usuario y la clave temporal del acta:
+#   POST /api/auth/login  { "username": "<usuario>", "password": "<clave temporal>" }
+# y obliga a cambiarla antes de operar.
+
+# 4. Pruebas end-to-end (157 comprobaciones; requieren modo demostración)
 cd backend && npm test
 
-# 4. Aplicar migraciones posteriores (si la BD ya existía)
-docker exec -i finanx-db psql -U finanx -d finanx < database/migracion_notas_credito.sql
-docker exec -i finanx-db psql -U finanx -d finanx < database/migracion_recuperacion_contrasena.sql
+# 5. Aplicar migraciones posteriores (si la BD ya existía)
+docker exec -i finanx-db psql -U postgres -d finanx < database/migracion_notas_credito.sql
+docker exec -i finanx-db psql -U postgres -d finanx < database/migracion_recuperacion_contrasena.sql
+docker exec -i finanx-db psql -U postgres -d finanx < database/migracion_refacturacion_y_dominios.sql
+docker exec -i finanx-db psql -U postgres -d finanx < database/migracion_version_token.sql
+docker exec -i finanx-db psql -U postgres -d finanx < database/migracion_despliegue.sql
 
-# 5. Frontend
-#    http://localhost:8080  (panel interno) y portal del cliente con cliente@finanx.test / cliente123
+# 6. Frontend
+#    http://localhost:8080  (panel interno) y portal del cliente con la cuenta
+#    "cliente" del acta (clave temporal, cambio obligatorio).
 
-# 6. Mockups de demostración (opcional, para mostrar al cliente)
-open mockups/index.html   # galería de prototipos wireframe — no es la aplicación final
+# 7. Mockups de demostración (opcional, para mostrar al cliente)
+open documentacion/06-anexos/mockups/index.html
 ```
 
-Credenciales demo: `admin@finanx.test/admin123` · `facturador@finanx.test/facturador123` · `cajero@finanx.test/cajero123` · `supervisor@finanx.test/supervisor123` · `cliente@finanx.test/cliente123`.
+Cuentas iniciales: `primer-ingreso/Acta-Usuarios-Primer-Ingreso.pdf` (claves temporales con cambio obligatorio).
 
 **Tarjeta de prueba válida** (cumple Luhn): `4111111111111111` (VISA), vencimiento `12/30`, CVV `123`.
 
@@ -590,7 +605,7 @@ Credenciales demo: `admin@finanx.test/admin123` · `facturador@finanx.test/factu
 | `database/init.sql` | Esquema (fuente única) |
 | `backend/src/seed.js` | Datos demo idempotentes |
 | `backend/src/routes/*.js` | Contrato exacto de la API |
-| `backend/scripts/e2e.mjs` | Pruebas de aceptación (154 comprobaciones) |
+| `backend/scripts/e2e.mjs` | Pruebas de aceptación (157 comprobaciones) |
 | `docker-compose.yml` + Dockerfiles | Infraestructura reproducible |
 | `frontend/src/App.jsx` | Mapa de rutas y guardas |
 | `frontend/src/styles.css` | Sistema visual (clases `.card`, `.table-wrap`, `.alert-*`, `.login-card`, `.badge`, etc.) |

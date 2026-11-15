@@ -1,57 +1,99 @@
-# Abrir FINAN-X en otra computadora
+# Abrir FINAN-X en otro equipo
 
-Guía corta para llevar el proyecto a otro equipo (por ejemplo, el de la universidad).
-La versión detallada está en `entrega/windows/LEEME-WINDOWS.txt` y
-`entrega/mac/LEEME-MAC.txt`.
+Hay dos caminos, según lo que se quiera hacer.
 
-## 1. Qué llevar
-
-| Elemento | Tamaño aprox. | Para qué |
+| Camino | Para quién | Necesita internet |
 |---|---|---|
-| Carpeta `version final finan-x/` | ~40 MB | Código, documentación y lanzadores. |
-| `entrega/windows/paquete-offline/` | ~250 MB | Funcionar **sin internet** en Windows. |
-| `entrega/mac/paquete-offline/` | ~250 MB | Funcionar **sin internet** en Mac Intel. |
-| `primer-ingreso/Acta-Usuarios-Primer-Ingreso.pdf` | < 1 MB | Claves temporales. |
+| **A. Desde el repositorio** | Profesor, evaluador o desarrollador que clona el proyecto | Sí, la primera vez (para construir las imágenes) |
+| **B. Paquete del Release** | Demostración en un equipo sin internet | No |
 
-Cabe en un USB de 1 GB. Formatee el USB en **exFAT** (sirve para Windows y Mac).
+---
 
-## 2. Windows
+## A. Desde el repositorio (clonar y ejecutar)
 
-1. Doble clic en `entrega/windows/ABRIR-FINAN-X.bat`.
-2. Si SmartScreen avisa: *Más información → Ejecutar de todas formas*.
-3. Esperar a que abra el navegador en <http://localhost:8080>.
+Requisitos: **Docker Desktop** (Windows 10/11, macOS 12+ o Linux), 4 GB de RAM libres y el
+puerto **8080** libre.
 
-Requisito: **Docker Desktop instalado** (una sola vez, con WSL 2). Si no está, el lanzador
-avisa y abre la página de descarga.
+```bash
+git clone https://github.com/Luis92561/aplicacion-finan-x.git
+cd aplicacion-finan-x
 
-## 3. Mac (Intel)
+# 1. Configuración con claves propias
+cp .env.example .env
 
-1. Doble clic en `entrega/mac/ABRIR-FINAN-X.command`.
-2. Si macOS lo bloquea: clic derecho → *Abrir* → *Abrir*.
-3. Se abre <http://localhost:8080>.
+# 2. Genere tres secretos y péguelos en .env
+node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"   # JWT_SECRET
+node -e "console.log(require('crypto').randomBytes(24).toString('base64url'))"   # POSTGRES_PASSWORD
+node -e "console.log(require('crypto').randomBytes(24).toString('base64url'))"   # APP_DB_PASSWORD
 
-El paquete de Mac se entrega como `.tar.gz` para conservar el permiso de ejecución.
-Requisito: Docker Desktop para Mac instalado una sola vez.
+# 3. Levante el stack
+docker compose up -d --build
+```
 
-## 4. Sin internet
+La primera construcción tarda unos minutos (descarga las imágenes base de Node y nginx).
 
-Los lanzadores cargan automáticamente `paquete-offline/*.tar.gz` si las imágenes no existen.
-No se descarga nada. Si el paquete no está, el primer arranque necesita internet para
-construir las imágenes.
+**Cuentas iniciales.** El repositorio no versiona claves. Genérelas una sola vez:
 
-## 5. Modo seguro (para la sustentación)
+```bash
+docker compose exec -T backend node scripts/crear-usuarios-iniciales.mjs
+```
 
-`ABRIR-MODO-SEGURO` (Windows/Mac) levanta HTTPS en <https://localhost:8443> con
-certificado autofirmado. El navegador pide aceptar la excepción; es lo esperado. Sirve
-para mostrar TLS, HSTS, CSP y `X-Frame-Options`.
+El comando crea `primer-ingreso/usuarios-iniciales.json` con **contraseñas temporales
+aleatorias** y las imprime en pantalla. Todas obligan a cambiarlas en el primer ingreso.
 
-## 6. Problemas frecuentes
+Cuando la API responda, abra <http://localhost:8080>:
+
+```bash
+curl -fsS http://localhost:8080/api/health
+```
+
+**Modo HTTPS.** Para ver TLS, HSTS y cabeceras de seguridad:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.secure.yml up -d --build
+# https://localhost:8443  (certificado autofirmado: acepte la excepción)
+```
+
+---
+
+## B. Paquete del Release (sin internet)
+
+1. Descargue `FINAN-X-USB.zip` (~191 MB) desde la pestaña **Releases** del repositorio.
+2. Verifique el SHA-256 publicado en las notas del Release:
+
+   ```powershell
+   Get-FileHash .\FINAN-X-USB.zip -Algorithm SHA256
+   ```
+
+3. Descomprímalo (clic derecho → *Extraer todo…*) en una carpeta local, por ejemplo
+   `C:\FINAN-X-USB`.
+4. Windows: doble clic en `ABRIR-FINAN-X.bat`. El lanzador genera el `.env`, carga las imágenes
+   incluidas, levanta el stack, crea las cuentas y abre el navegador.
+
+El paquete incluye las imágenes de Docker de la versión publicada, de modo que **no descarga
+nada**. Requiere Docker Desktop instalado una sola vez (esa instalación sí necesita internet).
+
+> El ZIP no se versiona en git porque supera el límite de 100 MB por archivo de GitHub. Se
+> publica como adjunto del Release.
+
+---
+
+## Cuentas y primer ingreso
+
+- Las cuentas se generan en el primer arranque con contraseñas temporales aleatorias.
+- Se entregan en el acta de `primer-ingreso/`, que **no viaja en el repositorio** (contiene
+  secretos de un solo uso).
+- Todas deben cambiar la contraseña antes de usar el sistema.
+- Un ADMIN puede restablecer claves desde **Usuarios**.
+
+Detalle del cambio de método de ingreso: `04-seguridad/06-Retiro-Credenciales-Demo.md`.
+
+## Problemas frecuentes
 
 | Síntoma | Solución |
 |---|---|
-| "Docker no está instalado" | Instalar Docker Desktop y reiniciar. |
-| Docker no responde | Abrir Docker Desktop y esperar "Engine running". |
-| Puerto 8080 ocupado | Cerrar el programa que lo usa (o usar el modo seguro en 8443). |
-| El .bat no se ejecuta | Clic derecho → Propiedades → Desbloquear, o copiar al disco. |
-| En Mac no abre el .command | `chmod +x ABRIR-FINAN-X.command` en Terminal, o descomprimir el `.tar.gz`. |
-| No aparece la base de datos | No debe aparecer: es intencional (solo red interna). |
+| Docker no responde | Abra Docker Desktop y espere a "Engine running". |
+| `Bind for 0.0.0.0:8080 failed` | Otro programa usa el 8080: ciérrelo o use el modo seguro. |
+| `backend ... unhealthy` con una base anterior | `docker compose down -v` y vuelva a levantar; había un volumen de otra instalación. |
+| `Falta JWT_SECRET` | Ejecute `cp .env.example .env` y complete los tres secretos. |
+| El login pide cambiar la clave | Es correcto: primer ingreso. |

@@ -1,6 +1,6 @@
 # Documentación de FINAN-X · Índice
 
-> **Versión:** 1.0.0 · **Fecha:** noviembre de 2026
+> **Versión:** 1.0.1 · **Fecha:** noviembre de 2026
 > Este índice reemplaza al antiguo `LEEME.md`. La documentación está organizada por
 > propósito: académica, técnica, operación, seguridad, usuarios y anexos.
 
@@ -33,7 +33,7 @@
 | `02-tecnica/SPEC_Tecnico.md` | Especificación técnica. |
 | `02-tecnica/PLAN_Creacion.md` | Plan de creación del proyecto. |
 | `02-tecnica/DASHBOARD.md` | Métricas, datos y comportamiento del panel de control. |
-| `02-tecnica/GUIA_CODIGO_COMPLETO.md` | Guía de código (documento extenso). |
+| `02-tecnica/GUIA_CODIGO_COMPLETO.md` | Guía de código **histórica** (volcado del código previo a la remediación; la referencia vigente es el repositorio). |
 | `02-tecnica/FINAN-X_Diagrama_Clases.pdf` | Diagrama de clases. |
 | `02-tecnica/diagrams/` | Diagramas UML y de arquitectura (fuentes y SVG). |
 | `02-tecnica/generador-documentos/` | Scripts que generan las evidencias E1–E7. |
@@ -57,12 +57,13 @@
 | `04-seguridad/03-Metodologia-y-Evidencias.md` | Método, comandos y hashes de la auditoría. |
 | `04-seguridad/04-Estado-de-Remediacion.md` | Qué se corrigió y cómo se verificó. |
 | `04-seguridad/05-Revision-Lanzamiento-GO-NO-GO.md` | Revisión del comité de lanzamiento (QA, DevOps, Tech Lead y Producto) con veredicto GO/NO-GO. |
+| `04-seguridad/06-Retiro-Credenciales-Demo.md` | Qué credenciales demo existieron, por qué se retiraron para proteger el acceso y cómo se ingresa ahora. |
 
 ## 05 · Usuarios
 
 | Documento | Contenido |
 |---|---|
-| `05-usuarios/Acta-Usuarios-Primer-Ingreso.md` / `.pdf` | Cuentas iniciales, claves temporales y cambio obligatorio. |
+| `../primer-ingreso/Acta-Usuarios-Primer-Ingreso.md` / `../primer-ingreso/Acta-Usuarios-Primer-Ingreso.pdf` | Cuentas iniciales, claves temporales y cambio obligatorio. |
 
 ## 06 · Anexos
 
@@ -79,7 +80,8 @@
 
 ---
 
-**Nota sobre documentos PDF:** los PDF de las evidencias E1–E7 y de las guías A/B se
-conservan tal como se entregaron. Si cambia el código, la referencia vigente es este
-`README`, `Instrucciones_Despliegue` y `SPEC_*.md`; los PDF no se regeneran
-automáticamente.
+**Nota sobre documentos PDF:** las evidencias **E1–E7 se regeneraron el 12-nov-2026** desde el
+esquema real (128 columnas), las licencias (276) y la suite (157 comprobaciones), con autores y
+fecha. Los PDF de las guías A/B y de `FINAN-X_Documentacion` se conservan tal como se
+entregaron. Si cambia el código, la referencia vigente es este índice, `README`,
+`Instrucciones_Despliegue` y `SPEC_*.md`.

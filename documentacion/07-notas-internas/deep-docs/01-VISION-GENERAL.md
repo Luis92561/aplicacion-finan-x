@@ -1,6 +1,7 @@
 # 1 · Visión general de FINAN-X
 
 > **Aviso de vigencia (v1.0.0).** Las credenciales de demostración de este documento son
+> El retiro de esas credenciales se documenta en `documentacion/04-seguridad/06-Retiro-Credenciales-Demo.md`.
 > históricas. En la versión 1.0.0 use las cuentas y claves temporales de
 > primer-ingreso/Acta-Usuarios-Primer-Ingreso.pdf (cambio obligatorio al entrar).
 > Ver documentacion/04-seguridad/04-Estado-de-Remediacion.md.
@@ -72,7 +73,7 @@ no puede pedir los datos de otro ni manipulando la URL ni el body de la petició
 
 | Rol | Credencial demo | Qué puede hacer |
 |---|---|---|
-| **ADMIN** (Administrador) | `admin@finanx.test` / `admin123` | Todo, incluida la **gestión de usuarios internos** (`/usuarios`, única ruta restringida a ADMIN) |
+| **ADMIN** (Administrador) | `admin@[correo de prueba]` / `[clave retirada]` | Todo, incluida la **gestión de usuarios internos** (`/usuarios`, única ruta restringida a ADMIN) |
 | **FACTURADOR** | `facturador@finanx.test` / `facturador123` | Clientes, productos, pedidos y **generar/anular facturas** |
 | **CAJERO** | `cajero@finanx.test` / `cajero123` | **Registrar pagos**, notas de crédito |
 | **SUPERVISOR** | `supervisor@finanx.test` / `supervisor123` | Consulta, reportes, balance, auditoría |

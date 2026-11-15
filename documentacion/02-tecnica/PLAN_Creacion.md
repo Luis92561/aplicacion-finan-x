@@ -6,6 +6,12 @@
 > **Nota:** cada fase termina con un ✅ *Verificación* — no avance a la siguiente si no se cumple.
 > **Metodología:** este plan se ejecutó con **metodología ágil (entregas semanales)** — las fases se agruparon en **6 sprints de una semana (21 ago – 28 sep 2026)**, cinco cerrados en viernes y el último como cierre final el lunes 28 de septiembre; cada sprint cierra con una versión ejecutable y verificada lista para demo ante el interesado (ver la tabla de abajo).
 
+> **Uso de IA.** Este documento y el proyecto se construyeron con asistencia de agentes de IA
+> (Claude Code y OpenCode) **bajo supervisión constante de los autores**: cada fase fue
+> dirigida, revisada, probada y aprobada manualmente antes de continuar. Las decisiones de
+> diseño, la validación funcional y la verificación de seguridad son responsabilidad de los
+> autores.
+
 ---
 
 ## Metodología: entregas semanales (sprints)
@@ -106,7 +112,7 @@ Rituales por sprint: planificación semanal, desarrollo, ejecución de la suite 
 2. Rutas `/portal/*` (`MiSaldo`, `MisDatos`, `MisCompras`, `MisFacturas`, `MisPagos`, `MisNotasCredito`, `MiHistorial`) con `ClientPage`.
 3. `PagarModal.jsx`: valor (≤ saldo) + método + referencia/observaciones; llama `POST /api/mis-pagos`.
 
-✅ *Verificación:* con `cliente@finanx.test/cliente123` se ve solo el saldo del cliente 1; no se lista ni paga factura de otro cliente.
+✅ *Verificación:* con la cuenta `cliente` del acta de primer ingreso (clave temporal ya cambiada) se ve solo el saldo del cliente 1; no se lista ni paga factura de otro cliente.
 
 ---
 

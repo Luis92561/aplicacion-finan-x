@@ -21,3 +21,13 @@
 *.zip binary
 *.tar.gz binary
 *.sql.gz binary
+
+# Scripts de PowerShell (lanzadores de la entrega)
+*.ps1 text eol=crlf
+
+# Documentos de Office y comprimidos: binarios
+*.docx binary
+*.xlsx binary
+*.pptx binary
+*.tar binary
+*.gz binary

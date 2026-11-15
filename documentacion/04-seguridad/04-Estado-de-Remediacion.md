@@ -73,7 +73,10 @@ Fecha de cierre: 2 de noviembre de 2026 · Versión: 1.0.0
 ## 6. Cómo se verificó
 
 - Suite end-to-end: **157 comprobaciones en verde** (`npm test`), incluidas las nuevas de
-  primer ingreso, bloqueo por cuenta, roles, dashboard y eliminación de clientes.
+  bloqueo por cuenta, roles, cambio de contraseña y eliminación de clientes. El **primer
+  ingreso** y el **panel de control** se verificaron manualmente: todavía no tienen prueba
+  automatizada (ver CP-49 y CP-51 en la Evidencia 7). La ejecución exige `NODE_ENV=development`,
+  `SEED_DEMO=true`, `OTP_RETORNO_DEMO=on`, `REGISTRO_ABIERTO=on` y `OTP_COOLDOWN_SEGUNDOS=0`.
 - Pruebas manuales contra el stack Docker: login → 403 de cambio obligatorio → cambio →
   200; token anterior → 401; CAJERO → 403 en notas; panel del CAJERO sin cartera.
 - `npm audit --audit-level=high` sin hallazgos altos.

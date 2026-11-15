@@ -33,7 +33,7 @@ FINAN-X está **bien construido en el núcleo de la lógica de negocio** —las 
 
 En concreto, la combinación de tres hallazgos es suficiente para comprometer el sistema por completo:
 
-1. **C-01** — El contenedor del backend ejecuta el *seed* en cada arranque y crea un administrador con contraseña conocida (`admin@finanx.test` / `admin123`), credenciales que además se muestran en la pantalla de login.
+1. **C-01** — El contenedor del backend ejecuta el *seed* en cada arranque y crea un administrador con contraseña conocida (`admin@[correo de prueba]` / `[clave retirada]`), credenciales que además se muestran en la pantalla de login.
 2. **C-02** — PostgreSQL se publica en `0.0.0.0:5432` con usuario y contraseña por defecto (`finanx`/`finanx`), y ese usuario es **superusuario** del motor.
 3. **C-03** — No hay TLS en ningún punto: frontend en HTTP, API en HTTP y backend publicado directamente en el puerto 4000, saltándose el proxy.
 
@@ -63,7 +63,7 @@ El segundo bloque de riesgo es **operativo e interno**: el bloqueo de fuerza bru
 
 > **De cero a administrador en tres pasos.**
 > 1. El atacante descubre `http://<host>:8080`. La pantalla de login le muestra las credenciales demo.
-> 2. Inicia sesión como `admin@finanx.test` / `admin123` → token JWT de ADMIN válido 8 horas.
+> 2. Inicia sesión como `admin@[correo de prueba]` / `[clave retirada]` → token JWT de ADMIN válido 8 horas.
 > 3. Con ese token puede crear usuarios, leer todos los clientes, facturas, pagos y la auditoría, y modificar cualquier dato. No hace falta nada más.
 >
 > **Variante sin tocar la aplicación:** se conecta directamente a `postgres://finanx:finanx@<host>:5432/finanx` y ejecuta `pg_dump`. Obtiene la base completa: clientes, identificaciones, teléfonos, correos, direcciones, facturas, pagos y hashes de contraseña.
@@ -235,7 +235,7 @@ CMD ["sh", "-c", "node src/seed.js && node src/index.js"]
 El *seed* crea, si no existen, cuatro usuarios internos con contraseñas triviales y **las imprime en el log**:
 
 ```js
-{ nombre: 'Administrador', correo: 'admin@finanx.test', rol: 'ADMIN', password: 'admin123' },
+{ nombre: 'Administrador', correo: 'admin@[correo de prueba]', rol: 'ADMIN', password: '[clave retirada]' },
 { nombre: 'Facturador',   correo: 'facturador@finanx.test', rol: 'FACTURADOR', password: 'facturador123' },
 { nombre: 'Cajero',       correo: 'cajero@finanx.test', rol: 'CAJERO', password: 'cajero123' },
 { nombre: 'Supervisor',   correo: 'supervisor@finanx.test', rol: 'SUPERVISOR', password: 'supervisor123' },
@@ -246,7 +246,7 @@ Además, la pantalla de login muestra esas credenciales al visitante:
 ```jsx
 <div className="login-hint">
   <strong>Credenciales demo:</strong><br />
-  Interno: <code>admin@finanx.test</code> / <code>admin123</code><br />
+  Interno: <code>admin@[correo de prueba]</code> / <code>[clave retirada]</code><br />
   Cliente: <code>cliente@finanx.test</code> / <code>cliente123</code>
 </div>
 ```
@@ -258,7 +258,7 @@ Además, la pantalla de login muestra esas credenciales al visitante:
 **Reproducción lógica (no ejecutada).**
 1. Desplegar con `docker compose up -d`.
 2. Abrir `http://<host>:8080/login`; la propia página muestra las credenciales.
-3. `POST /api/auth/login` con `{"username":"admin@finanx.test","password":"admin123"}`.
+3. `POST /api/auth/login` con `{"username":"admin@[correo de prueba]","password":"[clave retirada]"}`.
 4. La respuesta incluye `token` y `user.rol = "ADMIN"`. Usar `Authorization: Bearer <token>` contra cualquier endpoint interno.
 
 **Recomendación (prioridad máxima).**
@@ -277,8 +277,8 @@ if (process.env.SEED_DEMO === 'true' && process.env.NODE_ENV !== 'production') {
 
 2. **No crear usuarios con contraseña fija.** Si se necesita un primer administrador, generarlo con contraseña aleatoria de un solo uso, mostrarla **una vez por consola del operador** y **obligar el cambio en el primer inicio** (`debe_cambiar_password = true`).
 3. **Eliminar el bloque de credenciales demo de `Login.jsx`.** En producción no debe existir ningún texto que revele usuarios o contraseñas.
-4. **Rotar** cualquier contraseña demo que ya se haya usado en un entorno expuesto y **revisar la auditoría** en busca de logins con `admin@finanx.test`.
-5. Añadir una comprobación de arranque que **falle** si existen usuarios con la contraseña demo conocida (comparar hash contra `admin123` y abortar).
+4. **Rotar** cualquier contraseña demo que ya se haya usado en un entorno expuesto y **revisar la auditoría** en busca de logins con `admin@[correo de prueba]`.
+5. Añadir una comprobación de arranque que **falle** si existen usuarios con la contraseña demo conocida (comparar hash contra `[clave retirada]` y abortar).
 
 ---
 
@@ -421,16 +421,16 @@ export function limpiarFallosLogin(req) {
 
 El autoregistro (`POST /api/auth/registro`) es público y crea una cuenta de cliente válida al instante, sin verificación de correo ni teléfono. Por tanto, **cualquiera puede fabricarse una cuenta legítima** y usarla para resetear el contador cuando le convenga.
 
-**Por qué es alta.** El control existe, pero se puede neutralizar sin explotar nada: es un control **eludible por diseño**. El atacante alterna 4 intentos fallidos contra `admin@finanx.test` con 1 login correcto en su propia cuenta, y nunca llega a 5 fallos. El bloqueo de 15 minutos jamás se activa.
+**Por qué es alta.** El control existe, pero se puede neutralizar sin explotar nada: es un control **eludible por diseño**. El atacante alterna 4 intentos fallidos contra `admin@[correo de prueba]` con 1 login correcto en su propia cuenta, y nunca llega a 5 fallos. El bloqueo de 15 minutos jamás se activa.
 
 **Reproducción lógica (no ejecutada).**
 1. `POST /api/auth/registro` → cuenta propia válida.
 2. Bucle:
-   - 4 × `POST /api/auth/login` con `admin@finanx.test` y contraseñas del diccionario → 401.
+   - 4 × `POST /api/auth/login` con `admin@[correo de prueba]` y contraseñas del diccionario → 401.
    - 1 × `POST /api/auth/login` con la cuenta propia → 200 y **contador a cero**.
 3. Repetir hasta acertar. El límite por IP nunca se supera.
 
-**Impacto.** Fuerza bruta / *password spraying* sin límite práctico contra cualquier cuenta, en particular ADMIN. Con contraseñas como `admin123` o de 6 caracteres (A-06), el éxito es cuestión de tiempo.
+**Impacto.** Fuerza bruta / *password spraying* sin límite práctico contra cualquier cuenta, en particular ADMIN. Con contraseñas como `[clave retirada]` o de 6 caracteres (A-06), el éxito es cuestión de tiempo.
 
 **Recomendación.**
 1. **No reiniciar el contador global** por un login correcto. Si se quiere no penalizar al usuario legítimo, llevar contadores separados: por `(IP, usuario)` y por usuario.
@@ -632,7 +632,7 @@ if (clave.length < MIN_CLAVE) throw new HttpError(400, `La contraseña debe tene
 - No hay caducidad ni historial de contraseñas, ni bloqueo por contraseñas comprometidas.
 - El ADMIN fija la contraseña de otros usuarios y no hay cambio obligatorio en el primer inicio.
 
-**Impacto.** `admin123`, `123456`, `password` pasan la validación. Combinado con A-01 (fuerza bruta sin límite efectivo) y C-01 (credenciales demo), el resultado es que la autenticación no es una barrera real.
+**Impacto.** `[clave retirada]`, `123456`, `password` pasan la validación. Combinado con A-01 (fuerza bruta sin límite efectivo) y C-01 (credenciales demo), el resultado es que la autenticación no es una barrera real.
 
 **Recomendación.**
 1. Mínimo **12 caracteres** (o frase de paso), y bloqueo de las contraseñas más comunes y de las filtradas (API de HIBP con *k-anonymity*, sin enviar la contraseña completa).
@@ -1039,7 +1039,7 @@ Esta sección documenta lo que **se buscó y no se encontró**, con el razonamie
 
 ## 7. Plan de remediación priorizado
 
-El orden no es por severidad "de papel", sino por **relación entre riesgo y esfuerzo** y por dependencias (no tiene sentido endurecer la sesión si cualquiera entra con `admin123`).
+El orden no es por severidad "de papel", sino por **relación entre riesgo y esfuerzo** y por dependencias (no tiene sentido endurecer la sesión si cualquiera entra con `[clave retirada]`).
 
 ### Fase 0 — Contención inmediata (24-48 horas, ~6-8 h de trabajo)
 
@@ -1053,7 +1053,7 @@ El orden no es por severidad "de papel", sino por **relación entre riesgo y esf
 | 6 | Forzar `otpDemo=false` en producción y quitar el código de los logs | M-01 | 30 min |
 | 7 | `npm audit fix` y actualizar `express`, `axios`, `react-router` | M-12 | 2 h |
 
-**Criterio de salida:** un escaneo externo no encuentra 5432 ni 4000 abiertos; el login con `admin@finanx.test/admin123` falla; `https://` funciona con certificado válido.
+**Criterio de salida:** un escaneo externo no encuentra 5432 ni 4000 abiertos; el login con `admin@[correo de prueba]/[clave retirada]` falla; `https://` funciona con certificado válido.
 
 ### Fase 1 — Correcciones de fondo (1-2 semanas, ~30-40 h)
 
@@ -1101,7 +1101,7 @@ Marcar cada punto tras corregir; cualquiera sin marcar deja un hallazgo abierto.
 
 - [ ] `docker compose config` no muestra `5432` ni `4000` publicados.
 - [ ] `psql` desde fuera del host falla por timeout/conexión rechazada.
-- [ ] La contraseña `admin123` no existe en ningún entorno; el login demo devuelve 401.
+- [ ] La contraseña `[clave retirada]` no existe en ningún entorno; el login demo devuelve 401.
 - [ ] La pantalla de login no muestra usuarios ni contraseñas.
 - [ ] `http://` redirige a `https://`; HSTS presente; certificado válido.
 - [ ] Respuesta de `/api/*` con `Cache-Control: no-store`.

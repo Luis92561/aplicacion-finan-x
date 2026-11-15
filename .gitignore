@@ -43,8 +43,10 @@ respaldo/
 # Carpeta de construcción temporal del empaquetado
 _build-version-final/
 
-# --- Paquetes pesados de la entrega ---
-# Las imágenes sin conexión (~380 MB) y el tar de Mac superan el límite de GitHub
-# (100 MB por archivo). Viajan en el USB/ZIP de la entrega, no en el repositorio.
-entrega/*/paquete-offline/
-entrega/ENTREGA-MAC.tar
+# --- Carpeta de entrega (se construye aparte y se publica como Release) ---
+# Contiene el paquete USB con las imagenes de Docker (~191 MB) y los lanzadores.
+# Supera el limite de 100 MB por archivo de GitHub, asi que no viaja en git.
+entrega/
+
+# --- Material de estudio personal (no se publica) ---
+documentacion/01-academica/Guia_Estudio_Presentacion.*

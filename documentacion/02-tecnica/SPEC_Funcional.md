@@ -1,15 +1,22 @@
 # FINAN-X · Especificación Funcional
 
-> **Aviso de vigencia (v1.0.0).** Las credenciales de demostración que aparecen en este
+> **Aviso de vigencia (v1.0.0).** Las credenciales de demostración que aparecen en este
+> El retiro de esas credenciales se documenta en `documentacion/04-seguridad/06-Retiro-Credenciales-Demo.md`.
 > documento son históricas. La versión 1.0.0 no crea cuentas con contraseñas fijas: use las
 > cuentas y claves temporales de primer-ingreso/Acta-Usuarios-Primer-Ingreso.pdf (cambio
 > obligatorio en el primer ingreso). Ver documentacion/04-seguridad/04-Estado-de-Remediacion.md.
+
+> **Uso de IA.** Este documento y el proyecto se construyeron con asistencia de agentes de IA
+> (Claude Code y OpenCode) **bajo supervisión constante de los autores**: cada fase fue
+> dirigida, revisada, probada y aprobada manualmente antes de continuar. Las decisiones de
+> diseño, la validación funcional y la verificación de seguridad son responsabilidad de los
+> autores.
 
 
 > **Propósito de este documento:** describir **qué** hace FINAN-X, para quién, bajo qué reglas, y qué debe poder comprobarse al final. Es la guía de requisitos para **recrear el proyecto desde cero** con Claude Code u OpenCode (léalo junto con `SPEC_Tecnico.md` y ejecute `PLAN_Creacion.md`).
 >
 > **Proyecto:** FINAN-X · **Desarrolladores:** Luis Alfredo Jaramillo Restrepo · Mayra Juliana Velez
-> **Estado:** funcional · **Verificación:** suite e2e 154/154 aprobadas.
+> **Estado:** funcional · **Verificación:** suite e2e 157/157 aprobadas.
 > **Proceso:** se desarrolló con **metodología ágil (entregas semanales, 6 sprints: 21 ago – 28 sep 2026)** y **arquitectura hexagonal** (núcleo de reglas de negocio + puertos/adaptadores). Ver sección 10 y `PLAN_Creacion.md`.
 
 ---
@@ -55,7 +62,7 @@ Solo ve y opera **sus propios datos** (aislamiento estricto por `clienteId`):
 
 ### 2.3 Historias de usuario (backlog)
 
-El producto se especificó como **historias de usuario** en formato «Como **rol**, quiero **acción**, para **beneficio**», con criterios de aceptación y trazabilidad a las fases del `PLAN_Creacion.md` (columna *Fases*; las fases se distribuyen en los 6 sprints de la sección 10). Cada historia está cubierta por la suite e2e (154 comprobaciones, sección 8).
+El producto se especificó como **historias de usuario** en formato «Como **rol**, quiero **acción**, para **beneficio**», con criterios de aceptación y trazabilidad a las fases del `PLAN_Creacion.md` (columna *Fases*; las fases se distribuyen en los 6 sprints de la sección 10). Cada historia está cubierta por la suite e2e (157 comprobaciones, sección 8).
 
 | ID | Épica | Historia de usuario | Criterios de aceptación (clave) | Fases |
 |---|---|---|---|---|
@@ -82,7 +89,7 @@ El producto se especificó como **historias de usuario** en formato «Como **rol
 | **HU-21** | Portal del cliente | Como **cliente**, quiero **ver mi saldo, facturas, compras, pagos y notas de crédito**, para **controlar mis finanzas en línea**. | Solo mis datos (aislamiento); detalle no sensible de medios de pago. | 5 |
 | **HU-22** | Portal del cliente | Como **cliente**, quiero **consultar y actualizar mis datos personales**, para **mantener mi información al día**. | Acceso solo a la propia información (ajena → 404). | 5 |
 
-**Nota de trazabilidad:** las historias se agrupan en **épicas** y se resuelven en las **fases** del `PLAN_Creacion.md` (columna *Fases*); las fases se distribuyen en los 6 sprints de la sección 10. Todas quedan cubiertas por la suite e2e (154 comprobaciones). El mismo backlog aparece en `FINAN-X_Documentacion.html` §2.4 (completo) y en `B_Guia_Tecnica_Desarrolladores.html` §2.3 (resumen).
+**Nota de trazabilidad:** las historias se agrupan en **épicas** y se resuelven en las **fases** del `PLAN_Creacion.md` (columna *Fases*); las fases se distribuyen en los 6 sprints de la sección 10. Todas quedan cubiertas por la suite e2e (157 comprobaciones). El mismo backlog aparece en `FINAN-X_Documentacion.html` §2.4 (completo) y en `B_Guia_Tecnica_Desarrolladores.html` §2.3 (resumen).
 
 ---
 
@@ -91,7 +98,7 @@ El producto se especificó como **historias de usuario** en formato «Como **rol
 ### 3.1 Autenticación
 - **Login** con usuario (correo de usuario interno **o** username de cliente) + contraseña. Devuelve token JWT + datos del usuario.
 - **Anti fuerza bruta:** ≥5 fallos consecutivos desde una IP → bloqueo **429** por 15 minutos. Un login correcto resetea el contador.
-- **Autoregistro de cliente:** formulario con tipo (PERSONA/EMPRESA), identificación (CC/CE/NIT/PASAPORTE), número, nombre/razón social, contacto opcional, usuario y contraseña (mín. 6). Al registrarse lo deja autenticado. Validaciones: número de identificación único (400 si existe), usuario único (400), contraseña corta (400), nombre obligatorio. Anti-spam: **20 solicitudes/hora por IP**.
+- **Autoregistro de cliente:** formulario con tipo (PERSONA/EMPRESA), identificación (CC/CE/NIT/PASAPORTE), número, nombre/razón social, contacto opcional, usuario y contraseña (mín. 12). Al registrarse lo deja autenticado. Validaciones: número de identificación único (400 si existe), usuario único (400), contraseña corta (400), nombre obligatorio. Anti-spam: **20 solicitudes/hora por IP**.
 - **Recuperación de contraseña con OTP** — ver sección 5.
 
 ### 3.2 Usuarios internos (solo ADMIN)
@@ -159,7 +166,7 @@ El producto se especificó como **historias de usuario** en formato «Como **rol
 1. En el login, el cliente elige **«¿Olvidaste tu contraseña?»**.
 2. Escribe su **usuario** y elige **canal: EMAIL o SMS** (el código se envía al correo o teléfono registrados).
 3. El sistema genera un **código de 6 dígitos**, lo guarda cifrado y lo entrega.
-4. El cliente escribe **código + nueva contraseña (mín. 6, confirmada)**. Si es válido, la contraseña se actualiza y puede entrar con la nueva.
+4. El cliente escribe **código + nueva contraseña (mín. 12, confirmada)**. Si es válido, la contraseña se actualiza y puede entrar con la nueva.
 
 ### 5.2 Reglas de la funcionalidad (criterios de aceptación)
 - **R1 Solicitud** → `POST /auth/recuperar-solicitar` con `{ username, canal }`. Sin `username` → 400; `canal` diferente de EMAIL/SMS → 400.
@@ -209,21 +216,21 @@ Cuando el método de pago es **TARJETA, TRANSFERENCIA o CHEQUE**, el cliente (e 
 
 ---
 
-## 7. Estado inicial esperado (demo/seed)
+## 7. Estado inicial: cuentas y primer ingreso
 
-Al levantar el proyecto por primera vez (BD vacía + seed idempotente) debe existir:
+Al desplegar por primera vez (BD vacía con el esquema y las migraciones) debe existir:
 
-- **Roles:** ADMIN, FACTURADOR, CAJERO, SUPERVISOR.
-- **Usuarios internos:** `admin@finanx.test/admin123`, `facturador@finanx.test/facturador123`, `cajero@finanx.test/cajero123`, `supervisor@finanx.test/supervisor123`.
-- **Clientes demo:** María Fernanda López (CC 1002003001, Bogotá) y TecnoAndina S.A.S. (NIT 901234567, Medellín). El cliente 1 con cuenta de portal **`cliente@finanx.test` / `cliente123`**.
-- **Productos:** PROD-001…005 (Laptop 15" $4.500.000 IVA 19 %, Mouse $120.000 IVA 19 %, Teclado $280.000 IVA 19 %, Monitor 27" $2.100.000 IVA 19 %, Servicio de soporte $150.000 IVA 0 %).
-- Sin facturas ni pagos (los crea la operación).
+- **Roles:** ADMIN, FACTURADOR, CAJERO, SUPERVISOR y CLIENTE (portal).
+- **Cuentas iniciales:** se crean **una sola vez** con `npm run init:usuarios` (o el lanzador de `entrega/`) a partir de `primer-ingreso/usuarios-iniciales.json`. Cada cuenta nace con `debe_cambiar_clave = true` y una **clave temporal** que se entrega en el acta. **No hay credenciales de demostración** en el código ni en la interfaz.
+- **Primer ingreso:** mientras no se cambie la clave, la API solo permite consultar la sesión, cambiarla y cerrar sesión; el resto responde `403 CAMBIO_CLAVE_REQUERIDO`.
+- **Datos de demostración (solo desarrollo):** `SEED_DEMO=true npm run seed:demo` crea clientes, productos y facturas de ejemplo para las pruebas. **No se ejecuta en producción** (`seed.js` se niega con `NODE_ENV=production`).
+- **Productos:** el catálogo de ejemplo (20 productos tecnológicos, IVA 19 %) vive en `base/productos-tecnologicos.sql` y es opcional.
 
 ---
 
 ## 8. Criterios de aceptación finales (qué debe comprobarse)
 
-Verificación automatizada: **154 comprobaciones e2e aprobadas** (`backend/scripts/e2e.mjs`). Cubre al menos:
+Verificación automatizada: **157 comprobaciones e2e aprobadas** (`backend/scripts/e2e.mjs`). Cubre al menos:
 
 1. Login válido/inválido/sin token; 401 correctos; login correcto tras bloqueo.
 2. RBAC: 403 para roles sin permiso (p. ej. cliente tocando rutas internas).

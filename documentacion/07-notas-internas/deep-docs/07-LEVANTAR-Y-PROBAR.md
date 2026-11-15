@@ -1,6 +1,7 @@
 # 7 · Levantar y probar la aplicación
 
 > **Aviso de vigencia (v1.0.0).** Las credenciales de demostración de este documento son
+> El retiro de esas credenciales se documenta en `documentacion/04-seguridad/06-Retiro-Credenciales-Demo.md`.
 > históricas. En la versión 1.0.0 use las cuentas y claves temporales de
 > primer-ingreso/Acta-Usuarios-Primer-Ingreso.pdf (cambio obligatorio al entrar).
 > Ver documentacion/04-seguridad/04-Estado-de-Remediacion.md.
@@ -145,7 +146,7 @@ JWT_EXPIRES=8h
 
 | Rol | Correo | Contraseña |
 |---|---|---|
-| Administrador | `admin@finanx.test` | `admin123` |
+| Administrador | `admin@[correo de prueba]` | `[clave retirada]` |
 | Facturador | `facturador@finanx.test` | `facturador123` |
 | Cajero | `cajero@finanx.test` | `cajero123` |
 | Supervisor | `supervisor@finanx.test` | `supervisor123` |
