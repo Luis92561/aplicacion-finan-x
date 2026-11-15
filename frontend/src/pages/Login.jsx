@@ -74,7 +74,7 @@ export default function Login() {
         username: reg.regUsername,
         password: reg.regPassword,
       });
-      entrar(user, token);
+      entrar(user);
     } catch (err) {
       setError(errMsg(err));
     } finally {
