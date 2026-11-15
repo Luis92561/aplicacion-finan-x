@@ -11,7 +11,7 @@
 
 | Requisito | Versión | Estado en esta máquina |
 |---|---|---|
-| Docker + Docker Compose | cualquiera reciente | ✅ Docker **29.8.0**, Compose **v5.5.1** — pero el daemon no era accesible desde esta sesión (ver nota al final) |
+| Docker + Docker Compose | cualquiera reciente | ✅ Docker **29.8.0**, Compose **v5.5.1** — pero el daemon no era accesible desde el entorno de trabajo (ver nota al final) |
 | Node.js | **20+** | ✅ **v24.21.0** |
 | npm | — | ✅ **11.19.0** |
 
@@ -192,7 +192,7 @@ El proyecto sugiere un orden. Coincido, y lo ajusto un poco:
 
 | Síntoma | Causa probable / solución |
 |---|---|
-| `docker: permission denied ... npipe:////./pipe/dockerDesktopLinuxEngine` | Docker Desktop no está abierto, o la sesión no tiene acceso al named pipe. Abre Docker Desktop. **(Me pasó a mí en esta sesión — ver nota.)** |
+| `docker: permission denied ... npipe:////./pipe/dockerDesktopLinuxEngine` | Docker Desktop no está abierto, o el entorno no tiene acceso al named pipe. Abre Docker Desktop. **(Ocurre cuando el daemon no es accesible — ver nota.)** |
 | "El backend no respondió a tiempo" | `docker compose logs backend`. Puede ser que Postgres aún no esté sano. |
 | **429** en `npm test` | Rate limit en memoria. Reinicia el backend o espera 15 min. |
 | El esquema no se aplica | `init.sql` **solo corre la primera vez** que se crea el volumen. Usa `down -v` o aplica el SQL a mano. |
@@ -200,24 +200,24 @@ El proyecto sugiere un orden. Coincido, y lo ajusto un poco:
 | Recargar `/facturas/12` da 404 | nginx ya lo resuelve con `try_files ... /index.html`; en dev lo resuelve Vite. Si falla, revisa la config de tu servidor. |
 | El OTP no llega por correo/SMS | Es **demo a propósito**: con `OTP_RETORNO_DEMO=on` el código vuelve en la respuesta HTTP y se imprime por consola. |
 
-## Nota sobre mi entorno de ejecución
+## Nota sobre el entorno de ejecución
 
-Cuando intenté comprobar el estado de los contenedores desde esta sesión, obtuve:
+Al comprobar el estado de los contenedores, el entorno devolvió:
 
 ```
 docker: permission denied while trying to connect to the docker API at
 npipe:////./pipe/dockerDesktopLinuxEngine
 ```
 
-Esto **no significa que Docker esté roto**: significa que el **sandbox de esta sesión de agente no
-tiene acceso al named pipe de Docker Desktop**. Es una limitación del entorno de la sesión, no del
-proyecto. `docker --version` y `docker compose version` sí responden (son consultas locales al CLI),
-pero cualquier operación contra el daemon requiere permisos que aquí no tengo.
+Esto **no significa que Docker esté roto**: significa que el **entorno de trabajo no tiene acceso al
+named pipe de Docker Desktop**. Es una limitación del entorno, no del proyecto. `docker --version` y
+`docker compose version` sí responden (son consultas locales al CLI), pero cualquier operación contra
+el daemon requiere permisos que ese entorno no concedía.
 
-**Consecuencia:** no pude levantar la aplicación ni ejecutar la suite e2e para verificar el estado
-real en ejecución. Todo lo que describo viene de **leer el código y la documentación**, no de haber
-visto la app funcionando. Si quieres que la levante y verifique de verdad, habría que ampliar los
-permisos de la sesión.
+**Consecuencia:** en esa primera pasada no se levantó la aplicación ni se ejecutó la suite e2e, así
+que todo lo descrito viene de **leer el código y la documentación**, no de haber visto la app
+funcionando. Las comprobaciones en ejecución llegaron después, con el entorno habilitado (ver
+`09-OBSERVACIONES-Y-RIESGOS.md`).
 
 ---
 

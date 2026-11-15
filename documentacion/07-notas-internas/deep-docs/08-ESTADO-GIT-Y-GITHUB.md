@@ -1,6 +1,6 @@
 # 🔀 Estado de Git y de GitHub
 
-> ✅ **ACTUALIZADO.** Al inicio de la sesión el proyecto **no tenía Git**. Ya está resuelto:
+> ✅ **ACTUALIZADO.** Al inicio del proyecto no había repositorio Git. Ya está resuelto:
 > el repositorio existe, está vinculado y el proyecto quedó versionado.
 > Este documento conserva el diagnóstico original (útil como contexto) y documenta el estado final.
 
@@ -54,7 +54,7 @@ Es decir: **los HTML se excluyen a propósito** y viajan los PDF. No es una pér
 
 ---
 
-## Diagnóstico original (al empezar la sesión)
+## Diagnóstico original (al inicio del proyecto)
 
 <details>
 <summary>Por qué al principio parecía que no había repositorio (clic para desplegar)</summary>

@@ -132,7 +132,7 @@ Project Facturacion Finan-x/
 ├── mockups/                     ← 14 wireframes HTML + PDF (prototipos, NO la app real)
 ├── documentacion/               ← PDFs, HTMLs, specs MD, diagramas .puml/.svg
 ├── capturas/                    ← 7 capturas PNG + 3 scripts .cjs de captura
-└── deep-docs/                   ← 📁 ESTA CARPETA (notas del agente, no es código)
+└── deep-docs/                   ← 📁 ESTA CARPETA (notas internas, no es código)
 ```
 
 ## Cómo arranca el backend (`src/index.js`)

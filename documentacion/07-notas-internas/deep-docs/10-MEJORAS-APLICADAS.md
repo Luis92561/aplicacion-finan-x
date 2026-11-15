@@ -13,7 +13,7 @@
 - [🟡 Medio (M1–M11)](#-medio-m1m11)
 - [🔵 Bajo (limpieza)](#-bajo-limpieza)
 - [⚠️ Lo que tienes que hacer tú: la migración](#️-lo-que-tienes-que-hacer-tú-la-migración)
-- [Bugs que introduje yo y corregí](#bugs-que-introduje-yo-y-corregí)
+- [Bugs que detecté y corregí](#bugs-que-detecté-y-corregí)
 - [Qué sigue pendiente](#qué-sigue-pendiente)
 
 ---
@@ -354,13 +354,13 @@ Si prefieres empezar de cero: `docker compose down -v && docker compose up -d --
 
 ---
 
-## Bugs que introduje yo y corregí
+## Bugs que detecté y corregí
 
-Registro honesto, porque explica por qué tardé más de lo previsto y por qué conviene desconfiar de
+Registro honesto, porque explica por qué llevó más tiempo del previsto y por qué conviene desconfiar de
 los cambios "pequeños" hechos en masa:
 
-1. **Corrompí los acentos de 6 archivos.** Usé un script de PowerShell con `Set-Content -Encoding utf8`
-   sobre archivos UTF-8 sin BOM, y **doble-codifiqué** los acentos (`crédito` → `crÃ©dito`) y añadí
+1. **Se corrompieron los acentos de 6 archivos.** Un script de PowerShell con `Set-Content -Encoding utf8`
+   sobre archivos UTF-8 sin BOM **doble-codificó** los acentos (`crédito` → `crÃ©dito`) y añadió
    BOM. Lo detecté comparando con git (que tenía 0 mojibake). **Solución:** restaurar desde git y
    reaplicar con `System.Text.UTF8Encoding($false)` + `.Replace()`, verificando **después de cada
    archivo**. Lección: no hacer reescrituras masivas de archivos con acentos.
@@ -376,18 +376,18 @@ los cambios "pequeños" hechos en masa:
    pasaba con la comprobación anulada a propósito — justo para eso sirve comprobar que la prueba
    falla.
 
-4. **`METODOS_PAGO` e `idNumerico` sin importar.** Añadí su uso pero no siempre el `import`:
+4. **`METODOS_PAGO` e `idNumerico` sin importar.** Se añadió su uso pero no siempre el `import`:
    `ReferenceError` → 500 en todos los pagos. Detectado en los logs del backend.
 
 5. **Parámetros duplicados en `reportes.js`.** Empujé `desde`/`hasta` dos veces al array de
    parámetros → `bind message supplies 4 parameters, but prepared statement requires 2`. Corregido
    reutilizando los mismos índices `$n`.
 
-6. **Pruebas mal planteadas por mí.** `/productos/abc` no existe como `GET` (daba 403), y en
+6. **Pruebas mal planteadas.** `/productos/abc` no existe como `GET` (daba 403), y en
    `/mis-pagos` con `facturaId: 999999` el método por defecto `EFECTIVO` disparaba el 400 antes que
-   el 404. Corregí las aserciones, no el producto.
+   el 404. Se corrigieron las aserciones, no el producto.
 
-Y un recordatorio operativo que me costó dos corridas fallidas: **el backend en contenedor ocupa el
+Y un recordatorio operativo que costó dos corridas fallidas: **el backend en contenedor ocupa el
 puerto 4000**. Si arrancas el backend local sin detenerlo, tus peticiones van al contenedor (código
 antiguo) y parece que las correcciones no funcionan.
 

@@ -1,6 +1,6 @@
 # 📁 deep-docs — Notas de reconocimiento de FINAN-X
 
-> **Carpeta creada por el agente DSH.** No forma parte del código de la aplicación.
+> **Notas internas del proyecto.** No forman parte del código de la aplicación.
 > Contiene notas de familiarización para recordar cómo funciona el proyecto.
 
 > ✅ **Estado:** corregidos y verificados el **bug crítico del saldo** (producto cartesiano en
@@ -15,9 +15,9 @@
 
 ## Qué es esta carpeta
 
-Al pedirme "familiarízate con el proyecto", leí el código y la documentación de FINAN-X y aquí
-dejé mis notas. Las correcciones del bug de saldo (C1, C2, C3) se hicieron después, **con
-autorización expresa**, y están aisladas en un único commit (`5877ef8`).
+Revisé el código y la documentación de FINAN-X y aquí dejé mis notas de trabajo. Las correcciones
+del bug de saldo (C1, C2, C3) se aplicaron después, **con aprobación expresa**, y quedaron aisladas
+en un único commit (`5877ef8`).
 
 ## Índice de notas
 
@@ -29,7 +29,7 @@ autorización expresa**, y están aisladas en un único commit (`5877ef8`).
 | [`04-API-REST.md`](04-API-REST.md) | Todos los endpoints por módulo, roles permitidos, qué valida cada uno. | Para consumir o extender la API. |
 | [`05-REGLAS-DE-NEGOCIO.md`](05-REGLAS-DE-NEGOCIO.md) | Las invariantes del negocio (sin sobrepago, anulación lógica, 1 pedido → 1 factura…) y dónde se aplican. | **El documento más importante para no romper nada.** |
 | [`06-FRONTEND.md`](06-FRONTEND.md) | Rutas de la SPA, guardas de acceso, páginas, cliente HTTP, sistema visual. | Para trabajar en la interfaz. |
-| [`07-LEVANTAR-Y-PROBAR.md`](07-LEVANTAR-Y-PROBAR.md) | Cómo arrancar (Docker y modo dev), credenciales demo, suite e2e, solución de problemas. | Cuando quieras ejecutarlo. |
+| [`07-LEVANTAR-Y-PROBAR.md`](07-LEVANTAR-Y-PROBAR.md) | Cómo arrancar (Docker y modo dev), cuentas iniciales, suite e2e, solución de problemas. | Cuando quieras ejecutarlo. |
 | [`08-ESTADO-GIT-Y-GITHUB.md`](08-ESTADO-GIT-Y-GITHUB.md) | **Estado del control de versiones y conexión con GitHub.** | Si la pregunta es "¿está subido a algún lado?". |
 | [`09-OBSERVACIONES-Y-RIESGOS.md`](09-OBSERVACIONES-Y-RIESGOS.md) | Cosas que noté: deuda técnica, pendientes declarados, detalles a revisar. | Antes de planear cambios. |
 | [`10-MEJORAS-APLICADAS.md`](10-MEJORAS-APLICADAS.md) | **Segunda revisión: qué se corrigió, por qué y cómo** (A1–A7, M1–M11, limpieza), con la verificación de cada punto. | Si quieres saber qué cambió y por qué. |
@@ -54,4 +54,4 @@ código y `documentacion/` del proyecto.
 
 ---
 
-*Notas generadas durante una sesión de reconocimiento. Proyecto FINAN-X.*
+*Notas de reconocimiento del proyecto FINAN-X.*

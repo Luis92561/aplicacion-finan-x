@@ -1,11 +1,11 @@
 # 9 · Observaciones y riesgos
 
-> **Cómo leer este documento.** Clasifico cada hallazgo por severidad y digo **cómo lo verifiqué**.
-> Distingo claramente entre lo que **leí en el código**, lo que **verifiqué ejecutando algo** y lo que
-> **no pude comprobar** (porque no pude levantar la base de datos en esta sesión).
+> **Cómo leer este documento.** Clasifico cada hallazgo por severidad e indico **cómo lo verifiqué**.
+> Distingo entre lo que **leí en el código**, lo que **comprobé ejecutando algo** y lo que **no se pudo
+> comprobar** en ese momento (la base de datos no estaba disponible en el entorno).
 >
-> Todo esto viene de leer el proyecto, **no** de haberlo visto funcionar con datos reales. No modifiqué
-> ningún archivo del proyecto.
+> Todo esto viene de leer el proyecto, **no** de haberlo visto funcionar con datos reales. En esa
+> primera pasada no se modificó ningún archivo del proyecto.
 
 ## Resumen ejecutivo
 
@@ -54,7 +54,7 @@ Con **P** pagos y **N** notas activas el join genera **P×N filas**. Por tanto:
 - `SUM(p.valor)` queda multiplicado por **N**
 - `SUM(nc.valor)` queda multiplicado por **P**
 
-**Cómo lo verifiqué:** escribí [`_verificacion-fanout.mjs`](_verificacion-fanout.mjs), que replica la
+**Cómo lo verifiqué:** preparé [`_verificacion-fanout.mjs`](_verificacion-fanout.mjs), que replica la
 semántica del join en JavaScript y lo ejecuté con Node. Resultados reales:
 
 | Escenario (factura de 100) | `valor_pagado` | `notas_credito` | `saldo` |
@@ -424,21 +424,21 @@ Para ser justo, esto merece reconocimiento explícito:
 
 ---
 
-## Lo que en su momento **no** pude verificar (y después sí)
+## Lo que en su momento **no** se pudo verificar (y después sí)
 
 Transparencia sobre los límites del análisis inicial y de lo que se comprobó después:
 
-1. **Al principio no ejecuté la aplicación.** El sandbox de la sesión no tenía acceso al named pipe de
-   Docker Desktop. **Después sí se pudo** (con permisos ampliados) y **la corrección se verificó contra
+1. **Al principio no se ejecutó la aplicación.** El entorno no tenía acceso al named pipe de Docker
+   Desktop. **Después sí se pudo** (con permisos ampliados) y **la corrección se verificó contra
    PostgreSQL 16 real**, ejecutando la suite completa.
 2. **Al inicio la suite e2e no se ejecutó**; los 99 casos iniciales se contaron leyendo `e2e.mjs` (hoy son 154 y se ejecutan realmente).
    **Después se ejecutó: 112/112 en verde** con la corrección aplicada.
 3. **El bug C1 se verificó primero aritméticamente** ([`_verificacion-fanout.mjs`](_verificacion-fanout.mjs))
    y **después contra la base de datos real**, reproduciéndolo antes de corregirlo. Ver
    *Estado de la corrección*.
-4. **No revisé los archivos binarios** (PDFs, PNGs, SVGs) ni el `.docx` de comandos.
-5. **Al inicio no modifiqué nada**: `deep-docs/` fue lo único creado. Las correcciones posteriores
-   (C1, C2, C3) se hicieron **con autorización expresa** y están aisladas en el commit `5877ef8`.
+4. **No se revisaron los archivos binarios** (PDFs, PNGs, SVGs) ni el `.docx` de comandos.
+5. **Al inicio no se modificó nada**: `deep-docs/` fue lo único creado. Las correcciones posteriores
+   (C1, C2, C3) se aplicaron **con aprobación expresa** y quedaron aisladas en el commit `5877ef8`.
 
 ---
 
