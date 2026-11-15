@@ -35,7 +35,9 @@
   .portada table.meta{margin:0 auto; border-collapse:collapse; font-size:9.5pt; text-align:left}
   .portada table.meta td{padding:4px 10px; border-bottom:1px solid var(--border)}
   .portada table.meta td:first-child{color:var(--muted); font-weight:600; white-space:nowrap}
-  .portada .pie{margin-top:38px; font-size:9pt; color:var(--muted)}
+  .portada .autores{margin:26px 0 0; font-size:10pt; color:var(--primary-dark)}
+  .portada .autores strong{display:block; font-size:8pt; letter-spacing:.6px; text-transform:uppercase; color:var(--muted); margin-bottom:3px}
+  .portada .pie{margin-top:22px; font-size:9pt; color:var(--muted)}
 
   /* ---------- Encabezados ---------- */
   h1{font-size:16pt; color:var(--primary-dark); margin:0 0 4px; padding-bottom:6px; border-bottom:2.5px solid var(--primary)}
@@ -134,14 +136,15 @@
   <p class="sub">Sistema de facturación y pagos</p>
   <div class="evidencia">Evidencia 2 de 7</div>
   <h1>Diccionario de datos</h1>
-  <p class="desc">Definición precisa de los 117 campos que componen la base de datos de FINAN-X. Para cada uno se indica su tipo, longitud, si es clave primaria o foránea, si es obligatorio y qué representa en el negocio.</p>
+  <p class="desc">Definición precisa de los 128 campos que componen la base de datos de FINAN-X. Para cada uno se indica su tipo, longitud, si es clave primaria o foránea, si es obligatorio y qué representa en el negocio.</p>
   <table class="meta"><tr><td>Sistema</td><td>FINAN-X · Facturación y pagos</td></tr>
 <tr><td>Entidades documentadas</td><td>12 tablas + 1 vista</td></tr>
-<tr><td>Campos documentados</td><td>133</td></tr>
+<tr><td>Campos documentados</td><td>144</td></tr>
 <tr><td>Claves primarias</td><td>12</td></tr>
 <tr><td>Claves foráneas</td><td>16</td></tr>
-<tr><td>Campos obligatorios (NOT NULL)</td><td>81</td></tr></table>
-  <p class="pie">Proyecto académico · Integración de Aplicaciones · Sexto semestre</p>
+<tr><td>Campos obligatorios (NOT NULL)</td><td>85</td></tr></table>
+  <p class="autores"><strong>Autores</strong>Luis Alfredo Jaramillo Restrepo · Mayra Juliana Vélez Hernández</p>
+  <p class="pie">Proyecto académico · Integración de Aplicaciones · Sexto semestre · FINAN-X 1.0.0 · 12 de noviembre de 2026</p>
 </section>
 
 <h1>1. Propósito y método</h1>
@@ -163,22 +166,22 @@
 <h1>2. Panorama de las entidades</h1>
 <table class=""><thead><tr><th>Entidad</th><th>Qué representa</th><th class="c">Campos</th><th>Clave primaria</th><th class="c">FK</th><th class="c">Oblig.</th></tr></thead><tbody>
 <tr><td><code>roles</code></td><td>Catálogo de roles del personal interno. Define qué puede hacer cada usuario del sistema (RBAC).</td><td class="c">3</td><td><code>rol_id</code></td><td class="c">0</td><td class="c">2</td></tr>
-<tr><td><code>usuarios</code></td><td>Personal interno de la empresa (administrador, facturador, cajero, supervisor). No incluye a los clientes: esos viven en clientes + usuario_cliente.</td><td class="c">8</td><td><code>usuario_id</code></td><td class="c">1</td><td class="c">8</td></tr>
+<tr><td><code>usuarios</code></td><td>Personal interno de la empresa (administrador, facturador, cajero, supervisor). No incluye a los clientes: esos viven en clientes + usuario_cliente.</td><td class="c">13</td><td><code>usuario_id</code></td><td class="c">1</td><td class="c">10</td></tr>
 <tr><td><code>clientes</code></td><td>Personas o empresas a las que se les factura. Es la entidad central del negocio: los pedidos y las facturas cuelgan de aquí.</td><td class="c">11</td><td><code>cliente_id</code></td><td class="c">0</td><td class="c">7</td></tr>
-<tr><td><code>usuario_cliente</code></td><td>Credenciales de acceso del cliente al portal de autoservicio. Un cliente tiene como máximo una cuenta (cliente_id es único), por eso es una tabla aparte y no columnas en clientes.</td><td class="c">8</td><td><code>usuario_cliente_id</code></td><td class="c">1</td><td class="c">7</td></tr>
+<tr><td><code>usuario_cliente</code></td><td>Credenciales de acceso del cliente al portal de autoservicio. Un cliente tiene como máximo una cuenta (cliente_id es único), por eso es una tabla aparte y no columnas en clientes.</td><td class="c">12</td><td><code>usuario_cliente_id</code></td><td class="c">1</td><td class="c">9</td></tr>
 <tr><td><code>productos</code></td><td>Catálogo de artículos y servicios que se pueden vender. El precio se copia al pedido en el momento de la venta.</td><td class="c">11</td><td><code>producto_id</code></td><td class="c">0</td><td class="c">9</td></tr>
 <tr><td><code>pedidos</code></td><td>Documento interno que registra qué productos pidió un cliente, antes de facturarse. Recorre los estados BORRADOR, CONFIRMADO, CANCELADO y FACTURADO.</td><td class="c">10</td><td><code>pedido_id</code></td><td class="c">1</td><td class="c">8</td></tr>
 <tr><td><code>detalle_pedido</code></td><td>Líneas del pedido: un registro por producto y cantidad. Es la tabla que resuelve la relación de muchos a muchos entre pedidos y productos, guardando además el precio aplicado.</td><td class="c">6</td><td><code>detalle_id</code></td><td class="c">2</td><td class="c">6</td></tr>
 <tr><td><code>facturas</code></td><td>Documento de cobro generado a partir de un pedido confirmado. Un pedido puede tener varias facturas a lo largo del tiempo (por ejemplo si se anula una), pero solo una ACTIVA a la vez.</td><td class="c">14</td><td><code>factura_id</code></td><td class="c">3</td><td class="c">9</td></tr>
 <tr><td><code>pagos</code></td><td>Abonos recibidos contra una factura. Una factura puede tener varios pagos (pago parcial) hasta completar el total. Nunca se borran ni se editan: si hubo un error se corrige con una nota de crédito.</td><td class="c">17</td><td><code>pago_id</code></td><td class="c">3</td><td class="c">6</td></tr>
 <tr><td><code>notas_credito</code></td><td>Devoluciones sobre una factura. Una nota ACTIVA revierte el pago que devuelve, es decir, AUMENTA el saldo pendiente de la factura. Regla clave: no se puede devolver más de lo que realmente se ha pagado.</td><td class="c">13</td><td><code>nota_credito_id</code></td><td class="c">4</td><td class="c">8</td></tr>
-<tr><td><code>auditoria</code></td><td>Bitácora de operaciones. Cada acción sensible (login, creación, cambio de estado, anulación, pago…) deja un registro aquí. El campo usuario guarda el identificador como TEXTO y no como clave foránea, a propósito: el rastro debe sobrevivir aunque la cuenta se elimine.</td><td class="c">8</td><td><code>auditoria_id</code></td><td class="c">0</td><td class="c">3</td></tr>
+<tr><td><code>auditoria</code></td><td>Bitácora de operaciones. Cada acción sensible (login, creación, cambio de estado, anulación, pago…) deja un registro aquí. El campo usuario guarda el identificador como TEXTO y no como clave foránea, a propósito: el rastro debe sobrevivir aunque la cuenta se elimine.</td><td class="c">10</td><td><code>auditoria_id</code></td><td class="c">0</td><td class="c">3</td></tr>
 <tr><td><code>recuperaciones_clave</code></td><td>Solicitudes de recuperación de contraseña mediante código de un solo uso (OTP). El código se guarda CIFRADO con bcrypt, nunca en texto plano, y caduca.</td><td class="c">8</td><td><code>recuperacion_id</code></td><td class="c">1</td><td class="c">8</td></tr>
 </tbody></table>
 
 <div class="grid3">
   <div class="kpi"><div class="n">12</div><div class="t">Tablas</div></div>
-  <div class="kpi"><div class="n">117</div><div class="t">Campos en tablas</div></div>
+  <div class="kpi"><div class="n">128</div><div class="t">Campos en tablas</div></div>
   <div class="kpi"><div class="n">16</div><div class="t">Campos en la vista</div></div>
 </div>
 
@@ -205,6 +208,11 @@
 <tr><td><code>estado</code></td><td>VARCHAR</td><td class="c">20</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>ACTIVO o INACTIVO. Un usuario inactivo no puede iniciar sesión. Es baja lógica: nunca se borra la fila.</td></tr>
 <tr><td><code>fecha_creacion</code></td><td>TIMESTAMPTZ</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Momento en que se creó la cuenta.</td></tr>
 <tr><td><code>token_version</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Versión de sesión. Viaja dentro del JWT y se compara en cada petición. Al cambiar la contraseña o desactivar la cuenta se incrementa, y todos los tokens anteriores dejan de ser válidos (permite cerrar sesiones sin esperar a que caduquen).</td></tr>
+<tr><td><code>username</code></td><td>VARCHAR</td><td class="c">60</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Nombre de usuario corto para iniciar sesión (el correo también sirve).</td></tr>
+<tr><td><code>debe_cambiar_clave</code></td><td>BOOLEAN</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Verdadero mientras la cuenta use una clave temporal y deba cambiarla en el primer ingreso.</td></tr>
+<tr><td><code>clave_actualizada_en</code></td><td>TIMESTAMPTZ</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Fecha del último cambio de contraseña de la cuenta.</td></tr>
+<tr><td><code>fallos_login</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Intentos fallidos consecutivos; se reinicia al acertar.</td></tr>
+<tr><td><code>bloqueado_hasta</code></td><td>TIMESTAMPTZ</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Fecha hasta la que la cuenta está bloqueada por intentos fallidos.</td></tr>
 </tbody></table>
 
 <h3>3.3. <code>clientes</code></h3>
@@ -234,6 +242,10 @@
 <tr><td><code>fecha_creacion</code></td><td>TIMESTAMPTZ</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Momento en que se creó la cuenta de portal.</td></tr>
 <tr><td><code>ultimo_acceso</code></td><td>TIMESTAMPTZ</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Fecha y hora del último inicio de sesión correcto. Se actualiza en cada login del portal.</td></tr>
 <tr><td><code>token_version</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Versión de sesión, igual que en usuarios. Se incrementa al restablecer la contraseña con OTP, lo que invalida las sesiones abiertas.</td></tr>
+<tr><td><code>debe_cambiar_clave</code></td><td>BOOLEAN</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Verdadero mientras la cuenta de portal use una clave temporal.</td></tr>
+<tr><td><code>clave_actualizada_en</code></td><td>TIMESTAMPTZ</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Fecha del último cambio de contraseña de la cuenta de portal.</td></tr>
+<tr><td><code>fallos_login</code></td><td>INT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-warn">Sí</span></td><td>Intentos fallidos consecutivos de la cuenta de portal.</td></tr>
+<tr><td><code>bloqueado_hasta</code></td><td>TIMESTAMPTZ</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Fecha hasta la que la cuenta de portal está bloqueada.</td></tr>
 </tbody></table>
 
 <h3>3.5. <code>productos</code></h3>
@@ -348,6 +360,8 @@
 <tr><td><code>operacion</code></td><td>VARCHAR</td><td class="c">30</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Tipo de operación: LOGIN, LOGIN_FALLIDO, CREAR, ACTUALIZAR, ESTADO, GENERAR, ANULAR, REGISTRAR, PAGO_PORTAL, AUTORREGISTRO, CLAVE_RECUPERADA, CODIGO_EFECTY…</td></tr>
 <tr><td><code>registro_afectado</code></td><td>VARCHAR</td><td class="c">50</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Identificador del registro tocado (número de factura, de pago, id del cliente…).</td></tr>
 <tr><td><code>descripcion</code></td><td>TEXT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Descripción legible de lo que ocurrió, con los datos relevantes.</td></tr>
+<tr><td><code>ip</code></td><td>INET</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Dirección IP desde la que se realizó la operación.</td></tr>
+<tr><td><code>user_agent</code></td><td>TEXT</td><td class="c">—</td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td class="c"><span class="badge b-gray">No</span></td><td>Navegador o cliente que realizó la operación.</td></tr>
 </tbody></table>
 
 <h3>3.12. <code>recuperaciones_clave</code></h3>
@@ -404,12 +418,12 @@
 <tr><td>Clave primaria</td><td class="c">12</td><td>Cada fila es identificable de forma única</td><td><code>facturas.factura_id</code></td></tr>
 <tr><td>Clave foránea</td><td class="c">16</td><td>No puede haber un hijo sin su padre</td><td><code>pagos.factura_id</code> → <code>facturas</code></td></tr>
 <tr><td>UNIQUE</td><td class="c">11</td><td>Un valor no puede repetirse</td><td><code>clientes</code>: tipo + número de identificación</td></tr>
-<tr><td>CHECK</td><td class="c">15</td><td>Solo se admiten valores de una lista cerrada</td><td><code>facturas.estado</code> ∈ (ACTIVA, ANULADA)</td></tr>
-<tr><td>NOT NULL</td><td class="c">81</td><td>El dato es imprescindible</td><td><code>facturas.total</code></td></tr>
+<tr><td>CHECK</td><td class="c">16</td><td>Solo se admiten valores de una lista cerrada</td><td><code>facturas.estado</code> ∈ (ACTIVA, ANULADA)</td></tr>
+<tr><td>NOT NULL</td><td class="c">85</td><td>El dato es imprescindible</td><td><code>facturas.total</code></td></tr>
 <tr><td>Índice único parcial</td><td class="c">1</td><td>Una regla condicional sobre un subconjunto de filas</td><td>Como mucho <strong>una factura ACTIVA</strong> por pedido</td></tr>
 </tbody></table>
 
-<footer class="pie-doc">FINAN-X · Evidencia 2 de 7 · Diccionario de datos · 117 campos en tablas + 16 en la vista, extraídos de PostgreSQL 16.</footer>
+<footer class="pie-doc">FINAN-X · Evidencia 2 de 7 · Diccionario de datos · 128 campos en tablas + 16 en la vista, extraídos de PostgreSQL 16.</footer>
 
 </div></body>
 </html>

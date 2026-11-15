@@ -43,7 +43,7 @@ const M = [
   ['HU-02', 'Autenticación', 'RF-32, RF-35', 'CU-01, CU-09', '<code>POST /api/auth/login</code>', 'Login', 'usuarios, usuario_cliente, roles', 'Login admin', 'RNF-01, RNF-03, RNF-05, RNF-06'],
   ['HU-03', 'Autenticación', 'RF-35', 'CU-01', '<code>POST /api/auth/recuperar-solicitar</code>, <code>/recuperar-cambiar</code>', 'Login (recuperación)', 'recuperaciones_clave', 'Cambiar contraseña con código válido', 'RNF-02, RNF-04, RNF-08'],
   ['HU-04', 'Autenticación', 'RF-32, RF-33', 'CU-02', '<code>GET/POST /api/usuarios</code>, <code>PATCH /api/usuarios/:id</code>', 'Usuarios', 'usuarios, roles', 'Crear un segundo administrador', 'RNF-01, RNF-06'],
-  ['HU-05', 'Clientes', 'RF-01, RF-02, RF-03', 'CU-03..CU-08', '<code>GET/POST/PUT /api/clientes</code>', 'Clientes', 'clientes', 'Cliente duplicado', 'RNF-12'],
+  ['HU-05', 'Clientes', 'RF-01, RF-02, RF-03, RF-04', 'CU-03..CU-08', '<code>GET/POST/PUT /api/clientes</code>', 'Clientes', 'clientes', 'Cliente duplicado', 'RNF-12'],
   ['HU-06', 'Clientes', 'RF-05', 'CU-06', '<code>POST /api/clientes/:id/cuenta</code>', 'Clientes (crear cuenta)', 'usuario_cliente', 'Crear cuenta', 'RNF-01, RNF-06'],
   ['HU-07', 'Clientes', 'RF-29', 'CU-08', '<code>GET /api/clientes/:id/resumen-correo</code>', 'Clientes / Balance', 'factura_saldo, notas_credito', 'Resumen financiero para correo', 'RNF-17'],
   ['HU-08', 'Productos', 'RF-06, RF-07', 'CU-15..CU-19', '<code>GET/POST/PUT /api/productos</code>', 'Productos', 'productos', 'Crear producto', 'RNF-12'],
@@ -51,7 +51,7 @@ const M = [
   ['HU-10', 'Pedidos', 'RF-10, RF-11', 'CU-23, CU-24', '<code>PATCH /api/pedidos/:id/estado</code>, <code>PUT /api/pedidos/:id</code>', 'Pedidos / Detalle', 'pedidos', 'Confirmar pedido', 'RNF-12'],
   ['HU-11', 'Facturación', 'RF-12, RF-13, RF-16', 'CU-25, CU-26', '<code>POST /api/facturas</code>', 'Pedido (generar factura)', 'facturas, pedidos', 'Refacturar el pedido tras anular', 'RNF-12'],
   ['HU-12', 'Facturación', 'RF-14, RF-15', 'CU-29', '<code>POST /api/facturas/:id/anular</code>', 'Detalle de factura', 'facturas', 'Anular factura con pagos', 'RNF-12, RNF-14'],
-  ['HU-13', 'Pagos', 'RF-17, RF-18, RF-19', 'CU-27', '<code>POST /api/pagos</code>', 'Detalle de factura / Pagos', 'pagos, facturas', 'Sobrepago → 400', 'RNF-12, RNF-13, RNF-15'],
+  ['HU-13', 'Pagos', 'RF-17, RF-18, RF-19, RF-20', 'CU-27', '<code>POST /api/pagos</code>, <code>GET /api/facturas/:id/saldo</code>', 'Detalle de factura / Pagos', 'pagos, facturas', 'Sobrepago → 400', 'RNF-12, RNF-13, RNF-15'],
   ['HU-14', 'Pagos', 'RF-36, RF-37', 'CU-12, CU-13', '<code>POST /api/mis-pagos</code>', 'Mis facturas (portal)', 'pagos, facturas, usuario_cliente', 'No paga factura ajena', 'RNF-11, RNF-13'],
   ['HU-15', 'Pagos', 'RF-39', 'CU-27', '<code>POST /api/pagos</code>, <code>/api/mis-pagos</code>', 'Detalle de factura / Pagar', 'pagos', 'Tarjeta con CVV inválido', 'RNF-02'],
   ['HU-16', 'Notas de crédito', 'RF-21, RF-22, RF-23', 'CU-28', '<code>POST /api/notas-credito</code>', 'Notas de crédito', 'notas_credito, factura_saldo', 'CN supera lo pagado', 'RNF-12, RNF-15'],
@@ -61,6 +61,9 @@ const M = [
   ['HU-20', 'Auditoría', 'RF-30, RF-31', 'CU-30', '<code>GET /api/auditoria</code>', 'Auditoría', 'auditoria', 'Auditoría registra pagos', 'RNF-14'],
   ['HU-21', 'Portal del cliente', 'RF-38, RF-40', 'CU-10..CU-14', '<code>GET /api/mi-saldo</code>, <code>/mis-facturas</code>, <code>/mis-pagos</code>, <code>/mis-notas-credito</code>', 'Portal (mi saldo y demás)', 'factura_saldo, pagos, notas_credito', 'Mis facturas (solo las propias)', 'RNF-11, RNF-17'],
   ['HU-22', 'Portal del cliente', 'RF-38', 'CU-10', '<code>GET /api/mis-datos</code>', 'Portal (mis datos)', 'clientes', 'Mis datos = cliente autenticado', 'RNF-11'],
+  ['HU-23', 'Autenticación', 'RF-41', 'CU-01', '<code>GET /api/auth/sesion</code>, <code>POST /api/auth/cambiar-clave</code>', 'Cambio de contraseña obligatorio', 'usuarios, usuario_cliente', '', 'RNF-01, RNF-03, RNF-04'],
+  ['HU-24', 'Clientes', 'RF-42', 'CU-06', '<code>DELETE /api/clientes/:id</code>', 'Clientes (eliminar)', 'clientes, facturas, pagos, notas_credito', 'Eliminar cliente sin movimientos', 'RNF-12'],
+  ['HU-25', 'Panel de control', 'RF-43', 'CU-30', '<code>GET /api/dashboard</code>', 'Dashboard', 'facturas, pagos, factura_saldo', '', 'RNF-20'],
 ];
 
 // Aviso si alguna prueba citada no aparece en la ejecucion real
@@ -90,7 +93,7 @@ const RF_SIN_HU = [
 ];
 
 // ---------- Cobertura ----------
-const RF_TOTAL = 40;
+const RF_TOTAL = 43;
 const RF_EN_MATRIZ = new Set();
 for (const f of M) for (const r of f[2].split(',').map((s) => s.trim())) if (r.startsWith('RF-')) RF_EN_MATRIZ.add(r);
 
@@ -103,7 +106,7 @@ ${portada({
     ['Sistema', 'FINAN-X · Facturación y pagos'],
     ['Historias de usuario trazadas', `${M.length}`],
     ['Requisitos funcionales', `${RF_TOTAL}`],
-    ['Casos de prueba de control', '48 (Evidencia 7)'],
+    ['Casos de prueba de control', '51 (Evidencia 7)'],
     ['Comprobaciones ejecutadas', `${ejecutadas.length}`],
     ['Pruebas citadas y verificadas', `${M.filter((f) => f[7] && existePrueba(f[7])).length} de ${M.filter((f) => f[7]).length}`],
   ],

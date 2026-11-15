@@ -35,7 +35,9 @@
   .portada table.meta{margin:0 auto; border-collapse:collapse; font-size:9.5pt; text-align:left}
   .portada table.meta td{padding:4px 10px; border-bottom:1px solid var(--border)}
   .portada table.meta td:first-child{color:var(--muted); font-weight:600; white-space:nowrap}
-  .portada .pie{margin-top:38px; font-size:9pt; color:var(--muted)}
+  .portada .autores{margin:26px 0 0; font-size:10pt; color:var(--primary-dark)}
+  .portada .autores strong{display:block; font-size:8pt; letter-spacing:.6px; text-transform:uppercase; color:var(--muted); margin-bottom:3px}
+  .portada .pie{margin-top:22px; font-size:9pt; color:var(--muted)}
 
   /* ---------- Encabezados ---------- */
   h1{font-size:16pt; color:var(--primary-dark); margin:0 0 4px; padding-bottom:6px; border-bottom:2.5px solid var(--primary)}
@@ -92,17 +94,38 @@
   .kpi .n{font-size:17pt; font-weight:800; color:var(--primary); line-height:1.1}
   .kpi .t{font-size:8pt; color:var(--muted); text-transform:uppercase; letter-spacing:.4px}
 
-  .captura{border:1px solid var(--border); border-radius:8px; overflow:hidden; margin:9px 0; page-break-inside:avoid}
+  .captura{border:1px solid var(--border); border-radius:8px; overflow:hidden; margin:9px 0; page-break-inside:avoid; break-inside:avoid}
   .captura img{width:100%; display:block}
+  /* Capturas muy altas: sin limite ocuparian varias paginas y el navegador partiria el
+     marco, dejando un recuadro vacio en una pagina y la imagen suelta en la siguiente.
+     Se limitan a un alto que quepa de una vez y se centran. */
+  .captura img.alta{width:auto; max-width:100%; max-height:200mm; margin:0 auto}
   .captura .pie{background:var(--bg); padding:5px 9px; font-size:8pt; color:var(--muted); border-top:1px solid var(--border)}
+  .captura .aviso{font-size:7.6pt; color:var(--muted); font-style:italic}
 
   .salto{page-break-before:always}
   .evitar-corte{page-break-inside:avoid}
   .indice{font-size:10pt}
   .indice li{margin:3px 0}
   .firma{margin-top:38px; display:grid; grid-template-columns:1fr 1fr; gap:28px}
-  .firma .l{border-top:1px solid #334155; padding-top:5px; font-size:9pt; color:#334155}
-  .placeholder{background:#fef3c7; border-bottom:1px dashed var(--warning); padding:0 3px; font-weight:600}
+  .firma .l{padding-top:5px; font-size:9pt; color:#334155}
+  .firma .l strong{display:block; color:#172554; font-size:9.5pt; margin-bottom:2px}
+  /* Cada dato bajo la firma va en su propio renglon, con el hueco para escribirlo. */
+  .firma .firma-datos{display:block; margin-bottom:1px}
+  /* Hueco en blanco para completar a mano (los datos de las partes en el contrato).
+     No lleva raya: la franja y el borde de la tabla ya indican donde va cada dato.
+     Es inline-block con ancho completo para que ocupe el ancho de su celda Y pueda
+     usarse dentro de una frase (la linea de la fecha de firma). */
+  .hueco{display:inline-block; width:100%; height:1.3em; vertical-align:bottom}
+  /* Linea sobre la que se firma. Aqui si hay raya: es la referencia de la firma. */
+  .linea-firma{display:block; border-bottom:1px solid #334155}
+  /* Columna de etiquetas de las tablas de formulario. */
+  table.formulario .c-etiqueta{width:32%; font-weight:600}
+  /* En las tablas de formulario la etiqueta va arriba, a la altura de la primera
+     linea de escritura. */
+  table.formulario td{vertical-align:top}
+  /* La ultima fila no necesita el borde inferior: la tabla ya cierra ahi. */
+  table.formulario tbody tr:last-child td{border-bottom:none}
   footer.pie-doc{margin-top:26px; border-top:1px solid var(--border); padding-top:7px; font-size:8pt; color:var(--muted)}
 </style>
 </head>
@@ -116,11 +139,12 @@
   <p class="desc">Documento de requisitos elaborado siguiendo la estructura del estándar IEEE 830. Define qué debe hacer el sistema FINAN-X y bajo qué condiciones debe funcionar, con requisitos verificables y trazables al software realmente construido.</p>
   <table class="meta"><tr><td>Sistema</td><td>FINAN-X · Facturación y pagos</td></tr>
 <tr><td>Estándar de referencia</td><td>IEEE 830 (estructura de una ERS)</td></tr>
-<tr><td>Requisitos funcionales</td><td>40</td></tr>
+<tr><td>Requisitos funcionales</td><td>43</td></tr>
 <tr><td>Requisitos no funcionales</td><td>27</td></tr>
 <tr><td>Reglas de negocio</td><td>15</td></tr>
 <tr><td>Criterios de aceptación</td><td>20</td></tr></table>
-  <p class="pie">Proyecto académico · Integración de Aplicaciones · Sexto semestre</p>
+  <p class="autores"><strong>Autores</strong>Luis Alfredo Jaramillo Restrepo · Mayra Juliana Vélez Hernández</p>
+  <p class="pie">Proyecto académico · Integración de Aplicaciones · Sexto semestre · FINAN-X 1.0.0 · 12 de noviembre de 2026</p>
 </section>
 
 <h1>1. Introducción</h1>
@@ -206,19 +230,19 @@
 
 <h2>2.5 Restricciones de diseño y supuestos</h2>
 <table class=""><thead><tr><th>Tipo</th><th>Descripción</th></tr></thead><tbody>
-<tr><td><strong>Tecnológica</strong></td><td>El frontend se desarrolla con <strong>React 18 + Vite</strong>; el backend con <strong>Node.js + Express</strong>; la base de datos es <strong>PostgreSQL 16</strong>. Son las tecnologías vistas en la asignatura.</td></tr>
+<tr><td><strong>Tecnológica</strong></td><td>El frontend se desarrolla con <strong>React 18 + Vite</strong>; el backend con <strong>Node.js + Express</strong>; la base de datos es <strong>PostgreSQL 16</strong>.</td></tr>
 <tr><td><strong>De despliegue</strong></td><td>El sistema se ejecuta en <strong>contenedores Docker</strong> orquestados con Docker Compose, sobre cualquier máquina con Docker instalado.</td></tr>
 <tr><td><strong>De entorno</strong></td><td>Node.js 20 o superior. El proyecto se ha probado con Node 24 y PostgreSQL 16.</td></tr>
 <tr><td><strong>Legal</strong></td><td>El software se distribuye bajo licencia de uso; las dependencias de terceros conservan sus licencias (ver Evidencias 4 y 5).</td></tr>
 <tr><td><strong>De alcance</strong></td><td>El sistema <strong>no es un ERP</strong>: no incluye contabilidad general, inventario, nómina ni compras a proveedores. La facturación <strong>no tiene validez fiscal</strong> (no emite CUFE ni se integra con la DIAN).</td></tr>
 <tr><td><strong>De seguridad</strong></td><td>La recuperación de contraseña por SMS o correo <strong>no envía mensajes reales</strong> en esta versión: el proveedor de mensajería queda como punto de extensión.</td></tr>
 <tr><td><strong>De integración</strong></td><td>El código de pago en efectivo es una <strong>simulación</strong>: no se persiste ni se redime contra una pasarela real.</td></tr>
-<tr><td><strong>Académica</strong></td><td>Proyecto de la asignatura <em>Integración de Aplicaciones</em>. La variedad de roles, los límites de peticiones y las credenciales de demostración responden a fines didácticos.</td></tr>
+<tr><td><strong>Académica</strong></td><td>Proyecto de la asignatura <em>Integración de Aplicaciones</em>. La variedad de roles y los límites de peticiones responden a fines didácticos.</td></tr>
 </tbody></table>
 <p><strong>Supuestos:</strong> el equipo dispone de Docker; el cliente final tiene acceso a un navegador; la entrega del OTP por SMS o correo se sustituye por el modo demostración mientras no se contrate un proveedor.</p>
 
 <h1>3. Requisitos funcionales</h1>
-<p>Se especifican <strong>40 requisitos funcionales</strong>. Cada uno declara el actor que lo usa, su prioridad, cómo se verifica y su estado. <strong>No hay requisitos «pendientes»</strong>: todo lo especificado aquí está construido y probado, y lo que no existe figura en el alcance como fuera de alcance en lugar de como requisito incumplido.</p>
+<p>Se especifican <strong>43 requisitos funcionales</strong>. Cada uno declara el actor que lo usa, su prioridad, cómo se verifica y su estado. <strong>No hay requisitos «pendientes»</strong>: todo lo especificado aquí está construido y probado, y lo que no existe figura en el alcance como fuera de alcance en lugar de como requisito incumplido.</p>
 <p>La columna «Verificación» enlaza con los casos de prueba de la <strong>Evidencia 7</strong> y con la matriz de trazabilidad de la <strong>Evidencia 6</strong>.</p>
 
 <table class=""><thead><tr><th>ID</th><th>Enunciado del requisito</th><th>Actor</th><th class="c">Prioridad</th><th>Verificación</th><th class="c">Estado</th></tr></thead><tbody>
@@ -262,21 +286,24 @@
 <tr><td><strong>RF-38</strong></td><td>El sistema debe permitir al cliente <strong>consultar su saldo, facturas, compras, pagos y notas de crédito</strong>, y sus datos personales.</td><td>Cliente</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-40</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
 <tr><td><strong>RF-39</strong></td><td>El sistema debe <strong>validar los datos de pago según el método</strong> (tarjeta, transferencia o cheque) y rechazar los inválidos.</td><td>Sistema</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-41</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
 <tr><td><strong>RF-40</strong></td><td>El sistema debe <strong>generar un código de pago en efectivo</strong> para que el cliente pague en un punto físico, sin registrar el pago en el portal.</td><td>Cliente</td><td class="c"><span class="badge b-gray">Media</span></td><td>Prueba CP-42</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-41</strong></td><td>El sistema debe <strong>obligar a cambiar la contraseña en el primer ingreso</strong>: mientras <code>debe_cambiar_clave</code> esté activo, solo se permite consultar la sesión, cambiarla y cerrar sesión; el resto responde <code>403 CAMBIO_CLAVE_REQUERIDO</code>.</td><td>Todos</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba manual CP-49</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-42</strong></td><td>El sistema debe permitir <strong>eliminar un cliente</strong> solo al ADMIN y solo si no tiene pedidos, facturas, pagos ni notas de crédito; si tiene historial responde 409 y sugiere inactivarlo.</td><td>Administrador</td><td class="c"><span class="badge b-gray">Media</span></td><td>Prueba CP-50</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
+<tr><td><strong>RF-43</strong></td><td>El sistema debe ofrecer un <strong>panel de control</strong> con indicadores, gráficas y tabla filtrable, con contenido distinto según el rol (el CAJERO ve solo su caja del día).</td><td>Todos los internos</td><td class="c"><span class="badge b-gray">Media</span></td><td>Revisión manual CP-51</td><td class="c"><span class="badge b-ok">Implementado</span></td></tr>
 </tbody></table>
 
 <h1>4. Requisitos no funcionales</h1>
 <p>Los requisitos no funcionales describen <strong>cómo</strong> debe comportarse el sistema, no qué hace. Se agrupan por atributo de calidad.</p>
 
 <table class=""><thead><tr><th>ID</th><th>Categoría</th><th>Requisito</th><th class="c">Prioridad</th><th>Cómo se verifica</th></tr></thead><tbody>
-<tr><td><strong>RNF-01</strong></td><td>Seguridad · contraseñas</td><td>Las contraseñas y los códigos OTP se almacenan cifrados con <strong>bcrypt</strong> (coste 10). Nunca en texto plano.</td><td class="c"><span class="badge b-no">Crítica</span></td><td>Inspección de la base: la columna <code>password_hash</code> no contiene texto legible.</td></tr>
-<tr><td><strong>RNF-02</strong></td><td>Seguridad · datos de tarjeta</td><td>Nunca se almacenan el número completo de la tarjeta ni el CVV. Solo los <strong>últimos 4 dígitos</strong> y la marca (PCI-DSS).</td><td class="c"><span class="badge b-no">Crítica</span></td><td>Prueba CP-43: la respuesta de la API no contiene el PAN ni el CVV.</td></tr>
-<tr><td><strong>RNF-03</strong></td><td>Seguridad · sesiones</td><td>La sesión se firma con <strong>JWT</strong> con caducidad de 8 horas.</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Inspección: el token incluye <code>exp</code>.</td></tr>
-<tr><td><strong>RNF-04</strong></td><td>Seguridad · revocación de sesiones</td><td>Al cambiar la contraseña o desactivar una cuenta, <strong>las sesiones anteriores dejan de ser válidas</strong> de inmediato.</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-37: el token anterior responde 401.</td></tr>
-<tr><td><strong>RNF-05</strong></td><td>Seguridad · fuerza bruta</td><td>El sistema bloquea temporalmente (429) tras <strong>5 intentos fallidos</strong> de inicio de sesión desde la misma dirección, en una ventana de 15 minutos. Un acceso correcto reinicia el contador.</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-44.</td></tr>
+<tr><td><strong>RNF-01</strong></td><td>Seguridad · contraseñas</td><td>Las contraseñas y los códigos OTP se almacenan cifrados con <strong>bcrypt</strong> (coste 12). Además, la política exige <strong>mínimo 12 caracteres</strong>, lista de contraseñas comunes y bloqueo de datos personales o de la marca. Nunca en texto plano.</td><td class="c"><span class="badge b-no">Crítica</span></td><td>Inspección de la base: la columna <code>password_hash</code> no contiene texto legible.</td></tr>
+<tr><td><strong>RNF-02</strong></td><td>Seguridad · datos de tarjeta</td><td>Nunca se almacenan el número completo de la tarjeta ni el CVV. Solo los <strong>últimos 4 dígitos</strong> y la marca (PCI-DSS). El número de cuenta de una transferencia se devuelve <strong>enmascarado</strong> por la API.</td><td class="c"><span class="badge b-no">Crítica</span></td><td>Prueba CP-43: la respuesta de la API no contiene el PAN ni el CVV.</td></tr>
+<tr><td><strong>RNF-03</strong></td><td>Seguridad · sesiones</td><td>La sesión viaja en una cookie <strong>HttpOnly</strong> y <code>SameSite=Strict</code> (o <code>Bearer</code> para integraciones), firmada con <strong>JWT de 2 horas</strong>, algoritmo restringido y emisor/audiencia fijos.</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Inspección: el token incluye <code>exp</code>; prueba CP-46.</td></tr>
+<tr><td><strong>RNF-04</strong></td><td>Seguridad · revocación de sesiones</td><td>Al cambiar o restablecer la contraseña, o al <strong>desactivar la cuenta o el cliente</strong>, las sesiones anteriores dejan de ser válidas de inmediato (<code>token_version</code> y estado).</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-37: el token anterior responde 401.</td></tr>
+<tr><td><strong>RNF-05</strong></td><td>Seguridad · fuerza bruta</td><td>El sistema bloquea la cuenta tras <strong>5 intentos fallidos</strong>, con retroceso progresivo, contando por cuenta y por IP+usuario. Un inicio de sesión correcto de <strong>otra</strong> cuenta no desbloquea la cuenta atacada.</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-44.</td></tr>
 <tr><td><strong>RNF-06</strong></td><td>Seguridad · autorización</td><td>Cada operación exige el rol adecuado (RBAC). Un rol sin permiso recibe <strong>403</strong>.</td><td class="c"><span class="badge b-no">Crítica</span></td><td>Prueba CP-35.</td></tr>
 <tr><td><strong>RNF-07</strong></td><td>Seguridad · fuerza del secreto</td><td>El sistema <strong>no arranca</strong> sin una clave de firma propia de al menos 32 caracteres, y rechaza los valores de ejemplo publicados en el repositorio.</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-45: sin clave o con la de ejemplo, el arranque falla.</td></tr>
-<tr><td><strong>RNF-08</strong></td><td>Seguridad · exposición del OTP</td><td>En producción el código OTP <strong>no se devuelve</strong> en la respuesta de la API (solo en modo demostración).</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Inspección de configuración: el valor por defecto depende del entorno.</td></tr>
-<tr><td><strong>RNF-09</strong></td><td>Seguridad · cabeceras HTTP</td><td>Las respuestas incluyen cabeceras de seguridad (<code>X-Content-Type-Options</code>, <code>X-Frame-Options</code>) y no revelan el servidor.</td><td class="c"><span class="badge b-gray">Media</span></td><td>Prueba CP-46.</td></tr>
+<tr><td><strong>RNF-08</strong></td><td>Seguridad · exposición del OTP</td><td>En producción el código OTP <strong>no se devuelve</strong> en la respuesta de la API. La regla está en el código: no depende solo de la variable de entorno.</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Inspección de configuración y prueba CP-36.</td></tr>
+<tr><td><strong>RNF-09</strong></td><td>Seguridad · cabeceras HTTP</td><td>Las respuestas de la <strong>API y de la SPA</strong> incluyen cabeceras de seguridad (CSP, <code>X-Frame-Options</code>, <code>Cache-Control: no-store</code> y HSTS cuando hay TLS) y no revelan el servidor.</td><td class="c"><span class="badge b-gray">Media</span></td><td>Prueba CP-46 y revisión de <code>nginx.conf</code>.</td></tr>
 <tr><td><strong>RNF-10</strong></td><td>Seguridad · CORS</td><td>Solo los orígenes de la lista blanca reciben permiso de CORS.</td><td class="c"><span class="badge b-gray">Media</span></td><td>Prueba CP-47.</td></tr>
 <tr><td><strong>RNF-11</strong></td><td>Integridad · aislamiento de datos</td><td>El identificador de cliente se toma <strong>siempre del token</strong>, nunca de la petición.</td><td class="c"><span class="badge b-no">Crítica</span></td><td>Revisión de código y prueba CP-38.</td></tr>
 <tr><td><strong>RNF-12</strong></td><td>Integridad · atomicidad</td><td>Las operaciones que afectan a varias tablas se ejecutan en <strong>transacción</strong>: o se aplican todas o ninguna.</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Inspección: <code>BEGIN</code>/<code>COMMIT</code> en las rutas que lo requieren.</td></tr>
@@ -286,15 +313,15 @@
 <tr><td><strong>RNF-16</strong></td><td>Usabilidad · idioma</td><td>Toda la interfaz y los mensajes de error están en <strong>español</strong>, con mensajes que explican la causa.</td><td class="c"><span class="badge b-gray">Media</span></td><td>Revisión de la interfaz.</td></tr>
 <tr><td><strong>RNF-17</strong></td><td>Usabilidad · formato local</td><td>Los importes se muestran en formato de moneda colombiana (COP) y las fechas en hora de Colombia.</td><td class="c"><span class="badge b-gray">Media</span></td><td>Revisión: <code>Intl.NumberFormat(&quot;es-CO&quot;)</code> y zona <code>America/Bogota</code>.</td></tr>
 <tr><td><strong>RNF-18</strong></td><td>Usabilidad · adaptabilidad</td><td>La interfaz es utilizable en pantallas de escritorio y se reordena en pantallas estrechas (una sola hoja de estilos, sin dependencias).</td><td class="c"><span class="badge b-gray">Baja</span></td><td>Revisión de la hoja de estilos (punto de quiebre a 900 px).</td></tr>
-<tr><td><strong>RNF-19</strong></td><td>Rendimiento · tiempo de respuesta</td><td>Las operaciones habituales responden en menos de <strong>2 segundos</strong> con la base de demostración.</td><td class="c"><span class="badge b-gray">Media</span></td><td>Ejecución de la suite completa: 154 comprobaciones sin esperas anómalas.</td></tr>
-<tr><td><strong>RNF-20</strong></td><td>Rendimiento · listados</td><td>Los listados están acotados (<code>LIMIT 300</code>) para no degradar la respuesta con volúmenes grandes.</td><td class="c"><span class="badge b-gray">Media</span></td><td>Inspección de las consultas.</td></tr>
+<tr><td><strong>RNF-19</strong></td><td>Rendimiento · tiempo de respuesta</td><td>Las operaciones habituales responden en menos de <strong>2 segundos</strong> con la base de demostración.</td><td class="c"><span class="badge b-gray">Media</span></td><td>Ejecución de la suite completa: 157 comprobaciones sin esperas anómalas.</td></tr>
+<tr><td><strong>RNF-20</strong></td><td>Rendimiento · listados</td><td>Los listados están acotados (<code>LIMIT 300</code>) y aceptan <code>limit</code>/<code>offset</code> para no degradar la respuesta con volúmenes grandes.</td><td class="c"><span class="badge b-gray">Media</span></td><td>Inspección de las consultas.</td></tr>
 <tr><td><strong>RNF-21</strong></td><td>Portabilidad · despliegue</td><td>El sistema completo se levanta con <strong>un solo comando</strong> (<code>docker compose up</code>) en cualquier máquina con Docker.</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-48: los tres contenedores quedan sanos.</td></tr>
-<tr><td><strong>RNF-22</strong></td><td>Portabilidad · configuración</td><td>Toda la configuración se hace por variables de entorno; no hay valores sensibles en el código.</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-45 e inspección del archivo de composición.</td></tr>
+<tr><td><strong>RNF-22</strong></td><td>Portabilidad · configuración</td><td>Toda la configuración se hace por variables de entorno; no hay credenciales ni secretos por defecto en el código ni en el archivo de composición.</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Prueba CP-45 e inspección del archivo de composición.</td></tr>
 <tr><td><strong>RNF-23</strong></td><td>Mantenibilidad · separación de capas</td><td>La interfaz, la API y los datos están separados, y se comunican por HTTP con formato JSON.</td><td class="c"><span class="badge b-gray">Media</span></td><td>Revisión de la estructura del repositorio.</td></tr>
-<tr><td><strong>RNF-24</strong></td><td>Mantenibilidad · pruebas</td><td>Existe una suite de pruebas ejecutable que verifica los requisitos de punta a punta.</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Ejecución: <code>npm test</code> → 154 aprobadas, 0 fallidas.</td></tr>
+<tr><td><strong>RNF-24</strong></td><td>Mantenibilidad · pruebas</td><td>Existe una suite de pruebas ejecutable que verifica los requisitos de punta a punta.</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Ejecución: <code>npm test</code> → 157 aprobadas, 0 fallidas.</td></tr>
 <tr><td><strong>RNF-25</strong></td><td>Documentación</td><td>El proyecto incluye documentación de instalación, guía técnica, documentación funcional y estas evidencias.</td><td class="c"><span class="badge b-gray">Media</span></td><td>Revisión de la carpeta <code>documentacion/</code>.</td></tr>
-<tr><td><strong>RNF-26</strong></td><td>Disponibilidad de datos</td><td>Los datos persisten entre reinicios del sistema mediante volúmenes de Docker.</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Inspección: volumen <code>finanx_pgdata</code>.</td></tr>
-<tr><td><strong>RNF-27</strong></td><td>Licenciamiento</td><td>Todas las dependencias usan licencias permisivas compatibles con el uso comercial; ninguna es copyleft fuerte.</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Evidencia 4: revisión de las 238 dependencias.</td></tr>
+<tr><td><strong>RNF-26</strong></td><td>Disponibilidad de datos</td><td>Los datos persisten entre reinicios del sistema y existen <strong>respaldos con retención</strong> y procedimiento de restauración documentado.</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Inspección: volumen <code>finanx_pgdata</code> y <code>scripts/respaldo.*</code>.</td></tr>
+<tr><td><strong>RNF-27</strong></td><td>Licenciamiento</td><td>Todas las dependencias usan licencias permisivas compatibles con el uso comercial; ninguna es copyleft fuerte.</td><td class="c"><span class="badge b-warn">Alta</span></td><td>Evidencia 4: revisión de las 276 dependencias.</td></tr>
 </tbody></table>
 
 <h1>5. Interfaces</h1>
@@ -379,7 +406,7 @@ LICENCIAMIENTO (Evidencias 4 y 5)</code></pre>
   <li>Verificado por el caso de prueba <strong>CP-23</strong> de la Evidencia 7.</li>
 </ul>
 
-<footer class="pie-doc">FINAN-X · Evidencia 3 de 7 · Especificación de Requisitos de Software (IEEE 830) · 40 requisitos funcionales, 27 no funcionales, 15 reglas de negocio, 20 criterios de aceptación.</footer>
+<footer class="pie-doc">FINAN-X · Evidencia 3 de 7 · Especificación de Requisitos de Software (IEEE 830) · 43 requisitos funcionales, 27 no funcionales, 15 reglas de negocio, 20 criterios de aceptación.</footer>
 
 </div></body>
 </html>

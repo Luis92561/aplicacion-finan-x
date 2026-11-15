@@ -1,6 +1,6 @@
 # Licencia · FINAN-X
 
-Copyright (c) 2026 **Luis Alfredo Jaramillo Restrepo** y **Mayra Juliana Velez**.
+Copyright (c) 2026 **Luis Alfredo Jaramillo Restrepo** y **Mayra Juliana Vélez Hernández**.
 
 El contrato de licencia de uso del software hace parte de las evidencias académicas del
 proyecto y se entrega en:

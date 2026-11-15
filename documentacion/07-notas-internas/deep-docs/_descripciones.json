@@ -3,7 +3,6 @@
   "roles.rol_id": "Identificador único del rol. Clave primaria.",
   "roles.nombre": "Nombre corto del rol, en mayúsculas: ADMIN, FACTURADOR, CAJERO o SUPERVISOR. Es el valor que comparan las guardas de la API.",
   "roles.descripcion": "Explicación legible de qué puede hacer el rol. Se muestra en la pantalla de gestión de usuarios.",
-
   "__tabla__.usuarios": "Personal interno de la empresa (administrador, facturador, cajero, supervisor). No incluye a los clientes: esos viven en clientes + usuario_cliente.",
   "usuarios.usuario_id": "Identificador único del usuario interno. Clave primaria.",
   "usuarios.nombre": "Nombre completo de la persona.",
@@ -13,7 +12,6 @@
   "usuarios.estado": "ACTIVO o INACTIVO. Un usuario inactivo no puede iniciar sesión. Es baja lógica: nunca se borra la fila.",
   "usuarios.fecha_creacion": "Momento en que se creó la cuenta.",
   "usuarios.token_version": "Versión de sesión. Viaja dentro del JWT y se compara en cada petición. Al cambiar la contraseña o desactivar la cuenta se incrementa, y todos los tokens anteriores dejan de ser válidos (permite cerrar sesiones sin esperar a que caduquen).",
-
   "__tabla__.clientes": "Personas o empresas a las que se les factura. Es la entidad central del negocio: los pedidos y las facturas cuelgan de aquí.",
   "clientes.cliente_id": "Identificador único del cliente. Clave primaria.",
   "clientes.tipo_cliente": "PERSONA o EMPRESA. Determina si se pide nombre o razón social.",
@@ -26,7 +24,6 @@
   "clientes.ciudad": "Ciudad de residencia o de la sede.",
   "clientes.estado": "ACTIVO o INACTIVO. Un cliente inactivo no puede recibir pedidos ni autenticarse en el portal. Baja lógica.",
   "clientes.fecha_creacion": "Momento en que se registró el cliente.",
-
   "__tabla__.usuario_cliente": "Credenciales de acceso del cliente al portal de autoservicio. Un cliente tiene como máximo una cuenta (cliente_id es único), por eso es una tabla aparte y no columnas en clientes.",
   "usuario_cliente.usuario_cliente_id": "Identificador único de la cuenta de portal. Clave primaria.",
   "usuario_cliente.cliente_id": "Cliente al que pertenece la cuenta. Clave foránea a clientes y ÚNICA: garantiza la relación 1 a 0..1.",
@@ -36,7 +33,6 @@
   "usuario_cliente.fecha_creacion": "Momento en que se creó la cuenta de portal.",
   "usuario_cliente.ultimo_acceso": "Fecha y hora del último inicio de sesión correcto. Se actualiza en cada login del portal.",
   "usuario_cliente.token_version": "Versión de sesión, igual que en usuarios. Se incrementa al restablecer la contraseña con OTP, lo que invalida las sesiones abiertas.",
-
   "__tabla__.productos": "Catálogo de artículos y servicios que se pueden vender. El precio se copia al pedido en el momento de la venta.",
   "productos.producto_id": "Identificador único del producto. Clave primaria.",
   "productos.codigo": "Código interno del producto (por ejemplo PROD-001). Único: no puede haber dos productos con el mismo código.",
@@ -49,7 +45,6 @@
   "productos.estado": "ACTIVO o INACTIVO. Un producto inactivo no se puede añadir a pedidos nuevos, pero se conserva en las facturas históricas. Baja lógica.",
   "productos.fecha_creacion": "Momento en que se dio de alta el producto.",
   "productos.fecha_actualizacion": "Momento de la última modificación. Se actualiza al editar el producto o cambiar su estado.",
-
   "__tabla__.pedidos": "Documento interno que registra qué productos pidió un cliente, antes de facturarse. Recorre los estados BORRADOR, CONFIRMADO, CANCELADO y FACTURADO.",
   "pedidos.pedido_id": "Identificador único del pedido. Clave primaria.",
   "pedidos.numero_pedido": "Número legible del pedido, con formato PED-000123. Único.",
@@ -61,7 +56,6 @@
   "pedidos.estado": "BORRADOR (se puede editar), CONFIRMADO (listo para facturar), CANCELADO (descartado) o FACTURADO (ya tiene factura activa).",
   "pedidos.observaciones": "Notas libres sobre el pedido.",
   "pedidos.fecha_creacion": "Momento en que se registró el pedido.",
-
   "__tabla__.detalle_pedido": "Líneas del pedido: un registro por producto y cantidad. Es la tabla que resuelve la relación de muchos a muchos entre pedidos y productos, guardando además el precio aplicado.",
   "detalle_pedido.detalle_id": "Identificador único de la línea. Clave primaria.",
   "detalle_pedido.pedido_id": "Pedido al que pertenece la línea. Clave foránea a pedidos, con borrado en cascada (al borrar el pedido se borran sus líneas).",
@@ -69,7 +63,6 @@
   "detalle_pedido.cantidad": "Cantidad vendida. Debe ser mayor que cero.",
   "detalle_pedido.precio_unitario": "Precio del producto en el momento de la venta. Se copia aquí a propósito: si después cambia el precio del catálogo, el pedido y la factura históricos no se alteran.",
   "detalle_pedido.subtotal": "cantidad × precio_unitario de esta línea, redondeado a 2 decimales.",
-
   "__tabla__.facturas": "Documento de cobro generado a partir de un pedido confirmado. Un pedido puede tener varias facturas a lo largo del tiempo (por ejemplo si se anula una), pero solo una ACTIVA a la vez.",
   "facturas.factura_id": "Identificador único de la factura. Clave primaria.",
   "facturas.numero_factura": "Número legible de la factura, con formato FAC-000123. Único.",
@@ -85,7 +78,6 @@
   "facturas.fecha_anulacion": "Momento en que se anuló.",
   "facturas.usuario_anulacion": "Usuario interno que anuló la factura. Clave foránea a usuarios. Ayuda a la trazabilidad.",
   "facturas.fecha_creacion": "Momento en que se registró la factura.",
-
   "__tabla__.pagos": "Abonos recibidos contra una factura. Una factura puede tener varios pagos (pago parcial) hasta completar el total. Nunca se borran ni se editan: si hubo un error se corrige con una nota de crédito.",
   "pagos.pago_id": "Identificador único del pago. Clave primaria.",
   "pagos.numero_pago": "Número legible del pago, con formato PAG-000123. Único.",
@@ -104,7 +96,6 @@
   "pagos.vencimiento_tarjeta": "Fecha de vencimiento de la tarjeta, en formato MM/AA.",
   "pagos.numero_cuenta": "Número de cuenta para transferencias.",
   "pagos.usuario_cliente_id": "Cuenta de portal del cliente que hizo el pago. Clave foránea a usuario_cliente. Queda vacío si el pago lo registró el personal interno. Junto con usuario_id permite saber siempre quién pagó, porque son dos actores distintos.",
-
   "__tabla__.notas_credito": "Devoluciones sobre una factura. Una nota ACTIVA revierte el pago que devuelve, es decir, AUMENTA el saldo pendiente de la factura. Regla clave: no se puede devolver más de lo que realmente se ha pagado.",
   "notas_credito.nota_credito_id": "Identificador único de la nota de crédito. Clave primaria.",
   "notas_credito.numero_nota": "Número legible, con formato NC-000123. Único.",
@@ -119,7 +110,6 @@
   "notas_credito.fecha_anulacion": "Momento en que se anuló la nota.",
   "notas_credito.usuario_anulacion": "Usuario interno que la anuló. Clave foránea a usuarios.",
   "notas_credito.motivo_anulacion": "Razón de la anulación de la nota, obligatoria.",
-
   "__tabla__.auditoria": "Bitácora de operaciones. Cada acción sensible (login, creación, cambio de estado, anulación, pago…) deja un registro aquí. El campo usuario guarda el identificador como TEXTO y no como clave foránea, a propósito: el rastro debe sobrevivir aunque la cuenta se elimine.",
   "auditoria.auditoria_id": "Identificador único del registro. Clave primaria.",
   "auditoria.usuario": "Quién hizo la operación (correo del interno o username del cliente). Se guarda como texto, sin clave foránea, para que el histórico no dependa de que la cuenta siga existiendo.",
@@ -129,7 +119,6 @@
   "auditoria.operacion": "Tipo de operación: LOGIN, LOGIN_FALLIDO, CREAR, ACTUALIZAR, ESTADO, GENERAR, ANULAR, REGISTRAR, PAGO_PORTAL, AUTORREGISTRO, CLAVE_RECUPERADA, CODIGO_EFECTY…",
   "auditoria.registro_afectado": "Identificador del registro tocado (número de factura, de pago, id del cliente…).",
   "auditoria.descripcion": "Descripción legible de lo que ocurrió, con los datos relevantes.",
-
   "__tabla__.recuperaciones_clave": "Solicitudes de recuperación de contraseña mediante código de un solo uso (OTP). El código se guarda CIFRADO con bcrypt, nunca en texto plano, y caduca.",
   "recuperaciones_clave.recuperacion_id": "Identificador único de la solicitud. Clave primaria.",
   "recuperaciones_clave.usuario_cliente_id": "Cuenta de portal que pidió el código. Clave foránea a usuario_cliente, con borrado en cascada.",
@@ -139,7 +128,6 @@
   "recuperaciones_clave.usado": "Verdadero cuando la solicitud ya se consumió o se invalidó. Un código solo sirve una vez.",
   "recuperaciones_clave.expira_en": "Momento en que el código deja de ser válido (10 minutos desde su creación).",
   "recuperaciones_clave.creado_en": "Momento en que se solicitó el código.",
-
   "__vista__.factura_saldo": "Vista de lectura que calcula el estado de cobro de cada factura. El saldo NUNCA se almacena: se deriva de los pagos y las notas de crédito activas, así no puede desincronizarse. Fórmula: saldo = total − suma(pagos) + suma(notas de crédito ACTIVAS). Los pagos y las notas se agregan en subconsultas independientes: hacerlo con dos LEFT JOIN a la vez producía el producto cartesiano de ambos conjuntos y multiplicaba las sumas.",
   "factura_saldo.factura_id": "Factura a la que corresponde el cálculo. Clave primaria de la vista.",
   "factura_saldo.numero_factura": "Número legible de la factura.",
@@ -156,5 +144,16 @@
   "factura_saldo.estado_pago": "Estado de cobro calculado: PENDIENTE (nada pagado), PAGO_PARCIAL, PAGADA (saldo cero o negativo) o ANULADA.",
   "factura_saldo.motivo_anulacion": "Motivo, si la factura está anulada.",
   "factura_saldo.fecha_anulacion": "Fecha de anulación, si procede.",
-  "factura_saldo.notas_credito": "Suma de las notas de crédito ACTIVAS. Se suma al saldo porque revierte el pago devuelto."
+  "factura_saldo.notas_credito": "Suma de las notas de crédito ACTIVAS. Se suma al saldo porque revierte el pago devuelto.",
+  "usuarios.username": "Nombre de usuario corto para iniciar sesión (el correo también sirve).",
+  "usuarios.debe_cambiar_clave": "Verdadero mientras la cuenta use una clave temporal y deba cambiarla en el primer ingreso.",
+  "usuarios.clave_actualizada_en": "Fecha del último cambio de contraseña de la cuenta.",
+  "usuarios.fallos_login": "Intentos fallidos consecutivos; se reinicia al acertar.",
+  "usuarios.bloqueado_hasta": "Fecha hasta la que la cuenta está bloqueada por intentos fallidos.",
+  "usuario_cliente.debe_cambiar_clave": "Verdadero mientras la cuenta de portal use una clave temporal.",
+  "usuario_cliente.clave_actualizada_en": "Fecha del último cambio de contraseña de la cuenta de portal.",
+  "usuario_cliente.fallos_login": "Intentos fallidos consecutivos de la cuenta de portal.",
+  "usuario_cliente.bloqueado_hasta": "Fecha hasta la que la cuenta de portal está bloqueada.",
+  "auditoria.ip": "Dirección IP desde la que se realizó la operación.",
+  "auditoria.user_agent": "Navegador o cliente que realizó la operación."
 }

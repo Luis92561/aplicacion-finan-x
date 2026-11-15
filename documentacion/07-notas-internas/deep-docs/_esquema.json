@@ -89,6 +89,28 @@
       "ordinal_position": 8
     },
     {
+      "table_name": "auditoria",
+      "column_name": "ip",
+      "data_type": "inet",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "auditoria",
+      "column_name": "user_agent",
+      "data_type": "text",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 10
+    },
+    {
       "table_name": "clientes",
       "column_name": "cliente_id",
       "data_type": "integer",
@@ -1200,6 +1222,50 @@
       "ordinal_position": 8
     },
     {
+      "table_name": "usuario_cliente",
+      "column_name": "debe_cambiar_clave",
+      "data_type": "boolean",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": "false",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "usuario_cliente",
+      "column_name": "clave_actualizada_en",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "usuario_cliente",
+      "column_name": "fallos_login",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "NO",
+      "column_default": "0",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "usuario_cliente",
+      "column_name": "bloqueado_hasta",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 12
+    },
+    {
       "table_name": "usuarios",
       "column_name": "usuario_id",
       "data_type": "integer",
@@ -1286,6 +1352,61 @@
       "is_nullable": "NO",
       "column_default": "1",
       "ordinal_position": 8
+    },
+    {
+      "table_name": "usuarios",
+      "column_name": "username",
+      "data_type": "character varying",
+      "character_maximum_length": 60,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "usuarios",
+      "column_name": "debe_cambiar_clave",
+      "data_type": "boolean",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "NO",
+      "column_default": "false",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "usuarios",
+      "column_name": "clave_actualizada_en",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "usuarios",
+      "column_name": "fallos_login",
+      "data_type": "integer",
+      "character_maximum_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0,
+      "is_nullable": "NO",
+      "column_default": "0",
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "usuarios",
+      "column_name": "bloqueado_hasta",
+      "data_type": "timestamp with time zone",
+      "character_maximum_length": null,
+      "numeric_precision": null,
+      "numeric_scale": null,
+      "is_nullable": "YES",
+      "column_default": null,
+      "ordinal_position": 13
     }
   ],
   "pks": [
@@ -1584,6 +1705,11 @@
       "table_name": "usuarios",
       "constraint_name": "ck_usuarios_estado",
       "definicion": "CHECK (((estado)::text = ANY ((ARRAY['ACTIVO'::character varying, 'INACTIVO'::character varying])::text[])))"
+    },
+    {
+      "table_name": "usuarios",
+      "constraint_name": "ck_usuarios_username",
+      "definicion": "CHECK (((username IS NULL) OR ((username)::text ~ '^[a-z0-9._-]{3,32}$'::text)))"
     }
   ],
   "indices": [
@@ -1644,6 +1770,11 @@
     },
     {
       "tablename": "facturas",
+      "indexname": "idx_facturas_fecha_emision",
+      "indexdef": "CREATE INDEX idx_facturas_fecha_emision ON public.facturas USING btree (fecha_emision)"
+    },
+    {
+      "tablename": "facturas",
       "indexname": "idx_facturas_pedido",
       "indexdef": "CREATE INDEX idx_facturas_pedido ON public.facturas USING btree (pedido_id)"
     },
@@ -1676,6 +1807,11 @@
       "tablename": "pagos",
       "indexname": "idx_pagos_factura",
       "indexdef": "CREATE INDEX idx_pagos_factura ON public.pagos USING btree (factura_id)"
+    },
+    {
+      "tablename": "pagos",
+      "indexname": "idx_pagos_fecha",
+      "indexdef": "CREATE INDEX idx_pagos_fecha ON public.pagos USING btree (fecha)"
     },
     {
       "tablename": "pagos",
@@ -1764,6 +1900,11 @@
     },
     {
       "tablename": "usuarios",
+      "indexname": "uq_usuarios_username",
+      "indexdef": "CREATE UNIQUE INDEX uq_usuarios_username ON public.usuarios USING btree (lower((username)::text)) WHERE (username IS NOT NULL)"
+    },
+    {
+      "tablename": "usuarios",
       "indexname": "usuarios_correo_key",
       "indexdef": "CREATE UNIQUE INDEX usuarios_correo_key ON public.usuarios USING btree (correo)"
     },
@@ -1779,5 +1920,5 @@
       "view_definition": " SELECT f.factura_id,\n    f.numero_factura,\n    f.pedido_id,\n    f.cliente_id,\n    f.fecha_emision,\n    f.fecha_vencimiento,\n    (f.subtotal)::double precision AS subtotal,\n    (f.impuestos)::double precision AS impuestos,\n    (f.total)::double precision AS total,\n    (COALESCE(pg.valor_pagado, (0)::numeric))::double precision AS valor_pagado,\n    (((f.total - COALESCE(pg.valor_pagado, (0)::numeric)) + COALESCE(nc.notas_credito, (0)::numeric)))::double precision AS saldo,\n    f.estado,\n        CASE\n            WHEN ((f.estado)::text = 'ANULADA'::text) THEN 'ANULADA'::text\n            WHEN ((COALESCE(pg.valor_pagado, (0)::numeric) - COALESCE(nc.notas_credito, (0)::numeric)) <= (0)::numeric) THEN 'PENDIENTE'::text\n            WHEN (((f.total - COALESCE(pg.valor_pagado, (0)::numeric)) + COALESCE(nc.notas_credito, (0)::numeric)) <= (0)::numeric) THEN 'PAGADA'::text\n            ELSE 'PAGO_PARCIAL'::text\n        END AS estado_pago,\n    f.motivo_anulacion,\n    f.fecha_anulacion,\n    (COALESCE(nc.notas_credito, (0)::numeric))::double precision AS notas_credito\n   FROM ((facturas f\n     LEFT JOIN ( SELECT pagos.factura_id,\n            sum(pagos.valor) AS valor_pagado\n           FROM pagos\n          GROUP BY pagos.factura_id) pg ON ((pg.factura_id = f.factura_id)))\n     LEFT JOIN ( SELECT notas_credito.factura_id,\n            sum(notas_credito.valor) AS notas_credito\n           FROM notas_credito\n          WHERE ((notas_credito.estado)::text = 'ACTIVA'::text)\n          GROUP BY notas_credito.factura_id) nc ON ((nc.factura_id = f.factura_id)));"
     }
   ],
-  "generado": "2026-10-12T01:03:02.736Z"
+  "generado": "2026-11-12T06:00:54.219Z"
 }

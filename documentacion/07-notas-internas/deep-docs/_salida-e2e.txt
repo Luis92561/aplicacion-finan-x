@@ -1,4 +1,4 @@
-
+﻿
 === FINAN-X · Pruebas end-to-end ===
 
 1) Autenticación
@@ -140,8 +140,9 @@
   ✔ No se revela el motor web (sin X-Powered-By)
   ✔ CORS: origen permitido recibe la cabecera
   ✔ CORS: origen no permitido es bloqueado
-  ✔ Fuerza bruta: intentos fallidos consecutivos → 429
-  ✔ Login correcto tras bloqueo → 200 (el acierto resetea el contador)
+  ✔ Fuerza bruta: 5 fallos de una cuenta → 429
+  ✔ Un login correcto de OTRA cuenta no reinicia el bloqueo
+  ✔ La cuenta atacada sigue bloqueada tras el login ajeno → 429
   ✔ Token renovado sigue aislado en el portal
 12) Recuperación de contraseña (OTP) y datos de pago en línea
   ✔ Solicitar código → 200 y en demo llega el OTP
@@ -177,6 +178,9 @@
   ✔ Interno: cheque con banco y número → 201
   ✔ Se guardan solo los últimos 4 dígitos y la marca de la tarjeta
   ✔ Nunca se exponen CVV ni número completo de tarjeta
+13) Eliminación de clientes
+  ✔ Eliminar cliente sin movimientos → 200
+  ✔ Eliminar cliente con facturas → 409 (conserva historial)
 
-=== Resultado: 154 aprobadas, 0 fallidas ===
+=== Resultado: 157 aprobadas, 0 fallidas ===
 

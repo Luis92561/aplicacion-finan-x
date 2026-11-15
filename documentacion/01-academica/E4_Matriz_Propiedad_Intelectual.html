@@ -35,7 +35,9 @@
   .portada table.meta{margin:0 auto; border-collapse:collapse; font-size:9.5pt; text-align:left}
   .portada table.meta td{padding:4px 10px; border-bottom:1px solid var(--border)}
   .portada table.meta td:first-child{color:var(--muted); font-weight:600; white-space:nowrap}
-  .portada .pie{margin-top:38px; font-size:9pt; color:var(--muted)}
+  .portada .autores{margin:26px 0 0; font-size:10pt; color:var(--primary-dark)}
+  .portada .autores strong{display:block; font-size:8pt; letter-spacing:.6px; text-transform:uppercase; color:var(--muted); margin-bottom:3px}
+  .portada .pie{margin-top:22px; font-size:9pt; color:var(--muted)}
 
   /* ---------- Encabezados ---------- */
   h1{font-size:16pt; color:var(--primary-dark); margin:0 0 4px; padding-bottom:6px; border-bottom:2.5px solid var(--primary)}
@@ -92,17 +94,38 @@
   .kpi .n{font-size:17pt; font-weight:800; color:var(--primary); line-height:1.1}
   .kpi .t{font-size:8pt; color:var(--muted); text-transform:uppercase; letter-spacing:.4px}
 
-  .captura{border:1px solid var(--border); border-radius:8px; overflow:hidden; margin:9px 0; page-break-inside:avoid}
+  .captura{border:1px solid var(--border); border-radius:8px; overflow:hidden; margin:9px 0; page-break-inside:avoid; break-inside:avoid}
   .captura img{width:100%; display:block}
+  /* Capturas muy altas: sin limite ocuparian varias paginas y el navegador partiria el
+     marco, dejando un recuadro vacio en una pagina y la imagen suelta en la siguiente.
+     Se limitan a un alto que quepa de una vez y se centran. */
+  .captura img.alta{width:auto; max-width:100%; max-height:200mm; margin:0 auto}
   .captura .pie{background:var(--bg); padding:5px 9px; font-size:8pt; color:var(--muted); border-top:1px solid var(--border)}
+  .captura .aviso{font-size:7.6pt; color:var(--muted); font-style:italic}
 
   .salto{page-break-before:always}
   .evitar-corte{page-break-inside:avoid}
   .indice{font-size:10pt}
   .indice li{margin:3px 0}
   .firma{margin-top:38px; display:grid; grid-template-columns:1fr 1fr; gap:28px}
-  .firma .l{border-top:1px solid #334155; padding-top:5px; font-size:9pt; color:#334155}
-  .placeholder{background:#fef3c7; border-bottom:1px dashed var(--warning); padding:0 3px; font-weight:600}
+  .firma .l{padding-top:5px; font-size:9pt; color:#334155}
+  .firma .l strong{display:block; color:#172554; font-size:9.5pt; margin-bottom:2px}
+  /* Cada dato bajo la firma va en su propio renglon, con el hueco para escribirlo. */
+  .firma .firma-datos{display:block; margin-bottom:1px}
+  /* Hueco en blanco para completar a mano (los datos de las partes en el contrato).
+     No lleva raya: la franja y el borde de la tabla ya indican donde va cada dato.
+     Es inline-block con ancho completo para que ocupe el ancho de su celda Y pueda
+     usarse dentro de una frase (la linea de la fecha de firma). */
+  .hueco{display:inline-block; width:100%; height:1.3em; vertical-align:bottom}
+  /* Linea sobre la que se firma. Aqui si hay raya: es la referencia de la firma. */
+  .linea-firma{display:block; border-bottom:1px solid #334155}
+  /* Columna de etiquetas de las tablas de formulario. */
+  table.formulario .c-etiqueta{width:32%; font-weight:600}
+  /* En las tablas de formulario la etiqueta va arriba, a la altura de la primera
+     linea de escritura. */
+  table.formulario td{vertical-align:top}
+  /* La ultima fila no necesita el borde inferior: la tabla ya cierra ahi. */
+  table.formulario tbody tr:last-child td{border-bottom:none}
   footer.pie-doc{margin-top:26px; border-top:1px solid var(--border); padding-top:7px; font-size:8pt; color:var(--muted)}
 </style>
 </head>
@@ -115,12 +138,13 @@
   <h1>Matriz de propiedad intelectual</h1>
   <p class="desc">Inventario de todo lo que compone FINAN-X: qué es propio del equipo, qué es de terceros y bajo qué licencia se utiliza. Las licencias se han verificado en el árbol de dependencias real del proyecto, no supuesto.</p>
   <table class="meta"><tr><td>Sistema</td><td>FINAN-X · Facturación y pagos</td></tr>
-<tr><td>Paquetes analizados</td><td>238</td></tr>
-<tr><td>Dependencias directas</td><td>12</td></tr>
+<tr><td>Paquetes analizados</td><td>276</td></tr>
+<tr><td>Dependencias directas</td><td>13</td></tr>
 <tr><td>Componentes no npm</td><td>11</td></tr>
-<tr><td>Licencias distintas encontradas</td><td>6</td></tr>
+<tr><td>Licencias distintas encontradas</td><td>7</td></tr>
 <tr><td>Licencias copyleft fuerte</td><td>1 (una herramienta, no se distribuye)</td></tr></table>
-  <p class="pie">Proyecto académico · Integración de Aplicaciones · Sexto semestre</p>
+  <p class="autores"><strong>Autores</strong>Luis Alfredo Jaramillo Restrepo · Mayra Juliana Vélez Hernández</p>
+  <p class="pie">Proyecto académico · Integración de Aplicaciones · Sexto semestre · FINAN-X 1.0.0 · 12 de noviembre de 2026</p>
 </section>
 
 <h1>1. Para qué sirve esta matriz</h1>
@@ -144,12 +168,12 @@
 <tr><td><strong>Modelo de datos</strong></td><td>Diseño del esquema de PostgreSQL, las restricciones de integridad, los índices y la vista de saldo.</td></tr>
 <tr><td><strong>Reglas de negocio</strong></td><td>Las decisiones de negocio del sistema: no permitir sobrepago, una factura activa por pedido, no devolver más de lo pagado, baja lógica, auditoría.</td></tr>
 <tr><td><strong>Documentación</strong></td><td>Requisitos, guías, especificaciones, diagramas, mockups y estas siete evidencias.</td></tr>
-<tr><td><strong>Pruebas automáticas</strong></td><td>La suite de integración de 154 comprobaciones y los scripts de captura de pantalla.</td></tr>
+<tr><td><strong>Pruebas automáticas</strong></td><td>La suite de integración de 157 comprobaciones y los scripts de captura de pantalla.</td></tr>
 <tr><td><strong>Prototipos (mockups)</strong></td><td>Las 14 pantallas de demostración en HTML y la galería.</td></tr>
 </tbody></table>
 
 <h1>3. Componentes de terceros que forman parte del software</h1>
-<p>Se listan las <strong>dependencias directas</strong> (14), es decir, las que el equipo eligió de forma explícita. Las transitivas se resumen en la sección 6.</p>
+<p>Se listan las <strong>dependencias directas</strong> (15), es decir, las que el equipo eligió de forma explícita. Las transitivas se resumen en la sección 6.</p>
 
 <table class=""><thead><tr><th>Paquete</th><th>Versión</th><th>Ámbito</th><th>Licencia</th><th>Uso en el proyecto</th></tr></thead><tbody>
 <tr><td><code>bcryptjs</code></td><td>2.4.3</td><td>Backend</td><td>MIT</td><td>Cifrado de contraseñas y de los códigos OTP.</td></tr>
@@ -165,6 +189,7 @@
 <tr><td><code>react</code></td><td>18.3.1</td><td>Frontend</td><td>MIT</td><td>Biblioteca de interfaz de usuario del frontend.</td></tr>
 <tr><td><code>react-dom</code></td><td>18.3.1</td><td>Frontend</td><td>MIT</td><td>Renderizado de React en el navegador.</td></tr>
 <tr><td><code>react-router-dom</code></td><td>6.30.6</td><td>Frontend</td><td>MIT</td><td>Enrutado de la aplicación de página única.</td></tr>
+<tr><td><code>recharts</code></td><td>2.15.4</td><td>Frontend</td><td>MIT</td><td>—</td></tr>
 <tr><td><code>vite</code></td><td>5.4.21</td><td>Frontend</td><td>MIT</td><td>Empaquetador y servidor de desarrollo del frontend.</td></tr>
 </tbody></table>
 
@@ -197,25 +222,26 @@
 </div>
 
 <h1>5. Resumen de licencias encontradas</h1>
-<p>Resultado de analizar los <strong>238 paquetes</strong> que instala el proyecto (backend y frontend, incluidas las dependencias de desarrollo y las transitivas):</p>
+<p>Resultado de analizar los <strong>276 paquetes</strong> que instala el proyecto (backend y frontend, incluidas las dependencias de desarrollo y las transitivas):</p>
 
 <table class=""><thead><tr><th>Licencia</th><th class="c">Paquetes</th><th>Qué permite</th><th class="c">Tipo</th></tr></thead><tbody>
-<tr><td><strong>MIT</strong></td><td class="c">221</td><td>Permisiva. Permite usar, copiar, modificar y distribuir, incluso comercialmente, conservando el aviso de copyright.</td><td class="c"><span class="badge b-ok">Permisiva</span></td></tr>
-<tr><td><strong>ISC</strong></td><td class="c">10</td><td>Equivalente funcional a MIT. Mismas libertades.</td><td class="c"><span class="badge b-ok">Permisiva</span></td></tr>
-<tr><td><strong>BSD-3-Clause</strong></td><td class="c">3</td><td>Permisiva, con una cláusula extra que prohíbe usar el nombre de los autores para promocionar el producto derivado.</td><td class="c"><span class="badge b-ok">Permisiva</span></td></tr>
+<tr><td><strong>MIT</strong></td><td class="c">245</td><td>Permisiva. Permite usar, copiar, modificar y distribuir, incluso comercialmente, conservando el aviso de copyright.</td><td class="c"><span class="badge b-ok">Permisiva</span></td></tr>
+<tr><td><strong>ISC</strong></td><td class="c">21</td><td>Equivalente funcional a MIT. Mismas libertades.</td><td class="c"><span class="badge b-ok">Permisiva</span></td></tr>
+<tr><td><strong>BSD-3-Clause</strong></td><td class="c">5</td><td>Permisiva, con una cláusula extra que prohíbe usar el nombre de los autores para promocionar el producto derivado.</td><td class="c"><span class="badge b-ok">Permisiva</span></td></tr>
 <tr><td><strong>Apache-2.0</strong></td><td class="c">2</td><td>Permisiva. Permite uso comercial y además concede licencia explícita de patentes.</td><td class="c"><span class="badge b-ok">Permisiva</span></td></tr>
 <tr><td><strong>BSD-2-Clause</strong></td><td class="c">1</td><td>Permisiva. Como MIT, con el aviso de copyright.</td><td class="c"><span class="badge b-ok">Permisiva</span></td></tr>
 <tr><td><strong>CC-BY-4.0</strong></td><td class="c">1</td><td>Creative Commons de atribución: permite el uso citando la autoría.</td><td class="c"><span class="badge b-ok">Permisiva</span></td></tr>
+<tr><td><strong>MIT AND ISC</strong></td><td class="c">1</td><td>—</td><td class="c"><span class="badge b-ok">Permisiva</span></td></tr>
 </tbody></table>
 
 <div class="grid3">
-  <div class="kpi"><div class="n">238</div><div class="t">Paquetes analizados</div></div>
-  <div class="kpi"><div class="n">93%</div><div class="t">Bajo licencia MIT</div></div>
+  <div class="kpi"><div class="n">276</div><div class="t">Paquetes analizados</div></div>
+  <div class="kpi"><div class="n">89%</div><div class="t">Bajo licencia MIT</div></div>
   <div class="kpi"><div class="n">0</div><div class="t">Copyleft en las dependencias</div></div>
 </div>
 
 <h1>6. Dependencias transitivas</h1>
-<p>Son las 224 librerías que instalan las anteriores. No se eligieron directamente, pero también forman parte del software distribuido, por lo que se revisó su licencia. Todas son permisivas.</p>
+<p>Son las 261 librerías que instalan las anteriores. No se eligieron directamente, pero también forman parte del software distribuido, por lo que se revisó su licencia. Todas son permisivas.</p>
 
 <table class="compacta "><thead><tr><th>Paquete</th><th>Versión</th><th>Ámbito</th><th>Licencia</th></tr></thead><tbody>
 <tr><td><code>@babel/code-frame</code></td><td>7.29.7</td><td>Frontend</td><td>MIT</td></tr>
@@ -234,6 +260,7 @@
 <tr><td><code>@babel/parser</code></td><td>7.29.9</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>@babel/plugin-transform-react-jsx-self</code></td><td>7.29.7</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>@babel/plugin-transform-react-jsx-source</code></td><td>7.29.7</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@babel/runtime</code></td><td>7.29.10</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>@babel/template</code></td><td>7.29.7</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>@babel/traverse</code></td><td>7.29.8</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>@babel/types</code></td><td>7.29.8</td><td>Frontend</td><td>MIT</td></tr>
@@ -297,6 +324,15 @@
 <tr><td><code>@types/babel__generator</code></td><td>7.27.0</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>@types/babel__template</code></td><td>7.4.4</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>@types/babel__traverse</code></td><td>7.28.0</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@types/d3-array</code></td><td>3.2.2</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@types/d3-color</code></td><td>3.1.3</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@types/d3-ease</code></td><td>3.0.2</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@types/d3-interpolate</code></td><td>3.0.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@types/d3-path</code></td><td>3.1.1</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@types/d3-scale</code></td><td>4.0.9</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@types/d3-shape</code></td><td>3.2.0</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@types/d3-time</code></td><td>3.0.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>@types/d3-timer</code></td><td>3.0.2</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>@types/estree</code></td><td>1.0.9</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>accepts</code></td><td>1.3.8</td><td>Backend</td><td>MIT</td></tr>
 <tr><td><code>agent-base</code></td><td>6.0.2</td><td>Frontend</td><td>MIT</td></tr>
@@ -311,17 +347,32 @@
 <tr><td><code>call-bind-apply-helpers</code></td><td>1.0.2</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>call-bound</code></td><td>1.0.4</td><td>Backend</td><td>MIT</td></tr>
 <tr><td><code>caniuse-lite</code></td><td>1.0.30001810</td><td>Frontend</td><td>CC-BY-4.0</td></tr>
+<tr><td><code>clsx</code></td><td>2.1.1</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>combined-stream</code></td><td>1.0.8</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>content-disposition</code></td><td>0.5.4</td><td>Backend</td><td>MIT</td></tr>
 <tr><td><code>content-type</code></td><td>1.0.5</td><td>Backend</td><td>MIT</td></tr>
 <tr><td><code>convert-source-map</code></td><td>2.0.0</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>cookie</code></td><td>0.7.2</td><td>Backend</td><td>MIT</td></tr>
 <tr><td><code>cookie-signature</code></td><td>1.0.7</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>csstype</code></td><td>3.2.3</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>d3-array</code></td><td>3.2.4</td><td>Frontend</td><td>ISC</td></tr>
+<tr><td><code>d3-color</code></td><td>3.1.0</td><td>Frontend</td><td>ISC</td></tr>
+<tr><td><code>d3-ease</code></td><td>3.0.1</td><td>Frontend</td><td>BSD-3-Clause</td></tr>
+<tr><td><code>d3-format</code></td><td>3.1.2</td><td>Frontend</td><td>ISC</td></tr>
+<tr><td><code>d3-interpolate</code></td><td>3.0.1</td><td>Frontend</td><td>ISC</td></tr>
+<tr><td><code>d3-path</code></td><td>3.1.0</td><td>Frontend</td><td>ISC</td></tr>
+<tr><td><code>d3-scale</code></td><td>4.0.2</td><td>Frontend</td><td>ISC</td></tr>
+<tr><td><code>d3-shape</code></td><td>3.2.0</td><td>Frontend</td><td>ISC</td></tr>
+<tr><td><code>d3-time</code></td><td>3.1.0</td><td>Frontend</td><td>ISC</td></tr>
+<tr><td><code>d3-time-format</code></td><td>4.1.0</td><td>Frontend</td><td>ISC</td></tr>
+<tr><td><code>d3-timer</code></td><td>3.0.1</td><td>Frontend</td><td>ISC</td></tr>
 <tr><td><code>debug</code></td><td>2.6.9</td><td>Backend</td><td>MIT</td></tr>
 <tr><td><code>debug</code></td><td>4.4.3</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>decimal.js-light</code></td><td>2.5.1</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>delayed-stream</code></td><td>1.0.0</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>depd</code></td><td>2.0.0</td><td>Backend</td><td>MIT</td></tr>
 <tr><td><code>destroy</code></td><td>1.2.0</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>dom-helpers</code></td><td>5.2.1</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>dunder-proto</code></td><td>1.0.1</td><td>Backend</td><td>MIT</td></tr>
 <tr><td><code>dunder-proto</code></td><td>1.0.1</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>ecdsa-sig-formatter</code></td><td>1.0.11</td><td>Backend</td><td>Apache-2.0</td></tr>
@@ -339,6 +390,8 @@
 <tr><td><code>escalade</code></td><td>3.2.0</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>escape-html</code></td><td>1.0.3</td><td>Backend</td><td>MIT</td></tr>
 <tr><td><code>etag</code></td><td>1.8.1</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>eventemitter3</code></td><td>4.0.7</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>fast-equals</code></td><td>5.4.5</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>finalhandler</code></td><td>1.3.2</td><td>Backend</td><td>MIT</td></tr>
 <tr><td><code>follow-redirects</code></td><td>1.16.0</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>form-data</code></td><td>4.0.6</td><td>Frontend</td><td>MIT</td></tr>
@@ -363,12 +416,14 @@
 <tr><td><code>https-proxy-agent</code></td><td>5.0.1</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>iconv-lite</code></td><td>0.4.24</td><td>Backend</td><td>MIT</td></tr>
 <tr><td><code>inherits</code></td><td>2.0.4</td><td>Backend</td><td>ISC</td></tr>
+<tr><td><code>internmap</code></td><td>2.0.3</td><td>Frontend</td><td>ISC</td></tr>
 <tr><td><code>ipaddr.js</code></td><td>1.9.1</td><td>Backend</td><td>MIT</td></tr>
 <tr><td><code>js-tokens</code></td><td>4.0.0</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>jsesc</code></td><td>3.1.0</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>json5</code></td><td>2.2.3</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>jwa</code></td><td>2.0.1</td><td>Backend</td><td>MIT</td></tr>
 <tr><td><code>jws</code></td><td>4.0.1</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>lodash</code></td><td>4.18.1</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>lodash.includes</code></td><td>4.3.0</td><td>Backend</td><td>MIT</td></tr>
 <tr><td><code>lodash.isboolean</code></td><td>3.0.3</td><td>Backend</td><td>MIT</td></tr>
 <tr><td><code>lodash.isinteger</code></td><td>4.0.4</td><td>Backend</td><td>MIT</td></tr>
@@ -394,6 +449,7 @@
 <tr><td><code>negotiator</code></td><td>0.6.3</td><td>Backend</td><td>MIT</td></tr>
 <tr><td><code>node-releases</code></td><td>2.0.56</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>object-assign</code></td><td>4.1.1</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>object-assign</code></td><td>4.1.1</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>object-inspect</code></td><td>1.13.4</td><td>Backend</td><td>MIT</td></tr>
 <tr><td><code>on-finished</code></td><td>2.4.1</td><td>Backend</td><td>MIT</td></tr>
 <tr><td><code>parseurl</code></td><td>1.3.3</td><td>Backend</td><td>MIT</td></tr>
@@ -411,13 +467,18 @@
 <tr><td><code>postgres-bytea</code></td><td>1.0.1</td><td>Backend</td><td>MIT</td></tr>
 <tr><td><code>postgres-date</code></td><td>1.0.7</td><td>Backend</td><td>MIT</td></tr>
 <tr><td><code>postgres-interval</code></td><td>1.2.0</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>prop-types</code></td><td>15.8.1</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>proxy-addr</code></td><td>2.0.8</td><td>Backend</td><td>MIT</td></tr>
 <tr><td><code>proxy-from-env</code></td><td>2.1.0</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>qs</code></td><td>6.16.0</td><td>Backend</td><td>BSD-3-Clause</td></tr>
 <tr><td><code>range-parser</code></td><td>1.2.1</td><td>Backend</td><td>MIT</td></tr>
 <tr><td><code>raw-body</code></td><td>2.5.3</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>react-is</code></td><td>18.3.1</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>react-refresh</code></td><td>0.17.0</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>react-router</code></td><td>6.30.6</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>react-smooth</code></td><td>4.0.4</td><td>Frontend</td><td>MIT</td></tr>
+<tr><td><code>react-transition-group</code></td><td>4.4.5</td><td>Frontend</td><td>BSD-3-Clause</td></tr>
+<tr><td><code>recharts-scale</code></td><td>0.4.5</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>rollup</code></td><td>4.63.4</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>safe-buffer</code></td><td>5.2.1</td><td>Backend</td><td>MIT</td></tr>
 <tr><td><code>safer-buffer</code></td><td>2.1.2</td><td>Backend</td><td>MIT</td></tr>
@@ -434,12 +495,14 @@
 <tr><td><code>source-map-js</code></td><td>1.2.1</td><td>Frontend</td><td>BSD-3-Clause</td></tr>
 <tr><td><code>split2</code></td><td>4.2.0</td><td>Backend</td><td>ISC</td></tr>
 <tr><td><code>statuses</code></td><td>2.0.2</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>tiny-invariant</code></td><td>1.3.3</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>toidentifier</code></td><td>1.0.1</td><td>Backend</td><td>MIT</td></tr>
 <tr><td><code>type-is</code></td><td>1.6.18</td><td>Backend</td><td>MIT</td></tr>
 <tr><td><code>unpipe</code></td><td>1.0.0</td><td>Backend</td><td>MIT</td></tr>
 <tr><td><code>update-browserslist-db</code></td><td>1.3.3</td><td>Frontend</td><td>MIT</td></tr>
 <tr><td><code>utils-merge</code></td><td>1.0.1</td><td>Backend</td><td>MIT</td></tr>
 <tr><td><code>vary</code></td><td>1.1.2</td><td>Backend</td><td>MIT</td></tr>
+<tr><td><code>victory-vendor</code></td><td>36.9.2</td><td>Frontend</td><td>MIT AND ISC</td></tr>
 <tr><td><code>xtend</code></td><td>4.0.2</td><td>Backend</td><td>MIT</td></tr>
 <tr><td><code>yallist</code></td><td>3.1.1</td><td>Frontend</td><td>ISC</td></tr>
 </tbody></table>
@@ -458,7 +521,7 @@
 <h1>8. Riesgos detectados y medidas</h1>
 
 <table class=""><thead><tr><th>Riesgo</th><th>Nivel</th><th>Medida adoptada</th></tr></thead><tbody>
-<tr><td>Una dependencia con licencia copyleft fuerte obligaría a liberar el código propio</td><td><span class="badge b-ok">Bajo</span></td><td>Se revisaron las 238 licencias: ninguna dependencia del software distribuido es copyleft. PlantUML (GPL-3.0) es una herramienta externa que no se distribuye ni se enlaza.</td></tr>
+<tr><td>Una dependencia con licencia copyleft fuerte obligaría a liberar el código propio</td><td><span class="badge b-ok">Bajo</span></td><td>Se revisaron las 276 licencias: ninguna dependencia del software distribuido es copyleft. PlantUML (GPL-3.0) es una herramienta externa que no se distribuye ni se enlaza.</td></tr>
 <tr><td>Una dependencia sin licencia declarada dejaría el uso en zona gris</td><td><span class="badge b-ok">Bajo</span></td><td>Ningún paquete quedó sin licencia identificada en el análisis.</td></tr>
 <tr><td>Cambio de licencia en una versión futura de una dependencia</td><td><span class="badge b-warn">Medio</span></td><td>El proyecto fija versiones en <code>package-lock.json</code>, de modo que una actualización no entra sin revisión. Conviene repetir este análisis al actualizar.</td></tr>
 <tr><td>Vulnerabilidad conocida en una dependencia</td><td><span class="badge b-warn">Medio</span></td><td>Fuera del alcance de esta evidencia (es un asunto de seguridad, no de propiedad intelectual). Se recomienda ejecutar <code>npm audit</code> antes de cada entrega.</td></tr>
@@ -476,7 +539,7 @@ node deep-docs/_generar_licencias.mjs</code></pre>
   <p style="margin-bottom:0">La matriz debe revisarse cuando se añada o actualice una dependencia. Volver a ejecutar el script y regenerar este documento es suficiente; si aparece una licencia nueva, quedará reflejada automáticamente.</p>
 </div>
 
-<footer class="pie-doc">FINAN-X · Evidencia 4 de 7 · Matriz de propiedad intelectual · 238 paquetes npm + 11 componentes de infraestructura y herramientas. Licencias verificadas en el árbol de dependencias.</footer>
+<footer class="pie-doc">FINAN-X · Evidencia 4 de 7 · Matriz de propiedad intelectual · 276 paquetes npm + 11 componentes de infraestructura y herramientas. Licencias verificadas en el árbol de dependencias.</footer>
 
 </div></body>
 </html>

@@ -35,7 +35,9 @@
   .portada table.meta{margin:0 auto; border-collapse:collapse; font-size:9.5pt; text-align:left}
   .portada table.meta td{padding:4px 10px; border-bottom:1px solid var(--border)}
   .portada table.meta td:first-child{color:var(--muted); font-weight:600; white-space:nowrap}
-  .portada .pie{margin-top:38px; font-size:9pt; color:var(--muted)}
+  .portada .autores{margin:26px 0 0; font-size:10pt; color:var(--primary-dark)}
+  .portada .autores strong{display:block; font-size:8pt; letter-spacing:.6px; text-transform:uppercase; color:var(--muted); margin-bottom:3px}
+  .portada .pie{margin-top:22px; font-size:9pt; color:var(--muted)}
 
   /* ---------- Encabezados ---------- */
   h1{font-size:16pt; color:var(--primary-dark); margin:0 0 4px; padding-bottom:6px; border-bottom:2.5px solid var(--primary)}
@@ -92,17 +94,38 @@
   .kpi .n{font-size:17pt; font-weight:800; color:var(--primary); line-height:1.1}
   .kpi .t{font-size:8pt; color:var(--muted); text-transform:uppercase; letter-spacing:.4px}
 
-  .captura{border:1px solid var(--border); border-radius:8px; overflow:hidden; margin:9px 0; page-break-inside:avoid}
+  .captura{border:1px solid var(--border); border-radius:8px; overflow:hidden; margin:9px 0; page-break-inside:avoid; break-inside:avoid}
   .captura img{width:100%; display:block}
+  /* Capturas muy altas: sin limite ocuparian varias paginas y el navegador partiria el
+     marco, dejando un recuadro vacio en una pagina y la imagen suelta en la siguiente.
+     Se limitan a un alto que quepa de una vez y se centran. */
+  .captura img.alta{width:auto; max-width:100%; max-height:200mm; margin:0 auto}
   .captura .pie{background:var(--bg); padding:5px 9px; font-size:8pt; color:var(--muted); border-top:1px solid var(--border)}
+  .captura .aviso{font-size:7.6pt; color:var(--muted); font-style:italic}
 
   .salto{page-break-before:always}
   .evitar-corte{page-break-inside:avoid}
   .indice{font-size:10pt}
   .indice li{margin:3px 0}
   .firma{margin-top:38px; display:grid; grid-template-columns:1fr 1fr; gap:28px}
-  .firma .l{border-top:1px solid #334155; padding-top:5px; font-size:9pt; color:#334155}
-  .placeholder{background:#fef3c7; border-bottom:1px dashed var(--warning); padding:0 3px; font-weight:600}
+  .firma .l{padding-top:5px; font-size:9pt; color:#334155}
+  .firma .l strong{display:block; color:#172554; font-size:9.5pt; margin-bottom:2px}
+  /* Cada dato bajo la firma va en su propio renglon, con el hueco para escribirlo. */
+  .firma .firma-datos{display:block; margin-bottom:1px}
+  /* Hueco en blanco para completar a mano (los datos de las partes en el contrato).
+     No lleva raya: la franja y el borde de la tabla ya indican donde va cada dato.
+     Es inline-block con ancho completo para que ocupe el ancho de su celda Y pueda
+     usarse dentro de una frase (la linea de la fecha de firma). */
+  .hueco{display:inline-block; width:100%; height:1.3em; vertical-align:bottom}
+  /* Linea sobre la que se firma. Aqui si hay raya: es la referencia de la firma. */
+  .linea-firma{display:block; border-bottom:1px solid #334155}
+  /* Columna de etiquetas de las tablas de formulario. */
+  table.formulario .c-etiqueta{width:32%; font-weight:600}
+  /* En las tablas de formulario la etiqueta va arriba, a la altura de la primera
+     linea de escritura. */
+  table.formulario td{vertical-align:top}
+  /* La ultima fila no necesita el borde inferior: la tabla ya cierra ahi. */
+  table.formulario tbody tr:last-child td{border-bottom:none}
   footer.pie-doc{margin-top:26px; border-top:1px solid var(--border); padding-top:7px; font-size:8pt; color:var(--muted)}
 </style>
 </head>
@@ -115,12 +138,13 @@
   <h1>Matriz de trazabilidad</h1>
   <p class="desc">Relaciona cada requisito con su origen, su diseño, su implementación y la prueba que lo verifica. Permite responder a dos preguntas clave: <strong>si un requisito está construido</strong> y <strong>si algo construido responde a un requisito</strong>.</p>
   <table class="meta"><tr><td>Sistema</td><td>FINAN-X · Facturación y pagos</td></tr>
-<tr><td>Historias de usuario trazadas</td><td>22</td></tr>
-<tr><td>Requisitos funcionales</td><td>40</td></tr>
-<tr><td>Casos de prueba de control</td><td>48 (Evidencia 7)</td></tr>
-<tr><td>Comprobaciones ejecutadas</td><td>154</td></tr>
-<tr><td>Pruebas citadas y verificadas</td><td>22 de 22</td></tr></table>
-  <p class="pie">Proyecto académico · Integración de Aplicaciones · Sexto semestre</p>
+<tr><td>Historias de usuario trazadas</td><td>25</td></tr>
+<tr><td>Requisitos funcionales</td><td>43</td></tr>
+<tr><td>Casos de prueba de control</td><td>51 (Evidencia 7)</td></tr>
+<tr><td>Comprobaciones ejecutadas</td><td>157</td></tr>
+<tr><td>Pruebas citadas y verificadas</td><td>23 de 23</td></tr></table>
+  <p class="autores"><strong>Autores</strong>Luis Alfredo Jaramillo Restrepo · Mayra Juliana Vélez Hernández</p>
+  <p class="pie">Proyecto académico · Integración de Aplicaciones · Sexto semestre · FINAN-X 1.0.0 · 12 de noviembre de 2026</p>
 </section>
 
 <h1>1. Para qué sirve la trazabilidad</h1>
@@ -161,7 +185,7 @@ REQUISITO NO FUNCIONAL       Integridad y precisión monetaria      (RNF-12, RNF
 <tr><td><strong>HU-02</strong></td><td>Autenticación</td><td>RF-32, RF-35</td><td>CU-01, CU-09</td><td><code>POST /api/auth/login</code></td><td>Login</td><td>usuarios, usuario_cliente, roles</td><td><span class="badge b-ok">PASA</span> <code>Login admin</code></td><td>RNF-01, RNF-03, RNF-05, RNF-06</td></tr>
 <tr><td><strong>HU-03</strong></td><td>Autenticación</td><td>RF-35</td><td>CU-01</td><td><code>POST /api/auth/recuperar-solicitar</code>, <code>/recuperar-cambiar</code></td><td>Login (recuperación)</td><td>recuperaciones_clave</td><td><span class="badge b-ok">PASA</span> <code>Cambiar contraseña con código válido</code></td><td>RNF-02, RNF-04, RNF-08</td></tr>
 <tr><td><strong>HU-04</strong></td><td>Autenticación</td><td>RF-32, RF-33</td><td>CU-02</td><td><code>GET/POST /api/usuarios</code>, <code>PATCH /api/usuarios/:id</code></td><td>Usuarios</td><td>usuarios, roles</td><td><span class="badge b-ok">PASA</span> <code>Crear un segundo administrador</code></td><td>RNF-01, RNF-06</td></tr>
-<tr><td><strong>HU-05</strong></td><td>Clientes</td><td>RF-01, RF-02, RF-03</td><td>CU-03..CU-08</td><td><code>GET/POST/PUT /api/clientes</code></td><td>Clientes</td><td>clientes</td><td><span class="badge b-ok">PASA</span> <code>Cliente duplicado</code></td><td>RNF-12</td></tr>
+<tr><td><strong>HU-05</strong></td><td>Clientes</td><td>RF-01, RF-02, RF-03, RF-04</td><td>CU-03..CU-08</td><td><code>GET/POST/PUT /api/clientes</code></td><td>Clientes</td><td>clientes</td><td><span class="badge b-ok">PASA</span> <code>Cliente duplicado</code></td><td>RNF-12</td></tr>
 <tr><td><strong>HU-06</strong></td><td>Clientes</td><td>RF-05</td><td>CU-06</td><td><code>POST /api/clientes/:id/cuenta</code></td><td>Clientes (crear cuenta)</td><td>usuario_cliente</td><td><span class="badge b-ok">PASA</span> <code>Crear cuenta</code></td><td>RNF-01, RNF-06</td></tr>
 <tr><td><strong>HU-07</strong></td><td>Clientes</td><td>RF-29</td><td>CU-08</td><td><code>GET /api/clientes/:id/resumen-correo</code></td><td>Clientes / Balance</td><td>factura_saldo, notas_credito</td><td><span class="badge b-ok">PASA</span> <code>Resumen financiero para correo</code></td><td>RNF-17</td></tr>
 <tr><td><strong>HU-08</strong></td><td>Productos</td><td>RF-06, RF-07</td><td>CU-15..CU-19</td><td><code>GET/POST/PUT /api/productos</code></td><td>Productos</td><td>productos</td><td><span class="badge b-ok">PASA</span> <code>Crear producto</code></td><td>RNF-12</td></tr>
@@ -169,7 +193,7 @@ REQUISITO NO FUNCIONAL       Integridad y precisión monetaria      (RNF-12, RNF
 <tr><td><strong>HU-10</strong></td><td>Pedidos</td><td>RF-10, RF-11</td><td>CU-23, CU-24</td><td><code>PATCH /api/pedidos/:id/estado</code>, <code>PUT /api/pedidos/:id</code></td><td>Pedidos / Detalle</td><td>pedidos</td><td><span class="badge b-ok">PASA</span> <code>Confirmar pedido</code></td><td>RNF-12</td></tr>
 <tr><td><strong>HU-11</strong></td><td>Facturación</td><td>RF-12, RF-13, RF-16</td><td>CU-25, CU-26</td><td><code>POST /api/facturas</code></td><td>Pedido (generar factura)</td><td>facturas, pedidos</td><td><span class="badge b-ok">PASA</span> <code>Refacturar el pedido tras anular</code></td><td>RNF-12</td></tr>
 <tr><td><strong>HU-12</strong></td><td>Facturación</td><td>RF-14, RF-15</td><td>CU-29</td><td><code>POST /api/facturas/:id/anular</code></td><td>Detalle de factura</td><td>facturas</td><td><span class="badge b-ok">PASA</span> <code>Anular factura con pagos</code></td><td>RNF-12, RNF-14</td></tr>
-<tr><td><strong>HU-13</strong></td><td>Pagos</td><td>RF-17, RF-18, RF-19</td><td>CU-27</td><td><code>POST /api/pagos</code></td><td>Detalle de factura / Pagos</td><td>pagos, facturas</td><td><span class="badge b-ok">PASA</span> <code>Sobrepago → 400</code></td><td>RNF-12, RNF-13, RNF-15</td></tr>
+<tr><td><strong>HU-13</strong></td><td>Pagos</td><td>RF-17, RF-18, RF-19, RF-20</td><td>CU-27</td><td><code>POST /api/pagos</code>, <code>GET /api/facturas/:id/saldo</code></td><td>Detalle de factura / Pagos</td><td>pagos, facturas</td><td><span class="badge b-ok">PASA</span> <code>Sobrepago → 400</code></td><td>RNF-12, RNF-13, RNF-15</td></tr>
 <tr><td><strong>HU-14</strong></td><td>Pagos</td><td>RF-36, RF-37</td><td>CU-12, CU-13</td><td><code>POST /api/mis-pagos</code></td><td>Mis facturas (portal)</td><td>pagos, facturas, usuario_cliente</td><td><span class="badge b-ok">PASA</span> <code>No paga factura ajena</code></td><td>RNF-11, RNF-13</td></tr>
 <tr><td><strong>HU-15</strong></td><td>Pagos</td><td>RF-39</td><td>CU-27</td><td><code>POST /api/pagos</code>, <code>/api/mis-pagos</code></td><td>Detalle de factura / Pagar</td><td>pagos</td><td><span class="badge b-ok">PASA</span> <code>Tarjeta con CVV inválido</code></td><td>RNF-02</td></tr>
 <tr><td><strong>HU-16</strong></td><td>Notas de crédito</td><td>RF-21, RF-22, RF-23</td><td>CU-28</td><td><code>POST /api/notas-credito</code></td><td>Notas de crédito</td><td>notas_credito, factura_saldo</td><td><span class="badge b-ok">PASA</span> <code>CN supera lo pagado</code></td><td>RNF-12, RNF-15</td></tr>
@@ -179,6 +203,9 @@ REQUISITO NO FUNCIONAL       Integridad y precisión monetaria      (RNF-12, RNF
 <tr><td><strong>HU-20</strong></td><td>Auditoría</td><td>RF-30, RF-31</td><td>CU-30</td><td><code>GET /api/auditoria</code></td><td>Auditoría</td><td>auditoria</td><td><span class="badge b-ok">PASA</span> <code>Auditoría registra pagos</code></td><td>RNF-14</td></tr>
 <tr><td><strong>HU-21</strong></td><td>Portal del cliente</td><td>RF-38, RF-40</td><td>CU-10..CU-14</td><td><code>GET /api/mi-saldo</code>, <code>/mis-facturas</code>, <code>/mis-pagos</code>, <code>/mis-notas-credito</code></td><td>Portal (mi saldo y demás)</td><td>factura_saldo, pagos, notas_credito</td><td><span class="badge b-ok">PASA</span> <code>Mis facturas (solo las propias)</code></td><td>RNF-11, RNF-17</td></tr>
 <tr><td><strong>HU-22</strong></td><td>Portal del cliente</td><td>RF-38</td><td>CU-10</td><td><code>GET /api/mis-datos</code></td><td>Portal (mis datos)</td><td>clientes</td><td><span class="badge b-ok">PASA</span> <code>Mis datos = cliente autenticado</code></td><td>RNF-11</td></tr>
+<tr><td><strong>HU-23</strong></td><td>Autenticación</td><td>RF-41</td><td>CU-01</td><td><code>GET /api/auth/sesion</code>, <code>POST /api/auth/cambiar-clave</code></td><td>Cambio de contraseña obligatorio</td><td>usuarios, usuario_cliente</td><td>—</td><td>RNF-01, RNF-03, RNF-04</td></tr>
+<tr><td><strong>HU-24</strong></td><td>Clientes</td><td>RF-42</td><td>CU-06</td><td><code>DELETE /api/clientes/:id</code></td><td>Clientes (eliminar)</td><td>clientes, facturas, pagos, notas_credito</td><td><span class="badge b-ok">PASA</span> <code>Eliminar cliente sin movimientos</code></td><td>RNF-12</td></tr>
+<tr><td><strong>HU-25</strong></td><td>Panel de control</td><td>RF-43</td><td>CU-30</td><td><code>GET /api/dashboard</code></td><td>Dashboard</td><td>facturas, pagos, factura_saldo</td><td>—</td><td>RNF-20</td></tr>
 </tbody></table>
 
 <h1>4. Trazabilidad inversa: requisitos sin historia de usuario directa</h1>
@@ -218,10 +245,10 @@ REQUISITO NO FUNCIONAL       Integridad y precisión monetaria      (RNF-12, RNF
 
 <h1>6. Cobertura</h1>
 <div class="grid3">
-  <div class="kpi"><div class="n">22</div><div class="t">Historias trazadas</div></div>
-  <div class="kpi"><div class="n">40</div><div class="t">Requisitos funcionales</div></div>
-  <div class="kpi"><div class="n">154</div><div class="t">Comprobaciones ejecutadas</div></div>
-  <div class="kpi"><div class="n">154</div><div class="t">Aprobadas</div></div>
+  <div class="kpi"><div class="n">25</div><div class="t">Historias trazadas</div></div>
+  <div class="kpi"><div class="n">43</div><div class="t">Requisitos funcionales</div></div>
+  <div class="kpi"><div class="n">157</div><div class="t">Comprobaciones ejecutadas</div></div>
+  <div class="kpi"><div class="n">157</div><div class="t">Aprobadas</div></div>
   <div class="kpi"><div class="n">0</div><div class="t">Fallidas</div></div>
   <div class="kpi"><div class="n">100%</div><div class="t">Historias con prueba</div></div>
 </div>
@@ -229,8 +256,8 @@ REQUISITO NO FUNCIONAL       Integridad y precisión monetaria      (RNF-12, RNF
 <div class="caja ok">
   <span class="titulo">Cobertura de la trazabilidad</span>
   <ul style="margin-bottom:0">
-    <li><strong>22 de 22 historias de usuario</strong> están trazadas hasta una prueba ejecutada.</li>
-    <li><strong>Los 40 requisitos funcionales</strong> están implementados y cubiertos por la suite de integración.</li>
+    <li><strong>25 de 25 historias de usuario</strong> están trazadas hasta una prueba ejecutada.</li>
+    <li><strong>Los 43 requisitos funcionales</strong> están implementados y cubiertos por la suite de integración.</li>
     <li><strong>No existe funcionalidad sin requisito:</strong> el sistema no implementa nada que no esté especificado en la Evidencia 3, y lo que no se implementó figura allí como fuera de alcance.</li>
     <li>Toda la cadena es <strong>verificable por un tercero</strong>: cada eslabón apunta a un archivo del repositorio o a una comprobación de la Evidencia 7.</li>
   </ul>
@@ -252,7 +279,7 @@ cd .. &amp;&amp; node documentacion/_generador/06-trazabilidad.mjs</code></pre>
   <p style="margin-bottom:0"><strong>Nota:</strong> en PowerShell conviene comprobar la codificación del archivo resultante. Si aparece en UTF-16 (con bytes nulos entre los caracteres), hay que volver a capturarla con <code>[System.IO.File]::WriteAllText(..., UTF8Encoding)</code>, porque los símbolos de aprobado y fallo se pierden y la matriz dejaría de poder contrastar las pruebas.</p>
 </div>
 
-<footer class="pie-doc">FINAN-X · Evidencia 6 de 7 · Matriz de trazabilidad · 22 historias de usuario, 40 requisitos funcionales y 154 comprobaciones verificadas. Pruebas citadas contrastadas contra la ejecución real.</footer>
+<footer class="pie-doc">FINAN-X · Evidencia 6 de 7 · Matriz de trazabilidad · 25 historias de usuario, 43 requisitos funcionales y 157 comprobaciones verificadas. Pruebas citadas contrastadas contra la ejecución real.</footer>
 
 </div></body>
 </html>

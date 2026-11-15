@@ -13,7 +13,7 @@ Este es un proyecto académico. Si encuentra un problema de seguridad:
 
 1. **No lo publique** en un repositorio público ni en redes sociales.
 2. Escriba a los responsables del proyecto (Luis Alfredo Jaramillo Restrepo y
-   Mayra Juliana Velez) con:
+   Mayra Juliana Vélez Hernández) con:
    - descripción del problema,
    - pasos para reproducirlo,
    - impacto estimado,

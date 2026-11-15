@@ -60,7 +60,7 @@ function cita(fragmento) {
 // id, modulo, objetivo, datos de entrada, resultado esperado, busqueda en el log, requisitos que cubre
 // La busqueda debe coincidir con el texto REAL de la comprobacion (ver _salida-e2e.txt).
 const CP = [
-  ['CP-01', 'Autenticación', 'Iniciar sesión con credenciales válidas de administrador.', 'Correo <code>admin@finanx.test</code> y contraseña <code>admin123</code>.', '200 y token de sesión con rol ADMIN.', 'Login admin', 'RF-32, RNF-03'],
+  ['CP-01', 'Autenticación', 'Iniciar sesión con credenciales válidas de administrador.', 'Credenciales válidas de una cuenta ADMIN (clave temporal ya cambiada).', '200 y sesión con rol ADMIN.', 'Login admin', 'RF-32, RNF-03'],
   ['CP-02', 'Autenticación', 'Autoregistro de un cliente nuevo desde el portal.', 'Datos completos del cliente, usuario y contraseña.', '201, queda autenticado y accede a sus datos.', 'Registrar cliente', 'RF-01, RF-34'],
   ['CP-03', 'Clientes', 'Impedir el registro de un cliente con identificación duplicada.', 'Dos clientes con el mismo tipo y número de identificación.', '409 y no se crea el segundo.', 'Cliente duplicado', 'RF-02, CA-01'],
   ['CP-04', 'Clientes', 'Buscar clientes por coincidencia parcial.', 'Filtro de búsqueda con parte del nombre.', '200 con los clientes que coinciden.', 'Búsqueda de cliente', 'RF-03'],
@@ -108,6 +108,9 @@ const CP = [
   ['CP-46', 'Seguridad', 'Comprobar las cabeceras de seguridad HTTP.', 'Petición a la API.', 'Presentes <code>X-Content-Type-Options</code> y <code>X-Frame-Options</code>; sin <code>X-Powered-By</code>.', 'Cabecera de seguridad X-Content-Type-Options', 'RNF-09'],
   ['CP-47', 'Seguridad', 'Comprobar la lista blanca de CORS.', 'Petición desde un origen permitido y desde uno no permitido.', 'El permitido recibe la cabecera; el otro no.', 'CORS: origen permitido', 'RNF-10'],
   ['CP-48', 'Despliegue', 'Levantar el sistema completo con un solo comando.', '<code>docker compose up -d --build</code>.', 'Los tres servicios quedan disponibles.', '', 'RNF-21, CA-18'],
+  ['CP-49', 'Autenticación', 'Obligar el cambio de contraseña en el primer ingreso.', 'Cuenta con <code>debe_cambiar_clave = true</code> y una petición a una ruta distinta de sesión, cambio o cierre.', '403 <code>CAMBIO_CLAVE_REQUERIDO</code>; tras cambiarla, 200.', '', 'RF-41, RNF-04'],
+  ['CP-50', 'Clientes', 'Eliminar un cliente sin movimientos.', 'Cliente sin pedidos ni facturas, con sesión ADMIN.', '200 y el cliente desaparece; con historial, 409.', 'Eliminar cliente sin movimientos', 'RF-42, RN-13'],
+  ['CP-51', 'Panel de control', 'Panel con métricas y contenido por rol.', 'Sesión de ADMIN y de CAJERO.', 'Indicadores y gráficas; el CAJERO solo ve su caja del día.', '', 'RF-43, RNF-20'],
 ];
 
 const filasCP = CP.map(([id, mod, obj, datos, esp, busca, reqs]) => [
@@ -164,7 +167,7 @@ function esCapturaAlta(rel) {
 function captura(rel, texto) {
   const alta = esCapturaAlta(rel);
   const aviso = alta
-    ? '<br><span class="aviso">Imagen reducida para que quepa en una página. El archivo a tamaño completo está en la carpeta <code>capturas/</code> del proyecto.</span>'
+    ? '<br><span class="aviso">Imagen reducida para que quepa en una página. El archivo a tamaño completo está en la carpeta <code>../06-anexos/capturas/</code> del proyecto.</span>'
     : '';
   return `<div class="captura">
   <img src="${rel}"${alta ? ' class="alta"' : ''} alt="">
@@ -251,7 +254,7 @@ docker compose up -d db          # base de datos
 cd backend
 npm run seed                     # datos de demostración
 npm run dev                      # arranca la API (en otra terminal)
-npm test                         # ejecuta las 154 comprobaciones</code></pre>
+npm test                         # ejecuta las 157 comprobaciones</code></pre>
 
 <h1>5. Resultado de la ejecución</h1>
 
@@ -347,17 +350,17 @@ ${tabla(
 <h1>8. Evidencia visual</h1>
 <p>La suite verifica la API; estas capturas demuestran que el <strong>sistema completo</strong> —con su interfaz— funciona sobre datos reales.</p>
 
-${captura('capturas/11-dashboard.png', 'Panel de inicio con datos reales: clientes y productos activos, pedidos por facturar, facturas activas, cuentas por cobrar (1.345.800 COP), pagos recibidos y las últimas operaciones registradas en la auditoría. <strong>Requisitos:</strong> RF-26, RF-30.')}
+${captura('../06-anexos/capturas/11-dashboard.png', 'Panel de inicio con datos reales: clientes y productos activos, pedidos por facturar, facturas activas, cuentas por cobrar (1.345.800 COP), pagos recibidos y las últimas operaciones registradas en la auditoría. <strong>Requisitos:</strong> RF-26, RF-30.')}
 
-${captura('capturas/13-facturas.png', 'Listado de facturas con su estado y su estado de cobro (pendiente, pago parcial, pagada, anulada) calculados a partir del saldo. <strong>Requisitos:</strong> RF-12, RF-19, RF-20.')}
+${captura('../06-anexos/capturas/13-facturas.png', 'Listado de facturas con su estado y su estado de cobro (pendiente, pago parcial, pagada, anulada) calculados a partir del saldo. <strong>Requisitos:</strong> RF-12, RF-19, RF-20.')}
 
-${captura('capturas/14-pagos.png', 'Pagos registrados, con el medio de pago enmascarado (se ven solo los últimos 4 dígitos de la tarjeta) y la columna «Registrado por», que distingue los pagos hechos por el personal de los hechos por el cliente desde el portal. <strong>Requisitos:</strong> RF-17, RNF-02, RF-37.')}
+${captura('../06-anexos/capturas/14-pagos.png', 'Pagos registrados, con el medio de pago enmascarado (se ven solo los últimos 4 dígitos de la tarjeta) y la columna «Registrado por», que distingue los pagos hechos por el personal de los hechos por el cliente desde el portal. <strong>Requisitos:</strong> RF-17, RNF-02, RF-37.')}
 
-${captura('capturas/15-balance-clientes.png', 'Balance y cuentas por cobrar por cliente, con los totales de facturación y de lo recaudado. <strong>Requisitos:</strong> RF-27.')}
+${captura('../06-anexos/capturas/15-balance-clientes.png', 'Balance y cuentas por cobrar por cliente, con los totales de facturación y de lo recaudado. <strong>Requisitos:</strong> RF-27.')}
 
-${captura('capturas/16-auditoria-recorte.png', 'Registro de auditoría: cada operación sensible queda con su usuario, tipo, módulo, operación, registro afectado y fecha. <strong>Requisitos:</strong> RF-30, RF-31.')}
+${captura('../06-anexos/capturas/16-auditoria-recorte.png', 'Registro de auditoría: cada operación sensible queda con su usuario, tipo, módulo, operación, registro afectado y fecha. <strong>Requisitos:</strong> RF-30, RF-31.')}
 
-${captura('capturas/18-portal-saldo.png', 'Portal del cliente: el cliente ve únicamente su propia información y puede pagar en línea. <strong>Requisitos:</strong> RF-36, RF-37, RF-38.')}
+${captura('../06-anexos/capturas/18-portal-saldo.png', 'Portal del cliente: el cliente ve únicamente su propia información y puede pagar en línea. <strong>Requisitos:</strong> RF-36, RF-37, RF-38.')}
 
 <h1>9. Conclusiones</h1>
 <ul>

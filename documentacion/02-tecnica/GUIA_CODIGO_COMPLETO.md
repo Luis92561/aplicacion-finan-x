@@ -1,6 +1,7 @@
 # FINAN-X · Guía completa del código
 
-> **Aviso de vigencia (v1.0.0).** Las credenciales de demostración que aparecen en este
+> **Aviso de vigencia (v1.0.0).** Las credenciales de demostración que aparecen en este
+> El retiro de esas credenciales se documenta en `documentacion/04-seguridad/06-Retiro-Credenciales-Demo.md`.
 > documento son históricas. La versión 1.0.0 no crea cuentas con contraseñas fijas: use las
 > cuentas y claves temporales de primer-ingreso/Acta-Usuarios-Primer-Ingreso.pdf (cambio
 > obligatorio en el primer ingreso). Ver documentacion/04-seguridad/04-Estado-de-Remediacion.md.
@@ -118,7 +119,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
 
 ### 2.5 bcrypt (cómo se guardan las contraseñas)
 
-En las tablas verás columnas `password_hash`. Nunca se guarda `cliente123`; se guarda un **hash** generado con bcrypt (`$2b$10$...`). Cuando alguien inicia sesión se hace `bcrypt.compare(contraseña_escrita, hash_guardado)`, que devuelve verdadero o falso **sin revelar la contraseña original**.
+En las tablas verás columnas `password_hash`. Nunca se guarda `clave-demo`; se guarda un **hash** generado con bcrypt (`$2b$10$...`). Cuando alguien inicia sesión se hace `bcrypt.compare(contraseña_escrita, hash_guardado)`, que devuelve verdadero o falso **sin revelar la contraseña original**.
 
 ### 2.6 Middleware (los "porteros" de cada petición)
 
@@ -2994,7 +2995,7 @@ export default router;
 
 ## 2.22 Datos demo: `seed.js`
 
-El "sembrador" idempotente que crea los datos con los que pruebas la app: 4 roles, 4 usuarios internos (`admin@finanx.test`…), 2 clientes demo, la cuenta del portal (`cliente@finanx.test/cliente123`) y 5 productos. **Idempotente** significa que puedes ejecutarlo muchas veces y no duplica nada (usa `ON CONFLICT DO NOTHING` y comprobaciones previas). Además espera pacientes a que la base de datos esté lista (hasta 30 intentos de 2s).
+El "sembrador" idempotente que crea los datos con los que pruebas la app: 4 roles, 4 usuarios internos (`admin@ejemplo.test`…), 2 clientes demo, la cuenta del portal (`cliente@ejemplo.test/clave-demo`) y 5 productos. **Idempotente** significa que puedes ejecutarlo muchas veces y no duplica nada (usa `ON CONFLICT DO NOTHING` y comprobaciones previas). Además espera pacientes a que la base de datos esté lista (hasta 30 intentos de 2s).
 
 ### Archivo `backend/src/seed.js`
 
@@ -3038,10 +3039,10 @@ async function seed() {
   console.log('✔ Roles listos');
 
   const usuarios = [
-    { nombre: 'Administrador', correo: 'admin@finanx.test', rol: 'ADMIN', password: 'admin123' },
-    { nombre: 'Facturador', correo: 'facturador@finanx.test', rol: 'FACTURADOR', password: 'facturador123' },
-    { nombre: 'Cajero', correo: 'cajero@finanx.test', rol: 'CAJERO', password: 'cajero123' },
-    { nombre: 'Supervisor', correo: 'supervisor@finanx.test', rol: 'SUPERVISOR', password: 'supervisor123' },
+    { nombre: 'Administrador', correo: 'admin@ejemplo.test', rol: 'ADMIN', password: 'clave-demo' },
+    { nombre: 'Facturador', correo: 'facturador@ejemplo.test', rol: 'FACTURADOR', password: 'clave-demo' },
+    { nombre: 'Cajero', correo: 'cajero@ejemplo.test', rol: 'CAJERO', password: 'clave-demo' },
+    { nombre: 'Supervisor', correo: 'supervisor@ejemplo.test', rol: 'SUPERVISOR', password: 'clave-demo' },
   ];
   for (const u of usuarios) {
     const exists = await pool.query('SELECT 1 FROM usuarios WHERE correo = $1', [u.correo]);
@@ -3089,12 +3090,12 @@ async function seed() {
     const cid = cli.rows[0].cliente_id;
     const exists = await pool.query('SELECT 1 FROM usuario_cliente WHERE cliente_id = $1', [cid]);
     if (!exists.rowCount) {
-      const hash = await bcrypt.hash('cliente123', 10);
+      const hash = await bcrypt.hash('clave-demo', 10);
       await pool.query(
         `INSERT INTO usuario_cliente (cliente_id, username, password_hash) VALUES ($1, $2, $3)`,
-        [cid, 'cliente@finanx.test', hash]
+        [cid, 'cliente@ejemplo.test', hash]
       );
-      console.log('✔ Cuenta de cliente creada (cliente@finanx.test / cliente123)');
+      console.log('✔ Cuenta de cliente creada (cliente@ejemplo.test / clave-demo)');
     }
   }
 
@@ -3117,11 +3118,11 @@ async function seed() {
 
   await pool.end();
   console.log('\nSeed completado. Credenciales demo:');
-  console.log('  admin@finanx.test / admin123        (Administrador)');
-  console.log('  facturador@finanx.test / facturador123');
-  console.log('  cajero@finanx.test / cajero123');
-  console.log('  supervisor@finanx.test / supervisor123');
-  console.log('  cliente@finanx.test / cliente123    (Portal del cliente)');
+  console.log('  admin@ejemplo.test / clave-demo        (Administrador)');
+  console.log('  facturador@ejemplo.test / clave-demo');
+  console.log('  cajero@ejemplo.test / clave-demo');
+  console.log('  supervisor@ejemplo.test / clave-demo');
+  console.log('  cliente@ejemplo.test / clave-demo    (Portal del cliente)');
 }
 
 seed().catch((err) => {
@@ -4294,8 +4295,8 @@ export default function Login() {
           </div>
           <div className="login-hint">
             <strong>Credenciales demo:</strong><br />
-            Interno: <code>admin@finanx.test</code> / <code>admin123</code><br />
-            Cliente: <code>cliente@finanx.test</code> / <code>cliente123</code>
+            Interno: <code>admin@ejemplo.test</code> / <code>clave-demo</code><br />
+            Cliente: <code>cliente@ejemplo.test</code> / <code>clave-demo</code>
           </div>
           <div className="login-switch">
             ¿Eres cliente nuevo?{' '}
@@ -7407,9 +7408,9 @@ async function main() {
   const sinToken = await call('GET', '/clientes');
   check('Sin token → 401', sinToken.status === 401);
 
-  const admin = await call('POST', '/auth/login', { body: { username: 'admin@finanx.test', password: 'admin123' } });
+  const admin = await call('POST', '/auth/login', { body: { username: 'admin@ejemplo.test', password: 'clave-demo' } });
   check('Login admin → 200', admin.status === 200 && admin.data?.user?.rol === 'ADMIN');
-  const clienteLogin = await call('POST', '/auth/login', { body: { username: 'cliente@finanx.test', password: 'cliente123' } });
+  const clienteLogin = await call('POST', '/auth/login', { body: { username: 'cliente@ejemplo.test', password: 'clave-demo' } });
   check('Login cliente → 200', clienteLogin.status === 200 && clienteLogin.data?.user?.tipo === 'cliente');
   const AT = admin.data?.token;
   const CT = clienteLogin.data?.token;
@@ -7448,7 +7449,7 @@ async function main() {
 
   // ---------- Autorización por rol ----------
   console.log('2) Autorización por rol');
-  const facturador = await call('POST', '/auth/login', { body: { username: 'facturador@finanx.test', password: 'facturador123' } });
+  const facturador = await call('POST', '/auth/login', { body: { username: 'facturador@ejemplo.test', password: 'clave-demo' } });
   const FT = facturador.data?.token;
   const adminOnly = await call('GET', '/usuarios', { token: FT });
   check('Facturador en /usuarios → 403', adminOnly.status === 403);
@@ -7663,7 +7664,7 @@ async function main() {
     if (ultimoIntento.status === 429) break;
   }
   check('Fuerza bruta: intentos fallidos consecutivos → 429', ultimoIntento.status === 429, JSON.stringify(ultimoIntento.data));
-  const okTrasBloqueo = await call('POST', '/auth/login', { body: { username: 'cliente@finanx.test', password: 'cliente123' } });
+  const okTrasBloqueo = await call('POST', '/auth/login', { body: { username: 'cliente@ejemplo.test', password: 'clave-demo' } });
   check('Login correcto tras bloqueo → 200 (el acierto resetea el contador)', okTrasBloqueo.status === 200, JSON.stringify(okTrasBloqueo.data));
   const datosTrasTodo = await call('GET', '/mis-datos', { token: okTrasBloqueo.data?.token });
   check('Token renovado sigue aislado en el portal', datosTrasTodo.status === 200 && datosTrasTodo.data?.cliente_id === clienteLogin.data?.user?.clienteId);

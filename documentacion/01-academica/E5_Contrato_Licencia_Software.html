@@ -35,7 +35,9 @@
   .portada table.meta{margin:0 auto; border-collapse:collapse; font-size:9.5pt; text-align:left}
   .portada table.meta td{padding:4px 10px; border-bottom:1px solid var(--border)}
   .portada table.meta td:first-child{color:var(--muted); font-weight:600; white-space:nowrap}
-  .portada .pie{margin-top:38px; font-size:9pt; color:var(--muted)}
+  .portada .autores{margin:26px 0 0; font-size:10pt; color:var(--primary-dark)}
+  .portada .autores strong{display:block; font-size:8pt; letter-spacing:.6px; text-transform:uppercase; color:var(--muted); margin-bottom:3px}
+  .portada .pie{margin-top:22px; font-size:9pt; color:var(--muted)}
 
   /* ---------- Encabezados ---------- */
   h1{font-size:16pt; color:var(--primary-dark); margin:0 0 4px; padding-bottom:6px; border-bottom:2.5px solid var(--primary)}
@@ -92,9 +94,14 @@
   .kpi .n{font-size:17pt; font-weight:800; color:var(--primary); line-height:1.1}
   .kpi .t{font-size:8pt; color:var(--muted); text-transform:uppercase; letter-spacing:.4px}
 
-  .captura{border:1px solid var(--border); border-radius:8px; overflow:hidden; margin:9px 0; page-break-inside:avoid}
+  .captura{border:1px solid var(--border); border-radius:8px; overflow:hidden; margin:9px 0; page-break-inside:avoid; break-inside:avoid}
   .captura img{width:100%; display:block}
+  /* Capturas muy altas: sin limite ocuparian varias paginas y el navegador partiria el
+     marco, dejando un recuadro vacio en una pagina y la imagen suelta en la siguiente.
+     Se limitan a un alto que quepa de una vez y se centran. */
+  .captura img.alta{width:auto; max-width:100%; max-height:200mm; margin:0 auto}
   .captura .pie{background:var(--bg); padding:5px 9px; font-size:8pt; color:var(--muted); border-top:1px solid var(--border)}
+  .captura .aviso{font-size:7.6pt; color:var(--muted); font-style:italic}
 
   .salto{page-break-before:always}
   .evitar-corte{page-break-inside:avoid}
@@ -136,7 +143,8 @@
 <tr><td>Duración</td><td>Indefinida, sujeta a las causales de terminación</td></tr>
 <tr><td>Territorio</td><td>República de Colombia</td></tr>
 <tr><td>Finalidad</td><td>Académica (asignatura Integración de Aplicaciones)</td></tr></table>
-  <p class="pie">Proyecto académico · Integración de Aplicaciones · Sexto semestre</p>
+  <p class="autores"><strong>Autores</strong>Luis Alfredo Jaramillo Restrepo · Mayra Juliana Vélez Hernández</p>
+  <p class="pie">Proyecto académico · Integración de Aplicaciones · Sexto semestre · FINAN-X 1.0.0 · 12 de noviembre de 2026</p>
 </section>
 
 <div class="caja err">

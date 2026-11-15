@@ -11,8 +11,29 @@ import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
-export const RAIZ = fileURLToPath(new URL('../../', import.meta.url));
-export const SALIDA = path.join(RAIZ, 'documentacion');
+const AQUI = path.dirname(fileURLToPath(import.meta.url));
+
+/**
+ * Rutas por defecto del layout de entrega:
+ *   documentacion/02-tecnica/generador-documentos/  ← este script
+ *   documentacion/07-notas-internas/deep-docs/      ← datos (esquema, licencias, salida e2e)
+ *   documentacion/01-academica/                     ← salida (E1–E7)
+ * Se pueden sobrescribir con FINANX_RAIZ y FINANX_SALIDA para trabajar en un área temporal.
+ */
+export const RAIZ = process.env.FINANX_RAIZ
+  ? path.resolve(process.env.FINANX_RAIZ)
+  : path.resolve(AQUI, '..', '..', '07-notas-internas');
+export const SALIDA = process.env.FINANX_SALIDA
+  ? path.resolve(process.env.FINANX_SALIDA)
+  : path.resolve(AQUI, '..', '..', '01-academica');
+
+/**
+ * Identidad y versión de la documentación. Se usa en la portada y en el pie de
+ * TODAS las evidencias, para que ninguna quede sin autores ni sin fecha.
+ */
+export const AUTORES = ['Luis Alfredo Jaramillo Restrepo', 'Mayra Juliana Vélez Hernández'];
+export const FECHA_DOC = '12 de noviembre de 2026';
+export const VERSION_DOC = '1.0.0';
 
 export const CSS = `
   @page { size: A4; margin: 18mm 16mm 20mm; }
@@ -46,7 +67,9 @@ export const CSS = `
   .portada table.meta{margin:0 auto; border-collapse:collapse; font-size:9.5pt; text-align:left}
   .portada table.meta td{padding:4px 10px; border-bottom:1px solid var(--border)}
   .portada table.meta td:first-child{color:var(--muted); font-weight:600; white-space:nowrap}
-  .portada .pie{margin-top:38px; font-size:9pt; color:var(--muted)}
+  .portada .autores{margin:26px 0 0; font-size:10pt; color:var(--primary-dark)}
+  .portada .autores strong{display:block; font-size:8pt; letter-spacing:.6px; text-transform:uppercase; color:var(--muted); margin-bottom:3px}
+  .portada .pie{margin-top:22px; font-size:9pt; color:var(--muted)}
 
   /* ---------- Encabezados ---------- */
   h1{font-size:16pt; color:var(--primary-dark); margin:0 0 4px; padding-bottom:6px; border-bottom:2.5px solid var(--primary)}
@@ -163,7 +186,8 @@ export function portada({ evidencia, titulo, descripcion, meta = [] }) {
   <h1>${titulo}</h1>
   <p class="desc">${descripcion}</p>
   <table class="meta">${filas}</table>
-  <p class="pie">Proyecto académico · Integración de Aplicaciones · Sexto semestre</p>
+  <p class="autores"><strong>Autores</strong>${AUTORES.join(' · ')}</p>
+  <p class="pie">Proyecto académico · Integración de Aplicaciones · Sexto semestre · FINAN-X ${VERSION_DOC} · ${FECHA_DOC}</p>
 </section>`;
 }
 

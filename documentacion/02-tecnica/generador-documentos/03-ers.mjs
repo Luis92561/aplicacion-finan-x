@@ -57,21 +57,24 @@ const RF = [
   ['RF-38', 'El sistema debe permitir al cliente <strong>consultar su saldo, facturas, compras, pagos y notas de crédito</strong>, y sus datos personales.', 'Cliente', 'Alta', 'Prueba CP-40', 'Implementado'],
   ['RF-39', 'El sistema debe <strong>validar los datos de pago según el método</strong> (tarjeta, transferencia o cheque) y rechazar los inválidos.', 'Sistema', 'Alta', 'Prueba CP-41', 'Implementado'],
   ['RF-40', 'El sistema debe <strong>generar un código de pago en efectivo</strong> para que el cliente pague en un punto físico, sin registrar el pago en el portal.', 'Cliente', 'Media', 'Prueba CP-42', 'Implementado'],
+  ['RF-41', 'El sistema debe <strong>obligar a cambiar la contraseña en el primer ingreso</strong>: mientras <code>debe_cambiar_clave</code> esté activo, solo se permite consultar la sesión, cambiarla y cerrar sesión; el resto responde <code>403 CAMBIO_CLAVE_REQUERIDO</code>.', 'Todos', 'Alta', 'Prueba manual CP-49', 'Implementado'],
+  ['RF-42', 'El sistema debe permitir <strong>eliminar un cliente</strong> solo al ADMIN y solo si no tiene pedidos, facturas, pagos ni notas de crédito; si tiene historial responde 409 y sugiere inactivarlo.', 'Administrador', 'Media', 'Prueba CP-50', 'Implementado'],
+  ['RF-43', 'El sistema debe ofrecer un <strong>panel de control</strong> con indicadores, gráficas y tabla filtrable, con contenido distinto según el rol (el CAJERO ve solo su caja del día).', 'Todos los internos', 'Media', 'Revisión manual CP-51', 'Implementado'],
 ];
 
 // ============================================================
 // Requisitos no funcionales
 // ============================================================
 const RNF = [
-  ['RNF-01', 'Seguridad · contraseñas', 'Las contraseñas y los códigos OTP se almacenan cifrados con <strong>bcrypt</strong> (coste 10). Nunca en texto plano.', 'Crítica', 'Inspección de la base: la columna <code>password_hash</code> no contiene texto legible.'],
-  ['RNF-02', 'Seguridad · datos de tarjeta', 'Nunca se almacenan el número completo de la tarjeta ni el CVV. Solo los <strong>últimos 4 dígitos</strong> y la marca (PCI-DSS).', 'Crítica', 'Prueba CP-43: la respuesta de la API no contiene el PAN ni el CVV.'],
-  ['RNF-03', 'Seguridad · sesiones', 'La sesión se firma con <strong>JWT</strong> con caducidad de 8 horas.', 'Alta', 'Inspección: el token incluye <code>exp</code>.'],
-  ['RNF-04', 'Seguridad · revocación de sesiones', 'Al cambiar la contraseña o desactivar una cuenta, <strong>las sesiones anteriores dejan de ser válidas</strong> de inmediato.', 'Alta', 'Prueba CP-37: el token anterior responde 401.'],
-  ['RNF-05', 'Seguridad · fuerza bruta', 'El sistema bloquea temporalmente (429) tras <strong>5 intentos fallidos</strong> de inicio de sesión desde la misma dirección, en una ventana de 15 minutos. Un acceso correcto reinicia el contador.', 'Alta', 'Prueba CP-44.'],
+  ['RNF-01', 'Seguridad · contraseñas', 'Las contraseñas y los códigos OTP se almacenan cifrados con <strong>bcrypt</strong> (coste 12). Además, la política exige <strong>mínimo 12 caracteres</strong>, lista de contraseñas comunes y bloqueo de datos personales o de la marca. Nunca en texto plano.', 'Crítica', 'Inspección de la base: la columna <code>password_hash</code> no contiene texto legible.'],
+  ['RNF-02', 'Seguridad · datos de tarjeta', 'Nunca se almacenan el número completo de la tarjeta ni el CVV. Solo los <strong>últimos 4 dígitos</strong> y la marca (PCI-DSS). El número de cuenta de una transferencia se devuelve <strong>enmascarado</strong> por la API.', 'Crítica', 'Prueba CP-43: la respuesta de la API no contiene el PAN ni el CVV.'],
+  ['RNF-03', 'Seguridad · sesiones', 'La sesión viaja en una cookie <strong>HttpOnly</strong> y <code>SameSite=Strict</code> (o <code>Bearer</code> para integraciones), firmada con <strong>JWT de 2 horas</strong>, algoritmo restringido y emisor/audiencia fijos.', 'Alta', 'Inspección: el token incluye <code>exp</code>; prueba CP-46.'],
+  ['RNF-04', 'Seguridad · revocación de sesiones', 'Al cambiar o restablecer la contraseña, o al <strong>desactivar la cuenta o el cliente</strong>, las sesiones anteriores dejan de ser válidas de inmediato (<code>token_version</code> y estado).', 'Alta', 'Prueba CP-37: el token anterior responde 401.'],
+  ['RNF-05', 'Seguridad · fuerza bruta', 'El sistema bloquea la cuenta tras <strong>5 intentos fallidos</strong>, con retroceso progresivo, contando por cuenta y por IP+usuario. Un inicio de sesión correcto de <strong>otra</strong> cuenta no desbloquea la cuenta atacada.', 'Alta', 'Prueba CP-44.'],
   ['RNF-06', 'Seguridad · autorización', 'Cada operación exige el rol adecuado (RBAC). Un rol sin permiso recibe <strong>403</strong>.', 'Crítica', 'Prueba CP-35.'],
   ['RNF-07', 'Seguridad · fuerza del secreto', 'El sistema <strong>no arranca</strong> sin una clave de firma propia de al menos 32 caracteres, y rechaza los valores de ejemplo publicados en el repositorio.', 'Alta', 'Prueba CP-45: sin clave o con la de ejemplo, el arranque falla.'],
-  ['RNF-08', 'Seguridad · exposición del OTP', 'En producción el código OTP <strong>no se devuelve</strong> en la respuesta de la API (solo en modo demostración).', 'Alta', 'Inspección de configuración: el valor por defecto depende del entorno.'],
-  ['RNF-09', 'Seguridad · cabeceras HTTP', 'Las respuestas incluyen cabeceras de seguridad (<code>X-Content-Type-Options</code>, <code>X-Frame-Options</code>) y no revelan el servidor.', 'Media', 'Prueba CP-46.'],
+  ['RNF-08', 'Seguridad · exposición del OTP', 'En producción el código OTP <strong>no se devuelve</strong> en la respuesta de la API. La regla está en el código: no depende solo de la variable de entorno.', 'Alta', 'Inspección de configuración y prueba CP-36.'],
+  ['RNF-09', 'Seguridad · cabeceras HTTP', 'Las respuestas de la <strong>API y de la SPA</strong> incluyen cabeceras de seguridad (CSP, <code>X-Frame-Options</code>, <code>Cache-Control: no-store</code> y HSTS cuando hay TLS) y no revelan el servidor.', 'Media', 'Prueba CP-46 y revisión de <code>nginx.conf</code>.'],
   ['RNF-10', 'Seguridad · CORS', 'Solo los orígenes de la lista blanca reciben permiso de CORS.', 'Media', 'Prueba CP-47.'],
   ['RNF-11', 'Integridad · aislamiento de datos', 'El identificador de cliente se toma <strong>siempre del token</strong>, nunca de la petición.', 'Crítica', 'Revisión de código y prueba CP-38.'],
   ['RNF-12', 'Integridad · atomicidad', 'Las operaciones que afectan a varias tablas se ejecutan en <strong>transacción</strong>: o se aplican todas o ninguna.', 'Alta', 'Inspección: <code>BEGIN</code>/<code>COMMIT</code> en las rutas que lo requieren.'],
@@ -81,29 +84,29 @@ const RNF = [
   ['RNF-16', 'Usabilidad · idioma', 'Toda la interfaz y los mensajes de error están en <strong>español</strong>, con mensajes que explican la causa.', 'Media', 'Revisión de la interfaz.'],
   ['RNF-17', 'Usabilidad · formato local', 'Los importes se muestran en formato de moneda colombiana (COP) y las fechas en hora de Colombia.', 'Media', 'Revisión: <code>Intl.NumberFormat(&quot;es-CO&quot;)</code> y zona <code>America/Bogota</code>.'],
   ['RNF-18', 'Usabilidad · adaptabilidad', 'La interfaz es utilizable en pantallas de escritorio y se reordena en pantallas estrechas (una sola hoja de estilos, sin dependencias).', 'Baja', 'Revisión de la hoja de estilos (punto de quiebre a 900 px).'],
-  ['RNF-19', 'Rendimiento · tiempo de respuesta', 'Las operaciones habituales responden en menos de <strong>2 segundos</strong> con la base de demostración.', 'Media', 'Ejecución de la suite completa: 154 comprobaciones sin esperas anómalas.'],
-  ['RNF-20', 'Rendimiento · listados', 'Los listados están acotados (<code>LIMIT 300</code>) para no degradar la respuesta con volúmenes grandes.', 'Media', 'Inspección de las consultas.'],
+  ['RNF-19', 'Rendimiento · tiempo de respuesta', 'Las operaciones habituales responden en menos de <strong>2 segundos</strong> con la base de demostración.', 'Media', 'Ejecución de la suite completa: 157 comprobaciones sin esperas anómalas.'],
+  ['RNF-20', 'Rendimiento · listados', 'Los listados están acotados (<code>LIMIT 300</code>) y aceptan <code>limit</code>/<code>offset</code> para no degradar la respuesta con volúmenes grandes.', 'Media', 'Inspección de las consultas.'],
   ['RNF-21', 'Portabilidad · despliegue', 'El sistema completo se levanta con <strong>un solo comando</strong> (<code>docker compose up</code>) en cualquier máquina con Docker.', 'Alta', 'Prueba CP-48: los tres contenedores quedan sanos.'],
-  ['RNF-22', 'Portabilidad · configuración', 'Toda la configuración se hace por variables de entorno; no hay valores sensibles en el código.', 'Alta', 'Prueba CP-45 e inspección del archivo de composición.'],
+  ['RNF-22', 'Portabilidad · configuración', 'Toda la configuración se hace por variables de entorno; no hay credenciales ni secretos por defecto en el código ni en el archivo de composición.', 'Alta', 'Prueba CP-45 e inspección del archivo de composición.'],
   ['RNF-23', 'Mantenibilidad · separación de capas', 'La interfaz, la API y los datos están separados, y se comunican por HTTP con formato JSON.', 'Media', 'Revisión de la estructura del repositorio.'],
-  ['RNF-24', 'Mantenibilidad · pruebas', 'Existe una suite de pruebas ejecutable que verifica los requisitos de punta a punta.', 'Alta', 'Ejecución: <code>npm test</code> → 154 aprobadas, 0 fallidas.'],
+  ['RNF-24', 'Mantenibilidad · pruebas', 'Existe una suite de pruebas ejecutable que verifica los requisitos de punta a punta.', 'Alta', 'Ejecución: <code>npm test</code> → 157 aprobadas, 0 fallidas.'],
   ['RNF-25', 'Documentación', 'El proyecto incluye documentación de instalación, guía técnica, documentación funcional y estas evidencias.', 'Media', 'Revisión de la carpeta <code>documentacion/</code>.'],
-  ['RNF-26', 'Disponibilidad de datos', 'Los datos persisten entre reinicios del sistema mediante volúmenes de Docker.', 'Alta', 'Inspección: volumen <code>finanx_pgdata</code>.'],
-  ['RNF-27', 'Licenciamiento', 'Todas las dependencias usan licencias permisivas compatibles con el uso comercial; ninguna es copyleft fuerte.', 'Alta', 'Evidencia 4: revisión de las 238 dependencias.'],
+  ['RNF-26', 'Disponibilidad de datos', 'Los datos persisten entre reinicios del sistema y existen <strong>respaldos con retención</strong> y procedimiento de restauración documentado.', 'Alta', 'Inspección: volumen <code>finanx_pgdata</code> y <code>scripts/respaldo.*</code>.'],
+  ['RNF-27', 'Licenciamiento', 'Todas las dependencias usan licencias permisivas compatibles con el uso comercial; ninguna es copyleft fuerte.', 'Alta', 'Evidencia 4: revisión de las 276 dependencias.'],
 ];
 
 // ============================================================
 // Restricciones, interfaces y reglas de negocio
 // ============================================================
 const RESTRICCIONES = [
-  ['Tecnológica', 'El frontend se desarrolla con <strong>React 18 + Vite</strong>; el backend con <strong>Node.js + Express</strong>; la base de datos es <strong>PostgreSQL 16</strong>. Son las tecnologías vistas en la asignatura.'],
+  ['Tecnológica', 'El frontend se desarrolla con <strong>React 18 + Vite</strong>; el backend con <strong>Node.js + Express</strong>; la base de datos es <strong>PostgreSQL 16</strong>.'],
   ['De despliegue', 'El sistema se ejecuta en <strong>contenedores Docker</strong> orquestados con Docker Compose, sobre cualquier máquina con Docker instalado.'],
   ['De entorno', 'Node.js 20 o superior. El proyecto se ha probado con Node 24 y PostgreSQL 16.'],
   ['Legal', 'El software se distribuye bajo licencia de uso; las dependencias de terceros conservan sus licencias (ver Evidencias 4 y 5).'],
   ['De alcance', 'El sistema <strong>no es un ERP</strong>: no incluye contabilidad general, inventario, nómina ni compras a proveedores. La facturación <strong>no tiene validez fiscal</strong> (no emite CUFE ni se integra con la DIAN).'],
   ['De seguridad', 'La recuperación de contraseña por SMS o correo <strong>no envía mensajes reales</strong> en esta versión: el proveedor de mensajería queda como punto de extensión.'],
   ['De integración', 'El código de pago en efectivo es una <strong>simulación</strong>: no se persiste ni se redime contra una pasarela real.'],
-  ['Académica', 'Proyecto de la asignatura <em>Integración de Aplicaciones</em>. La variedad de roles, los límites de peticiones y las credenciales de demostración responden a fines didácticos.'],
+  ['Académica', 'Proyecto de la asignatura <em>Integración de Aplicaciones</em>. La variedad de roles y los límites de peticiones responden a fines didácticos.'],
 ];
 
 const INTERFACES = [

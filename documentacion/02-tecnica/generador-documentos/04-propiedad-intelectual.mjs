@@ -134,7 +134,7 @@ ${tabla(
     ['<strong>Modelo de datos</strong>', 'Diseño del esquema de PostgreSQL, las restricciones de integridad, los índices y la vista de saldo.'],
     ['<strong>Reglas de negocio</strong>', 'Las decisiones de negocio del sistema: no permitir sobrepago, una factura activa por pedido, no devolver más de lo pagado, baja lógica, auditoría.'],
     ['<strong>Documentación</strong>', 'Requisitos, guías, especificaciones, diagramas, mockups y estas siete evidencias.'],
-    ['<strong>Pruebas automáticas</strong>', 'La suite de integración de 154 comprobaciones y los scripts de captura de pantalla.'],
+    ['<strong>Pruebas automáticas</strong>', 'La suite de integración de 157 comprobaciones y los scripts de captura de pantalla.'],
     ['<strong>Prototipos (mockups)</strong>', 'Las 14 pantallas de demostración en HTML y la galería.'],
   ],
 )}
@@ -204,7 +204,7 @@ ${tabla(
 ${tabla(
   ['Riesgo', 'Nivel', 'Medida adoptada'],
   [
-    ['Una dependencia con licencia copyleft fuerte obligaría a liberar el código propio', '<span class="badge b-ok">Bajo</span>', 'Se revisaron las 238 licencias: ninguna dependencia del software distribuido es copyleft. PlantUML (GPL-3.0) es una herramienta externa que no se distribuye ni se enlaza.'],
+    ['Una dependencia con licencia copyleft fuerte obligaría a liberar el código propio', '<span class="badge b-ok">Bajo</span>', 'Se revisaron las 276 licencias: ninguna dependencia del software distribuido es copyleft. PlantUML (GPL-3.0) es una herramienta externa que no se distribuye ni se enlaza.'],
     ['Una dependencia sin licencia declarada dejaría el uso en zona gris', '<span class="badge b-ok">Bajo</span>', 'Ningún paquete quedó sin licencia identificada en el análisis.'],
     ['Cambio de licencia en una versión futura de una dependencia', '<span class="badge b-warn">Medio</span>', 'El proyecto fija versiones en <code>package-lock.json</code>, de modo que una actualización no entra sin revisión. Conviene repetir este análisis al actualizar.'],
     ['Vulnerabilidad conocida en una dependencia', '<span class="badge b-warn">Medio</span>', 'Fuera del alcance de esta evidencia (es un asunto de seguridad, no de propiedad intelectual). Se recomienda ejecutar <code>npm audit</code> antes de cada entrega.'],

@@ -35,7 +35,9 @@
   .portada table.meta{margin:0 auto; border-collapse:collapse; font-size:9.5pt; text-align:left}
   .portada table.meta td{padding:4px 10px; border-bottom:1px solid var(--border)}
   .portada table.meta td:first-child{color:var(--muted); font-weight:600; white-space:nowrap}
-  .portada .pie{margin-top:38px; font-size:9pt; color:var(--muted)}
+  .portada .autores{margin:26px 0 0; font-size:10pt; color:var(--primary-dark)}
+  .portada .autores strong{display:block; font-size:8pt; letter-spacing:.6px; text-transform:uppercase; color:var(--muted); margin-bottom:3px}
+  .portada .pie{margin-top:22px; font-size:9pt; color:var(--muted)}
 
   /* ---------- Encabezados ---------- */
   h1{font-size:16pt; color:var(--primary-dark); margin:0 0 4px; padding-bottom:6px; border-bottom:2.5px solid var(--primary)}
@@ -134,14 +136,15 @@
   <p class="sub">Sistema de facturación y pagos</p>
   <div class="evidencia">Evidencia 7 de 7</div>
   <h1>Pruebas de integración</h1>
-  <p class="desc">Resultados de la suite de integración de FINAN-X ejecutada sobre el sistema completo y en funcionamiento. Verifica que las piezas —interfaz, API y base de datos— funcionan juntas y cumplen las reglas de negocio. <strong>154 comprobaciones, 0 fallos.</strong></p>
+  <p class="desc">Resultados de la suite de integración de FINAN-X ejecutada sobre el sistema completo y en funcionamiento. Verifica que las piezas —interfaz, API y base de datos— funcionan juntas y cumplen las reglas de negocio. <strong>157 comprobaciones, 0 fallos.</strong></p>
   <table class="meta"><tr><td>Sistema</td><td>FINAN-X · Facturación y pagos</td></tr>
 <tr><td>Tipo de prueba</td><td>Integración de extremo a extremo (end-to-end)</td></tr>
-<tr><td>Comprobaciones ejecutadas</td><td>154</td></tr>
-<tr><td>Aprobadas</td><td>154</td></tr>
+<tr><td>Comprobaciones ejecutadas</td><td>157</td></tr>
+<tr><td>Aprobadas</td><td>157</td></tr>
 <tr><td>Fallidas</td><td>0</td></tr>
-<tr><td>Casos de control documentados</td><td>48</td></tr></table>
-  <p class="pie">Proyecto académico · Integración de Aplicaciones · Sexto semestre</p>
+<tr><td>Casos de control documentados</td><td>51</td></tr></table>
+  <p class="autores"><strong>Autores</strong>Luis Alfredo Jaramillo Restrepo · Mayra Juliana Vélez Hernández</p>
+  <p class="pie">Proyecto académico · Integración de Aplicaciones · Sexto semestre · FINAN-X 1.0.0 · 12 de noviembre de 2026</p>
 </section>
 
 <h1>1. Objetivo</h1>
@@ -199,19 +202,19 @@ docker compose up -d db          # base de datos
 cd backend
 npm run seed                     # datos de demostración
 npm run dev                      # arranca la API (en otra terminal)
-npm test                         # ejecuta las 154 comprobaciones</code></pre>
+npm test                         # ejecuta las 157 comprobaciones</code></pre>
 
 <h1>5. Resultado de la ejecución</h1>
 
 <div class="grid3">
-  <div class="kpi"><div class="n">154</div><div class="t">Comprobaciones</div></div>
-  <div class="kpi"><div class="n" style="color:#15803d">154</div><div class="t">Aprobadas</div></div>
+  <div class="kpi"><div class="n">157</div><div class="t">Comprobaciones</div></div>
+  <div class="kpi"><div class="n" style="color:#15803d">157</div><div class="t">Aprobadas</div></div>
   <div class="kpi"><div class="n" style="color:#64748b">0</div><div class="t">Fallidas</div></div>
 </div>
 
 <div class="caja ok">
   <span class="titulo">Resultado global: TODAS LAS PRUEBAS APROBADAS</span>
-  <pre style="margin:6px 0 0"><code>=== Resultado: 154 aprobadas, 0 fallidas ===</code></pre>
+  <pre style="margin:6px 0 0"><code>=== Resultado: 157 aprobadas, 0 fallidas ===</code></pre>
 </div>
 
 <h2>5.1 Resultado por bloque</h2>
@@ -222,11 +225,11 @@ npm test                         # ejecuta las 154 comprobaciones</code></pre>
 </tbody></table>
 
 <h1>6. Casos de prueba de control</h1>
-<p>Se documentan <strong>48 casos de control</strong> que cubren los requisitos más importantes de la Evidencia 3. Cada caso declara sus datos de entrada, el resultado esperado y el <strong>resultado obtenido</strong>, que se corresponde con una comprobación realmente ejecutada (el nombre entre comillas es el que aparece en el registro).</p>
+<p>Se documentan <strong>51 casos de control</strong> que cubren los requisitos más importantes de la Evidencia 3. Cada caso declara sus datos de entrada, el resultado esperado y el <strong>resultado obtenido</strong>, que se corresponde con una comprobación realmente ejecutada (el nombre entre comillas es el que aparece en el registro).</p>
 <p>La columna «Resultado» refleja lo ocurrido en la ejecución registrada en el anexo.</p>
 
 <table class=""><thead><tr><th>ID</th><th>Módulo</th><th>Objetivo</th><th>Datos de entrada</th><th>Resultado esperado</th><th class="c">Res.</th><th>Requisitos</th></tr></thead><tbody>
-<tr><td><strong>CP-01</strong></td><td>Autenticación</td><td>Iniciar sesión con credenciales válidas de administrador.</td><td>Correo <code>admin@finanx.test</code> y contraseña <code>admin123</code>.</td><td>200 y token de sesión con rol ADMIN.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-32, RNF-03</td></tr>
+<tr><td><strong>CP-01</strong></td><td>Autenticación</td><td>Iniciar sesión con credenciales válidas de administrador.</td><td>Credenciales válidas de una cuenta ADMIN (clave temporal ya cambiada).</td><td>200 y sesión con rol ADMIN.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-32, RNF-03</td></tr>
 <tr><td><strong>CP-02</strong></td><td>Autenticación</td><td>Autoregistro de un cliente nuevo desde el portal.</td><td>Datos completos del cliente, usuario y contraseña.</td><td>201, queda autenticado y accede a sus datos.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-01, RF-34</td></tr>
 <tr><td><strong>CP-03</strong></td><td>Clientes</td><td>Impedir el registro de un cliente con identificación duplicada.</td><td>Dos clientes con el mismo tipo y número de identificación.</td><td>409 y no se crea el segundo.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-02, CA-01</td></tr>
 <tr><td><strong>CP-04</strong></td><td>Clientes</td><td>Buscar clientes por coincidencia parcial.</td><td>Filtro de búsqueda con parte del nombre.</td><td>200 con los clientes que coinciden.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-03</td></tr>
@@ -274,6 +277,9 @@ npm test                         # ejecuta las 154 comprobaciones</code></pre>
 <tr><td><strong>CP-46</strong></td><td>Seguridad</td><td>Comprobar las cabeceras de seguridad HTTP.</td><td>Petición a la API.</td><td>Presentes <code>X-Content-Type-Options</code> y <code>X-Frame-Options</code>; sin <code>X-Powered-By</code>.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RNF-09</td></tr>
 <tr><td><strong>CP-47</strong></td><td>Seguridad</td><td>Comprobar la lista blanca de CORS.</td><td>Petición desde un origen permitido y desde uno no permitido.</td><td>El permitido recibe la cabecera; el otro no.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RNF-10</td></tr>
 <tr><td><strong>CP-48</strong></td><td>Despliegue</td><td>Levantar el sistema completo con un solo comando.</td><td><code>docker compose up -d --build</code>.</td><td>Los tres servicios quedan disponibles.</td><td class="c"><span class="badge b-info">Manual</span></td><td>RNF-21, CA-18</td></tr>
+<tr><td><strong>CP-49</strong></td><td>Autenticación</td><td>Obligar el cambio de contraseña en el primer ingreso.</td><td>Cuenta con <code>debe_cambiar_clave = true</code> y una petición a una ruta distinta de sesión, cambio o cierre.</td><td>403 <code>CAMBIO_CLAVE_REQUERIDO</code>; tras cambiarla, 200.</td><td class="c"><span class="badge b-info">Manual</span></td><td>RF-41, RNF-04</td></tr>
+<tr><td><strong>CP-50</strong></td><td>Clientes</td><td>Eliminar un cliente sin movimientos.</td><td>Cliente sin pedidos ni facturas, con sesión ADMIN.</td><td>200 y el cliente desaparece; con historial, 409.</td><td class="c"><span class="badge b-ok">PASA</span></td><td>RF-42, RN-13</td></tr>
+<tr><td><strong>CP-51</strong></td><td>Panel de control</td><td>Panel con métricas y contenido por rol.</td><td>Sesión de ADMIN y de CAJERO.</td><td>Indicadores y gráficas; el CAJERO solo ve su caja del día.</td><td class="c"><span class="badge b-info">Manual</span></td><td>RF-43, RNF-20</td></tr>
 </tbody></table>
 
 <h1>7. Errores encontrados y corregidos</h1>
@@ -297,38 +303,38 @@ npm test                         # ejecuta las 154 comprobaciones</code></pre>
 <p>La suite verifica la API; estas capturas demuestran que el <strong>sistema completo</strong> —con su interfaz— funciona sobre datos reales.</p>
 
 <div class="captura">
-  <img src="capturas/11-dashboard.png" alt="">
+  <img src="../06-anexos/capturas/11-dashboard.png" alt="">
   <div class="pie">Panel de inicio con datos reales: clientes y productos activos, pedidos por facturar, facturas activas, cuentas por cobrar (1.345.800 COP), pagos recibidos y las últimas operaciones registradas en la auditoría. <strong>Requisitos:</strong> RF-26, RF-30.</div>
 </div>
 
 <div class="captura">
-  <img src="capturas/13-facturas.png" alt="">
+  <img src="../06-anexos/capturas/13-facturas.png" alt="">
   <div class="pie">Listado de facturas con su estado y su estado de cobro (pendiente, pago parcial, pagada, anulada) calculados a partir del saldo. <strong>Requisitos:</strong> RF-12, RF-19, RF-20.</div>
 </div>
 
 <div class="captura">
-  <img src="capturas/14-pagos.png" alt="">
+  <img src="../06-anexos/capturas/14-pagos.png" alt="">
   <div class="pie">Pagos registrados, con el medio de pago enmascarado (se ven solo los últimos 4 dígitos de la tarjeta) y la columna «Registrado por», que distingue los pagos hechos por el personal de los hechos por el cliente desde el portal. <strong>Requisitos:</strong> RF-17, RNF-02, RF-37.</div>
 </div>
 
 <div class="captura">
-  <img src="capturas/15-balance-clientes.png" alt="">
+  <img src="../06-anexos/capturas/15-balance-clientes.png" alt="">
   <div class="pie">Balance y cuentas por cobrar por cliente, con los totales de facturación y de lo recaudado. <strong>Requisitos:</strong> RF-27.</div>
 </div>
 
 <div class="captura">
-  <img src="capturas/16-auditoria-recorte.png" alt="">
+  <img src="../06-anexos/capturas/16-auditoria-recorte.png" alt="">
   <div class="pie">Registro de auditoría: cada operación sensible queda con su usuario, tipo, módulo, operación, registro afectado y fecha. <strong>Requisitos:</strong> RF-30, RF-31.</div>
 </div>
 
 <div class="captura">
-  <img src="capturas/18-portal-saldo.png" alt="">
+  <img src="../06-anexos/capturas/18-portal-saldo.png" alt="">
   <div class="pie">Portal del cliente: el cliente ve únicamente su propia información y puede pagar en línea. <strong>Requisitos:</strong> RF-36, RF-37, RF-38.</div>
 </div>
 
 <h1>9. Conclusiones</h1>
 <ul>
-  <li>Las <strong>154 comprobaciones</strong> de integración finalizaron sin fallos, cubriendo todos los módulos del sistema.</li>
+  <li>Las <strong>157 comprobaciones</strong> de integración finalizaron sin fallos, cubriendo todos los módulos del sistema.</li>
   <li>Se verificaron específicamente las <strong>reglas de negocio críticas</strong>: no sobrepagar, no facturar dos veces el mismo pedido, no devolver más de lo cobrado y no mezclar datos entre clientes.</li>
   <li>Los <strong>seis defectos detectados durante el desarrollo</strong> están corregidos y cada uno quedó protegido por una comprobación que fallaría si el problema reapareciera.</li>
   <li>La suite es <strong>repetible y automatizada</strong>, por lo que puede ejecutarse tras cada cambio como red de seguridad.</li>
@@ -484,8 +490,9 @@ npm test                         # ejecuta las 154 comprobaciones</code></pre>
   ✔ No se revela el motor web (sin X-Powered-By)
   ✔ CORS: origen permitido recibe la cabecera
   ✔ CORS: origen no permitido es bloqueado
-  ✔ Fuerza bruta: intentos fallidos consecutivos → 429
-  ✔ Login correcto tras bloqueo → 200 (el acierto resetea el contador)
+  ✔ Fuerza bruta: 5 fallos de una cuenta → 429
+  ✔ Un login correcto de OTRA cuenta no reinicia el bloqueo
+  ✔ La cuenta atacada sigue bloqueada tras el login ajeno → 429
   ✔ Token renovado sigue aislado en el portal
 12) Recuperación de contraseña (OTP) y datos de pago en línea
   ✔ Solicitar código → 200 y en demo llega el OTP
@@ -521,8 +528,11 @@ npm test                         # ejecuta las 154 comprobaciones</code></pre>
   ✔ Interno: cheque con banco y número → 201
   ✔ Se guardan solo los últimos 4 dígitos y la marca de la tarjeta
   ✔ Nunca se exponen CVV ni número completo de tarjeta
+13) Eliminación de clientes
+  ✔ Eliminar cliente sin movimientos → 200
+  ✔ Eliminar cliente con facturas → 409 (conserva historial)
 
-=== Resultado: 154 aprobadas, 0 fallidas ===</pre>
+=== Resultado: 157 aprobadas, 0 fallidas ===</pre>
 
 <h1>Anexo B · Cómo reproducir estas pruebas</h1>
 <pre><code># 1. Base de datos y datos de demostración
@@ -536,7 +546,7 @@ cd backend &amp;&amp; npm run dev
 cd backend &amp;&amp; npm test | tee ../deep-docs/_salida-e2e.txt</code></pre>
 <p>El comando devuelve un código de salida distinto de cero si alguna comprobación falla, lo que permite integrarlo en una verificación automática.</p>
 
-<footer class="pie-doc">FINAN-X · Evidencia 7 de 7 · Pruebas de integración · 154 comprobaciones aprobadas, 0 fallidas · 48 casos de control documentados · Registro completo en el Anexo A.</footer>
+<footer class="pie-doc">FINAN-X · Evidencia 7 de 7 · Pruebas de integración · 157 comprobaciones aprobadas, 0 fallidas · 51 casos de control documentados · Registro completo en el Anexo A.</footer>
 
 </div></body>
 </html>
