@@ -438,7 +438,7 @@ Transparencia sobre los límites del análisis inicial y de lo que se comprobó 
    *Estado de la corrección*.
 4. **No se revisaron los archivos binarios** (PDFs, PNGs, SVGs) ni el `.docx` de comandos.
 5. **Al inicio no se modificó nada**: `deep-docs/` fue lo único creado. Las correcciones posteriores
-   (C1, C2, C3) se aplicaron **con aprobación expresa** y quedaron aisladas en el commit `5877ef8`.
+   (C1, C2, C3) las apliqué después y quedaron aisladas en el commit `5877ef8`.
 
 ---
 

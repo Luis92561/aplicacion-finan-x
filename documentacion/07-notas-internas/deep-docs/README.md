@@ -15,9 +15,8 @@
 
 ## Qué es esta carpeta
 
-Revisé el código y la documentación de FINAN-X y aquí dejé mis notas de trabajo. Las correcciones
-del bug de saldo (C1, C2, C3) se aplicaron después, **con aprobación expresa**, y quedaron aisladas
-en un único commit (`5877ef8`).
+Revisé el código y la documentación de FINAN-X y aquí dejé mis notas de trabajo. Las correcciones del
+bug de saldo (C1, C2, C3) las apliqué después y quedaron aisladas en un único commit (`5877ef8`).
 
 ## Índice de notas
 
