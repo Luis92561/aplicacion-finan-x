@@ -11,7 +11,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const RAIZ = fileURLToPath(new URL('../../07-notas-internas', import.meta.url));
+const RAIZ = fileURLToPath(new URL('../datos-evidencia', import.meta.url));
 const DOC = process.env.FINANX_SALIDA || fileURLToPath(new URL('../../01-academica', import.meta.url));
 
 const CHROME_CANDIDATOS = [

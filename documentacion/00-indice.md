@@ -37,6 +37,7 @@
 | `02-tecnica/FINAN-X_Diagrama_Clases.pdf` | Diagrama de clases. |
 | `02-tecnica/diagrams/` | Diagramas UML y de arquitectura (fuentes y SVG). |
 | `02-tecnica/generador-documentos/` | Scripts que generan las evidencias E1–E7. |
+| `02-tecnica/datos-evidencia/` | Datos de entrada de esas evidencias: esquema, descripciones, licencias y salida de la suite. |
 | `../refactor.md` (raíz del proyecto) | Plan de refactor por fases y deuda técnica priorizada. |
 | `../capacidad.md` (raíz del proyecto) | Plan de capacidad para 600–1.000 clientes y para 600–1.000 empresas (SaaS), con umbrales y checklist. |
 
@@ -71,12 +72,6 @@
 |---|---|
 | `06-anexos/mockups/` | Prototipos de pantallas (HTML/CSS y PDF). |
 | `06-anexos/capturas/` | Capturas de la aplicación. |
-
-## 07 · Notas internas
-
-| Documento | Contenido |
-|---|---|
-| `07-notas-internas/` | Notas de desarrollo, decisiones y revisiones anteriores. |
 
 ---
 

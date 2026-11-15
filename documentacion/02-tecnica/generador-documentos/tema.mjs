@@ -16,13 +16,13 @@ const AQUI = path.dirname(fileURLToPath(import.meta.url));
 /**
  * Rutas por defecto del layout de entrega:
  *   documentacion/02-tecnica/generador-documentos/  ← este script
- *   documentacion/07-notas-internas/deep-docs/      ← datos (esquema, licencias, salida e2e)
+ *   documentacion/02-tecnica/datos-evidencia/deep-docs/ ← datos (esquema, licencias, salida e2e)
  *   documentacion/01-academica/                     ← salida (E1–E7)
  * Se pueden sobrescribir con FINANX_RAIZ y FINANX_SALIDA para trabajar en un área temporal.
  */
 export const RAIZ = process.env.FINANX_RAIZ
   ? path.resolve(process.env.FINANX_RAIZ)
-  : path.resolve(AQUI, '..', '..', '07-notas-internas');
+  : path.resolve(AQUI, '..', 'datos-evidencia');
 export const SALIDA = process.env.FINANX_SALIDA
   ? path.resolve(process.env.FINANX_SALIDA)
   : path.resolve(AQUI, '..', '..', '01-academica');

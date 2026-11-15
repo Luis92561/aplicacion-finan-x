@@ -1,7 +1,7 @@
 /**
  * Extrae el esquema REAL de la base de datos y lo deja listo para documentar.
  *
- * Escribe en ../deep-docs/:
+ * Escribe en documentacion/02-tecnica/datos-evidencia/deep-docs/:
  *   - _esquema.json   datos crudos (columnas, PK, FK, UNIQUE, CHECK, indices, vistas)
  *
  * Asi el diccionario de datos y el MER coinciden con la implementacion por
@@ -93,7 +93,7 @@ const vistas = (await db.query(`
 
 // ---------- Validar que todo esta descrito ----------
 // Este archivo vive en backend/scripts/, asi que la raiz del proyecto esta dos niveles arriba.
-const RAIZ = new URL('../../', import.meta.url);
+const RAIZ = new URL('../../documentacion/02-tecnica/datos-evidencia/', import.meta.url);
 const DESCRIPCIONES = JSON.parse(fs.readFileSync(new URL('deep-docs/_descripciones.json', RAIZ), 'utf8'));
 
 const salida = { columnas, pks, fks, uniques, checks, indices, vistas, generado: new Date().toISOString() };
