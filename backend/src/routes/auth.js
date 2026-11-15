@@ -118,6 +118,8 @@ router.post('/login', async (req, res, next) => {
                 c.nombre_razon_social, c.estado AS cliente_estado
            FROM usuario_cliente uc JOIN clientes c ON c.cliente_id = uc.cliente_id
           WHERE LOWER(uc.username) = LOWER($1)
+             OR (c.correo IS NOT NULL AND LOWER(c.correo) = LOWER($1))
+          ORDER BY CASE WHEN LOWER(uc.username) = LOWER($1) THEN 0 ELSE 1 END
           LIMIT 1`,
         [identificador]
       );
