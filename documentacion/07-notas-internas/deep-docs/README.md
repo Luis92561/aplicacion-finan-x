@@ -48,9 +48,9 @@ SQL parametrizado directo con `pg`. Autenticación **JWT** (8 h) + **bcrypt**; a
 
 ## Aviso
 
-Estas notas son mi **interpretación** del código tal como estaba en el momento de la lectura. Si el
-código cambia, las notas pueden quedar desactualizadas. Las fuentes autoritativas siguen siendo el
-código y `documentacion/` del proyecto.
+Son **mis notas de trabajo**: recogen lo que entendí del código en el momento de la revisión. Si el
+código cambia, pueden quedar desactualizadas; las fuentes autoritativas siguen siendo el código y
+`documentacion/` del proyecto.
 
 ---
 
