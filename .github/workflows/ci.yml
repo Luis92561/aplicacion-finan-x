@@ -42,7 +42,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Preparar .env de prueba
-        run: cp .env.example .env
+        run: bash scripts/generar-env.sh
       - name: Validar los tres perfiles
         run: |
           docker compose config --quiet
@@ -56,6 +56,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Preparar .env de prueba
-        run: cp .env.example .env
+        run: bash scripts/generar-env.sh
       - name: Construir backend y frontend
         run: docker compose build

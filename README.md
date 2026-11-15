@@ -27,10 +27,14 @@ autoservicio para clientes**.
 ### Desde el repositorio
 
 ```bash
-cp .env.example .env      # complete JWT_SECRET, POSTGRES_PASSWORD y APP_DB_PASSWORD
+# 1. Cree el .env con secretos aleatorios
+powershell -ExecutionPolicy Bypass -File scripts\generar-env.ps1    # Windows
+./scripts/generar-env.sh                                            # macOS / Linux
+
+# 2. Levante el stack
 docker compose up -d --build
 
-# Cuentas iniciales: genera claves temporales aleatorias y las imprime en pantalla
+# 3. Cuentas iniciales: genera claves temporales aleatorias y las imprime
 docker compose exec -T backend node scripts/crear-usuarios-iniciales.mjs
 ```
 

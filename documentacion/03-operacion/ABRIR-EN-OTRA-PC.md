@@ -18,15 +18,11 @@ puerto **8080** libre.
 git clone https://github.com/Luis92561/aplicacion-finan-x.git
 cd aplicacion-finan-x
 
-# 1. Configuración con claves propias
-cp .env.example .env
+# 1. Genere el .env con secretos aleatorios (no copie .env.example a mano)
+powershell -ExecutionPolicy Bypass -File scripts\generar-env.ps1   # Windows
+./scripts/generar-env.sh                                           # macOS / Linux
 
-# 2. Genere tres secretos y péguelos en .env
-node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"   # JWT_SECRET
-node -e "console.log(require('crypto').randomBytes(24).toString('base64url'))"   # POSTGRES_PASSWORD
-node -e "console.log(require('crypto').randomBytes(24).toString('base64url'))"   # APP_DB_PASSWORD
-
-# 3. Levante el stack
+# 2. Levante el stack
 docker compose up -d --build
 ```
 
